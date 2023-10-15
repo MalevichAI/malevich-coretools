@@ -34,7 +34,6 @@ jobs:
           echo "Version: $(cat VERSION)"
       - name: Building the package
         run: |
-          cp VERSION requirements.txt malevich_coretools/
           python -m build
       - name: Uploading to PYPI
         run: |
