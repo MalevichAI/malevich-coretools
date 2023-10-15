@@ -9,5 +9,6 @@ setup(
     author="Andrew Pogrebnoj",
     author_email="andrew@onjulius.co",
     package_dir={"malevich_coretools": "malevich_coretools"},
+    package_data={"": ["VERSION", "requirements.txt", "README.md"]},
     install_requires=requirements,
 )
