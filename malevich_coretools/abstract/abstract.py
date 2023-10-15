@@ -278,7 +278,7 @@ class ResultUserCfg(BaseModel):
 
 # TODO add smth from Cfg
 class AppSettings(BaseModel):
-    taskId: Optional[str]
+    taskId: Optional[str] = None
     appId: str
     saveCollectionsName: Optional[Union[str, List[str]]] = None
 
