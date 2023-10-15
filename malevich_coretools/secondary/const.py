@@ -1,6 +1,8 @@
-import aiohttp
-from malevich_coretools.secondary.helpers import bool_to_str
 from typing import Dict, Optional
+
+import aiohttp
+
+from malevich_coretools.secondary.helpers import bool_to_str
 
 # const
 API_VERSION = "api/v1"
@@ -11,7 +13,10 @@ WAIT_RESULT_TIMEOUT = 60 * 60   # hour
 AIOHTTP_TIMEOUT = aiohttp.ClientTimeout(total=60 * 10) # 10 min
 AIOHTTP_TIMEOUT_MINI = aiohttp.ClientTimeout(total=60 * 5) # 5 min
 # endpoints
-with_wait = lambda url, wait: url if wait is None else f"{url}?wait={bool_to_str(wait)}"    # always first
+
+def with_wait(url, wait) -> str:
+    return url if wait is None else f"{url}?wait={bool_to_str(wait)}"    # always first
+
 def with_key_values(url: str, key_values: Dict[Optional[str], str]) -> str:
     sep = "?"
     for key, value in key_values.items():

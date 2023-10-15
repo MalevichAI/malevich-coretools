@@ -1,11 +1,13 @@
 import json
 import os
-import pandas as pd
 from typing import Union
+
+import pandas as pd
+
 import malevich_coretools.funcs.funcs as f
-from malevich_coretools.abstract import *
-from malevich_coretools.secondary import Config, to_json
 import malevich_coretools.funcs.helpers as fh
+from malevich_coretools.abstract import *  # noqa: F403
+from malevich_coretools.secondary import Config, to_json
 from malevich_coretools.secondary.const import WAIT_RESULT_TIMEOUT
 from malevich_coretools.secondary.helpers import rand_str
 
@@ -34,12 +36,12 @@ def set_warnings(with_warnings: bool) -> None:
     Config.WITH_WARNINGS = with_warnings
 
 
-def set_logger(logger):
+def set_logger(logger):  # noqa: ANN201
     """set custom logger"""
     Config.logger = logger
 
 
-def get_logger():
+def get_logger():  # noqa: ANN201
     """get logger"""
     return Config.logger
 
@@ -655,7 +657,7 @@ def get_task_schedules(operation_id: str, with_show: bool=True, auth: Optional[A
 # FIXME check component
 def task_full(task_id: str, cfg_id: str, info_url: Optional[str]=None, debug_mode: bool=False, core_manage: bool = False, single_request: bool = False, profile_mode: Optional[str] = None, with_show: bool=True, long: bool=False, long_timeout: Optional[int]=WAIT_RESULT_TIMEOUT, scaleInfo: List[ScaleInfo] = None, component: TaskComponent = None, policy: TaskPolicy = None, schedule: Optional[Schedule] = None, restrictions: Optional[Restrictions] = None, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> AppLogs:
     """prepare, run and stop task by \"task_id\", \"cfg_id\" and other
-    
+
     Args:
         task_id (str): task id
         cfg_id (str): cfg id
@@ -712,7 +714,7 @@ def task_prepare(task_id: str, cfg_id: Optional[str]=None, info_url: Optional[st
         restrictions: (Optional[Restrictions]): permissions to handle deployment
         wait (bool): is it worth waiting for the result or immediately return operation_id
         auth (Optional[AUTH]): redefined auth if not None"""
-    if kafka_mode_url_response is not None and kafka_mode == False:
+    if kafka_mode_url_response is not None and kafka_mode is False:
         Config.logger.info("\"kafka_mode_url_response\" ignored because \"kafka_mode\" = False")
         kafka_mode_url_response = None
     if with_show is None:
@@ -731,7 +733,7 @@ def task_prepare(task_id: str, cfg_id: Optional[str]=None, info_url: Optional[st
 
 def task_run(operation_id: str, cfg_id: Optional[str]=None, info_url: Optional[str]=None, debug_mode: Optional[bool]=None, run_id: Optional[str] = None, single_request: Optional[bool] = None, profile_mode: Optional[str] = None, with_show: bool=None, long: bool=False, long_timeout: int=WAIT_RESULT_TIMEOUT, with_logs: bool = False, schedule: Optional[Schedule] = None, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Optional[AppLogs]:
     """run prepared task by \"operation_id\" with \"cfg_id\" and other overridden parameters
-    
+
     Args:
         operation_id (str): operation_id, that returned from 'task_prepare'
         cfg_id (Optional[str]): cfg id, override default cfg id (from 'task_prepare') if exist
@@ -763,7 +765,7 @@ def task_unschedule(schedule_id: str, with_show: bool=True, wait: bool = True, a
 
 def task_stop(operation_id: str, with_logs: bool = False, info_url: Optional[str] = None, with_show: bool=None, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Optional[AppLogs]:
     """stop task by \"operation_id\"
-    
+
      Args:
         operation_id (str): operation_id, that returned from 'task_prepare', or just operation_id for runned task
         with_logs (bool): return logs for task if True
@@ -852,14 +854,14 @@ def create_collection_from_df(data: pd.DataFrame, name: Optional[str]=None, meta
 def get_collection_to_df(id: str, offset: int = 0, limit: int = -1, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> pd.DataFrame:
     """return df from collection by \"id\", pagination: unlimited - limit < 0"""
     collection = get_collection(id, offset, limit, auth=auth, conn_url=conn_url)
-    records = list(map(lambda x: json.loads(x.data), collection.docs))        
+    records = list(map(lambda x: json.loads(x.data), collection.docs))
     return pd.DataFrame.from_records(records)
 
 
 def get_collection_by_name_to_df(name: str, operation_id: Optional[str]=None, run_id: Optional[str]=None, offset: int = 0, limit: int = -1, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> pd.DataFrame:
     """return df from collection by \"name\" and mb also operation_id and run_id with which it was saved. raise if there are multiple collections, pagination: unlimited - limit < 0"""
     collection = get_collection_by_name(name, operation_id, run_id, offset, limit, auth=auth, conn_url=conn_url)
-    records = list(map(lambda x: json.loads(x.data), collection.docs))        
+    records = list(map(lambda x: json.loads(x.data), collection.docs))
     return pd.DataFrame.from_records(records)
 
 
@@ -869,7 +871,7 @@ def create_schemes_by_path(path: str, wait: bool = True, auth: Optional[AUTH]=No
     for filename in os.listdir(path):
         if filename.endswith(".json"):
             name = filename[:-5]
-            with open(f"{path}/{filename}", 'r') as f:
+            with open(f"{path}/{filename}") as f:
                 data = f.read()
             res[name] = create_scheme(data, name, wait=wait, auth=auth, conn_url=conn_url)
     return res

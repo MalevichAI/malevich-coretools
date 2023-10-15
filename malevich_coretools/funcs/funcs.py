@@ -1,14 +1,16 @@
 import asyncio
-from asyncio import exceptions
 import datetime
+from asyncio import exceptions
 from http import HTTPStatus
+from typing import Any, Callable, Optional
+
 import aiohttp
 import requests
 from requests.models import Response
-from typing import Optional, Any, Callable
-from malevich_coretools.abstract.abstract import *
-from malevich_coretools.secondary.const import *
-from malevich_coretools.secondary import model_from_json, Config, show_logs_func
+
+from malevich_coretools.abstract.abstract import *  # noqa: F403
+from malevich_coretools.secondary import Config, model_from_json, show_logs_func
+from malevich_coretools.secondary.const import *  # noqa: F403
 from malevich_coretools.secondary.helpers import show_fail_app_info
 
 # DocsController
@@ -457,7 +459,7 @@ def get_task_schedules(data: Operation, with_show: bool, *args, **kwargs) -> Sch
 
 
 def post_manager_task(data: MainTask, with_show: bool, long: bool, long_timeout: int, wait: bool, auth: Optional[AUTH], conn_url: Optional[str]=None, *args, **kwargs) -> AppLogs:
-    check_profile_mode(data.profileMode)
+    __check_profile_mode(data.profileMode)
     res = send_to_core_modify(MANAGER_TASK(wait and not long), data, with_show=with_show, show_func=show_logs_func, auth=auth, conn_url=conn_url, *args, **kwargs)
     if wait and long:
         res = asyncio.run(__get_result(res, timeout=long_timeout, auth=auth))
@@ -465,7 +467,7 @@ def post_manager_task(data: MainTask, with_show: bool, long: bool, long_timeout:
 
 
 def post_manager_task_run(data: RunTask, with_show: bool, long: bool, long_timeout: int, wait: bool, auth: Optional[AUTH], conn_url: Optional[str]=None, *args, **kwargs) -> Optional[AppLogs]:
-    check_profile_mode(data.profileMode)
+    __check_profile_mode(data.profileMode)
     res = send_to_core_modify(MANAGER_TASK_RUN(wait and not long), data, with_show=with_show, show_func=show_logs_func, auth=auth, conn_url=conn_url, *args, **kwargs)
     if wait and long:
         res = asyncio.run(__get_result(res, timeout=long_timeout, auth=auth))
@@ -512,7 +514,7 @@ async def kafka_send(data: KafkaMsg, *args, **kwargs) -> Union[Alias.Info, Kafka
     result = await send_to_core_post_async(KAFKA_SEND, data, *args, **kwargs)
     try:
         return KafkaMsg.parse_raw(result)
-    except:
+    except BaseException:
         return result
 
 
@@ -524,7 +526,7 @@ async def __get_result(id: str, is_text: bool = True, check_time: float = LONG_S
     assert host is not None, "host port not set"
     if auth is None:
         auth = aiohttp.BasicAuth(login=Config.CORE_USERNAME, password=Config.CORE_PASSWORD, encoding='utf-8')
-    
+
     timeout_deadline = None if timeout is None else datetime.datetime.now() + datetime.timedelta(0, timeout)
     while True:
         try:
@@ -536,7 +538,7 @@ async def __get_result(id: str, is_text: bool = True, check_time: float = LONG_S
                                 result = await response.text()
                             else:
                                 result = await response.json()
-                            return result    
+                            return result
                         else:
                             if timeout_deadline is not None:
                                 now = datetime.datetime.now()
@@ -547,7 +549,7 @@ async def __get_result(id: str, is_text: bool = True, check_time: float = LONG_S
             pass    # recreate ClientSession
 
 
-async def async_check_response(response: aiohttp.ClientResponse, show_func: Optional[Callable]=None):
+async def __async_check_response(response: aiohttp.ClientResponse, show_func: Optional[Callable]=None):  # noqa: ANN202
     if not response.ok:
         if show_func is None:
             Config.logger.error(await response.text())
@@ -556,7 +558,7 @@ async def async_check_response(response: aiohttp.ClientResponse, show_func: Opti
     response.raise_for_status()
 
 
-def check_response(path: str, response: Response, show_func: Optional[Callable]=None):
+def __check_response(path: str, response: Response, show_func: Optional[Callable]=None):  # noqa: ANN202
     if response.status_code >= 400:
         if show_func is None:
             text = response.text
@@ -574,7 +576,7 @@ def send_to_core_get(path: str, with_auth=True, show_func: Optional[Callable]=No
     if auth is None or not with_auth:
         auth = (Config.CORE_USERNAME, Config.CORE_PASSWORD) if with_auth else None
     response = requests.get(f"{host}{path}", headers=HEADERS, auth=auth)
-    check_response(f"{host}{path}", response, show_func)
+    __check_response(f"{host}{path}", response, show_func)
     if response.status_code == HTTPStatus.NO_CONTENT:
         return None
     if is_text:
@@ -583,7 +585,7 @@ def send_to_core_get(path: str, with_auth=True, show_func: Optional[Callable]=No
         return response.json()
 
 
-def send_to_core_modify(path: str, operation: Optional[Any] = None, with_auth: bool=True, with_show: Optional[bool]=None, show_func: Optional[Callable]=None, is_post: bool=True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> str:
+def send_to_core_modify(path: str, operation: Optional[Any] = None, with_auth: bool=True, with_show: Optional[bool]=None, show_func: Optional[Callable]=None, is_post: bool=True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> str:  # noqa: ANN401
     """modify: post by default, else - delete"""
     host = Config.HOST_PORT if conn_url is None else conn_url
     assert host is not None, "host port not set"
@@ -595,7 +597,7 @@ def send_to_core_modify(path: str, operation: Optional[Any] = None, with_auth: b
         response = requests.post(f"{host}{path}", data=operation, headers=HEADERS, auth=auth if with_auth else None)
     else:   # delete
         response = requests.delete(f"{host}{path}", data=operation, headers=HEADERS, auth=auth if with_auth else None)
-    check_response(f"{host}{path}", response, show_func=show_func)
+    __check_response(f"{host}{path}", response, show_func=show_func)
     if response.status_code == HTTPStatus.NO_CONTENT:
         return ""
     result = response.text
@@ -619,7 +621,7 @@ async def send_to_core_post_async(path: str, operation: Optional[str] = None, wi
 
     async with aiohttp.ClientSession(auth=auth, connector=aiohttp.TCPConnector(verify_ssl=False), timeout=AIOHTTP_TIMEOUT) as session:
         async with session.post(f"{host}{path}", data=operation, headers=HEADERS) as response:
-            await async_check_response(response, show_func=show_func)
+            await __async_check_response(response, show_func=show_func)
             result = await response.text()
     if with_show:
         if show_func is None:
@@ -629,5 +631,5 @@ async def send_to_core_post_async(path: str, operation: Optional[str] = None, wi
     return result
 
 
-def check_profile_mode(profile_mode: Optional[str]):
+def __check_profile_mode(profile_mode: Optional[str]):  # noqa: ANN202
     assert profile_mode in [None, "no", "all", "time", "df_info", "df_show"], f"wrong profile_mode: {profile_mode}"

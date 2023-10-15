@@ -1,5 +1,6 @@
-import os
 import logging
+import os
+
 
 # FIXME reusability
 class Config:
@@ -11,6 +12,6 @@ class Config:
     CORE_PASSWORD = None
     VERBOSE = False
     WITH_WARNINGS = False
-    
+
     logger = logging.getLogger("base-malevich-logger")
     logger.setLevel(logging.INFO)

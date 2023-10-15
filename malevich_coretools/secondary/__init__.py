@@ -1,2 +1,1 @@
-from .config import Config
-from .helpers import *
+from .helpers import *  # noqa: F403

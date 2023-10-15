@@ -1,4 +1,5 @@
-from typing import Optional, List, Dict, Any, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
+
 from pydantic import BaseModel
 
 DEFAULT_MSG_URL = None
@@ -18,7 +19,7 @@ AUTH = Tuple[USERNAME, PASSWORD]
 
 # models
 class Operation(BaseModel):
-    operationId: Alias.Id 
+    operationId: Alias.Id
 
 
 class StopOperation(Operation):
@@ -222,7 +223,7 @@ class ResultOwnAndSharedIds(BaseModel):
 class IdsMap(BaseModel):
     id: Alias.Id
     realId: Alias.Id
-    
+
 
 class ResultIdsMap(BaseModel):
     ids: List[IdsMap]

@@ -1,5 +1,2 @@
 select=["E", "F", "I", "W", "N", "UP", "ANN"]
-ignore=["ANN101"]
-
-[per-file-ignores]
-"__init__.py" = ["E402", "F", "I"]
+ignore=["ANN001", "ANN002", "ANN003", "N802", "N803", "N806", "N815", "F405", "E501", "E731"]
