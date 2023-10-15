@@ -1,5 +1,6 @@
 #!/bin/sh
 version=`cat VERSION`
 
+git push
 git tag v$version
-git push --tags
+git push origin	v$version

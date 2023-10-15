@@ -1,7 +1,7 @@
 from setuptools import setup
 
-version = open('VERSION').read().strip()
-requirements = open('requirements.txt').read().split()
+version = open('malevich_coretools/VERSION').read().strip()
+requirements = open('malevich_coretools/requirements.txt').read().split()
 
 setup(
     name='malevich-coretools',
