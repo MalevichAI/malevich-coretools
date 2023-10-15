@@ -3,8 +3,8 @@ on:
   push:
     branches:
       - main
-    # tags:
-    #   - "v*"
+    tags:
+      - "v*"
 jobs:
   build_and_push:
     name: Build pip package and push to PYPI
