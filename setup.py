@@ -9,9 +9,8 @@ setup(
     install_requires=[
         'requests',
         'pydantic',
-        'typing',
         'pandas',
-        'deprecation',
-        'aiohttp'
+        'aiohttp',
+        'setuptools'
     ]
 )
