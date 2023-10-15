@@ -1,8 +1,10 @@
 name: PYPI
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - main
+    # tags:
+    #   - "v*"
 jobs:
   build_and_push:
     name: Build pip package and push to PYPI
