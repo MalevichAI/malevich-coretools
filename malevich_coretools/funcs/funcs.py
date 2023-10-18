@@ -451,6 +451,13 @@ def get_app_info_by_real_id(id: str, parse: bool, *args, **kwargs) -> Union[Alia
     return res
 
 
+def get_image_info(data: JsonImage, parse: bool, *args, **kwargs) -> Union[Alias.Json, AppFunctionsInfo]:
+    res = send_to_core_modify(MANAGER_IMAGE_INFO, data, with_auth=False, with_show=False, show_func = show_fail_app_info, *args, **kwargs)
+    if parse:
+        res = model_from_json(res, AppFunctionsInfo)
+    return res
+
+
 def get_task_schedules(data: Operation, with_show: bool, *args, **kwargs) -> Schedules:
     res = model_from_json(send_to_core_modify(MANAGER_TASK_SCHEDULES, data, with_show=False, *args, **kwargs), Schedules)
     if with_show:

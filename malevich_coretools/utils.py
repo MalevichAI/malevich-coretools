@@ -54,155 +54,155 @@ def update_core_credentials(username: USERNAME, password: PASSWORD) -> None:
 # Docs
 
 
-def get_docs(auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultIds:
+def get_docs(*, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultIds:
     """return list ids"""
     return f.get_docs(auth=auth, conn_url=conn_url)
 
 
-def get_doc(id: str, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultDoc:
+def get_doc(id: str, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultDoc:
     """return doc by \"id\""""
     return f.get_docs_id(id, auth=auth, conn_url=conn_url)
 
 
-def create_doc(data: Alias.Json, name: Optional[str], wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
+def create_doc(data: Alias.Json, name: Optional[str], wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
     """save doc with \"data\" and \"name\", return \"id\""""
     return f.post_docs(DocWithName(data=data, name=name), wait=wait, auth=auth, conn_url=conn_url)
 
 
-def update_doc(id: str, data: Alias.Json, name: Optional[str], wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
+def update_doc(id: str, data: Alias.Json, name: Optional[str], wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
     """update doc by \"id\", return \"id\""""
     return f.post_docs_id(id, DocWithName(data=data, name=name), wait=wait, auth=auth, conn_url=conn_url)
 
 
-def delete_doc(id: str, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def delete_doc(id: str, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """delete doc by \"id\""""
     return f.delete_docs_id(id, wait=wait, auth=auth, conn_url=conn_url)
 
 
-def delete_docs(wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def delete_docs(wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """delete all docs"""
     return f.delete_docs(wait=wait, auth=auth, conn_url=conn_url)
 
 # Collections
 
 
-def get_collections(auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultOwnAndSharedIds:
+def get_collections(*, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultOwnAndSharedIds:
     """return 2 list: own collections ids and shared collections ids"""
     return f.get_collections(auth=auth, conn_url=conn_url)
 
 
-def get_collections_by_name(name: str, operation_id: Optional[str]=None, run_id: Optional[str]=None, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultOwnAndSharedIds:
+def get_collections_by_name(name: str, operation_id: Optional[str]=None, run_id: Optional[str]=None, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultOwnAndSharedIds:
     """return 2 list: own collections ids and shared collections ids by \"name\" and mb also operation_id and run_id with which it was saved"""
     assert not (operation_id is None and run_id is not None), "if run_id set, operation_id should be set too"
     return f.get_collections_name(name, operation_id, run_id, auth=auth, conn_url=conn_url)
 
 
-def get_collection(id: str, offset: int = 0, limit: int = -1, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultCollection:
+def get_collection(id: str, offset: int = 0, limit: int = -1, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultCollection:
     """return collection by \"id\", pagination: unlimited - limit < 0"""
     return f.get_collections_id(id, offset, limit, auth=auth, conn_url=conn_url)
 
 
-def get_collection_by_name(name: str, operation_id: Optional[str]=None, run_id: Optional[str]=None, offset: int = 0, limit: int = -1, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultCollection:
+def get_collection_by_name(name: str, operation_id: Optional[str]=None, run_id: Optional[str]=None, offset: int = 0, limit: int = -1, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultCollection:
     """return collection by \"name\" and mb also operation_id and run_id with which it was saved. raise if there are multiple collections, pagination: unlimited - limit < 0"""
     assert not (operation_id is None and run_id is not None), "if run_id set, operation_id should be set too"
     return f.get_collection_name(name, operation_id, run_id, offset, limit, auth=auth, conn_url=conn_url)
 
 
-def create_collection(ids: List[str], name: Optional[str]=None, metadata: Optional[str]=None, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
+def create_collection(ids: List[str], name: Optional[str]=None, metadata: Optional[str]=None, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
     """save collection by list docs \"ids\", return id"""
     return f.post_collections(DocsCollection(data=ids, name=name, metadata=metadata), wait=wait, auth=auth, conn_url=conn_url)
 
 
-def update_collection(id: str, ids: List[str], name: Optional[str]=None, metadata: Optional[str]=None, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
+def update_collection(id: str, ids: List[str], name: Optional[str]=None, metadata: Optional[str]=None, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
     """update collection with \"id\" by list docs \"ids\", return \"id\""""
     return f.post_collections_id(id, DocsCollection(data=ids, name=name, metadata=metadata), wait=wait, auth=auth, conn_url=conn_url)
 
 
-def s3_put_collection(id: str, is_csv = True, key: Optional[str] = None, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def s3_put_collection(id: str, is_csv = True, key: Optional[str] = None, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """is_csv = false -> save json, key by default = id"""
     return f.post_collections_id_s3(id, PostS3Settings(isCsv=is_csv, key=key), wait=wait, auth=auth, conn_url=conn_url)
 
 
-def create_collection_by_docs(docs: List[Alias.Json], name: Optional[str]=None, metadata: Optional[str]=None, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
+def create_collection_by_docs(docs: List[Alias.Json], name: Optional[str]=None, metadata: Optional[str]=None, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
     """save collection by \"docs\", return \"id\""""
     return f.post_collections_data(DocsDataCollection(data=docs, name=name, metadata=metadata), wait=wait, auth=auth, conn_url=conn_url)
 
 
-def add_to_collection(id: str, ids: List[str], wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def add_to_collection(id: str, ids: List[str], wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """add to collection with \"id\" docs with \"ids\""""
     return f.post_collections_id_add(id, DocsCollectionChange(data=ids), wait=wait, auth=auth, conn_url=conn_url)
 
 
-def copy_collection(id: str, full_copy: bool = True, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
+def copy_collection(id: str, full_copy: bool = True, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
     """copy collection with \"id\", if not \"full_copy\" docs same as in collection with \"id\""""
     return f.post_collections_id_copy(id, full_copy=full_copy, wait=wait, auth=auth, conn_url=conn_url)
 
 
-def apply_scheme(coll_id: str, scheme_name: str, mode: str="drop", wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
+def apply_scheme(coll_id: str, scheme_name: str, mode: str="drop", wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
     """apply scheme with \"scheme_name\" to collection with \"coll_id\" return new collection with another \"coll_id\""""
     return f.post_collections_id_applyScheme(coll_id, FixScheme(schemeName=scheme_name, mode=mode), wait=wait, auth=auth, conn_url=conn_url)
 
 
-def fix_scheme(coll_id: str, scheme_name: str, mode="check", wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def fix_scheme(coll_id: str, scheme_name: str, mode="check", wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """optimization to core (not necessary call), sets the schema with \"scheme_name\" for the collection with \"coll_id\""""
     fix_scheme_data = FixScheme(schemeName=scheme_name, mode=mode)
     return f.post_collections_id_fixScheme(coll_id, fix_scheme_data, wait=wait, auth=auth, conn_url=conn_url)
 
 
-def unfix_scheme(coll_id: str, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def unfix_scheme(coll_id: str, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """unfix scheme for collection with \"coll_id\""""
     return f.post_collections_id_unfixScheme(coll_id, wait=wait, auth=auth, conn_url=conn_url)
 
 
-def update_metadata(coll_id: str, metadata: Optional[str], wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def update_metadata(coll_id: str, metadata: Optional[str], wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """update metadata for collection with \"coll_id\""""
     collection_metadata = CollectionMetadata(data=metadata)
     return f.post_collections_metadata(coll_id, collection_metadata, wait=wait, auth=auth, conn_url=conn_url)
 
 
-def delete_collections(wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def delete_collections(wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """delete all collections"""
     return f.delete_collections(wait=wait, auth=auth, conn_url=conn_url)
 
 
-def delete_collection(id: str, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def delete_collection(id: str, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """delete collection with \"id\""""
     return f.delete_collections_id(id, wait=wait, auth=auth, conn_url=conn_url)
 
 
-def s3_delete_collection(key: str, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def s3_delete_collection(key: str, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """delete collection from s3 by key (that =id if not specified in s3_save_collection)"""
     return f.delete_collections_id_s3(key, wait=wait, auth=auth, conn_url=conn_url)
 
 
-def delete_from_collection(id: str, ids: List[str], wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def delete_from_collection(id: str, ids: List[str], wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """delete docs with \"ids\" from collection with \"id\""""
     return f.delete_collections_id_del(id, DocsCollectionChange(data=ids), wait=wait, auth=auth, conn_url=conn_url)
 
 # Scheme
 
 
-def get_schemes(auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultOwnAndSharedIds:
+def get_schemes(*, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultOwnAndSharedIds:
     """return 2 list: own schemes ids and shared schemes ids"""
     return f.get_schemes(auth=auth, conn_url=conn_url)
 
 
-def get_scheme(id: str, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultScheme:
+def get_scheme(id: str, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultScheme:
     """return scheme by id"""
     return f.get_schemes_id(id, auth=auth, conn_url=conn_url)
 
 
-def get_scheme_raw(id: str, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Json:
+def get_scheme_raw(id: str, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Json:
     """return raw scheme data by id"""
     return f.get_schemes_id_raw(id, auth=auth, conn_url=conn_url)
 
 
-def get_schemes_mapping(scheme_from_id: str, scheme_to_id: str, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultMapping:
+def get_schemes_mapping(scheme_from_id: str, scheme_to_id: str, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultMapping:
     """return mapping by schemes ids, does not assume if it is not"""
     return f.get_schemes_mapping(scheme_from_id, scheme_to_id, auth=auth, conn_url=conn_url)
 
 
-def create_scheme(scheme_data: Union[Dict[str, Any], Alias.Json], name: str, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
+def create_scheme(scheme_data: Union[Dict[str, Any], Alias.Json], name: str, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
     """create scheme\n
     \"scheme_data\" must be json or dict
     return \"id\""""
@@ -211,7 +211,7 @@ def create_scheme(scheme_data: Union[Dict[str, Any], Alias.Json], name: str, wai
     return f.post_schemes(scheme, wait=wait, auth=auth, conn_url=conn_url)
 
 
-def update_scheme(id: str, scheme_data: Union[Dict[str, Any], Alias.Json], name: str, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
+def update_scheme(id: str, scheme_data: Union[Dict[str, Any], Alias.Json], name: str, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
     """update scheme\n
     \"scheme_data\" must be json or dict
     return \"id\""""
@@ -220,29 +220,29 @@ def update_scheme(id: str, scheme_data: Union[Dict[str, Any], Alias.Json], name:
     return f.post_schemes_id(id, scheme, wait=wait, auth=auth, conn_url=conn_url)
 
 
-def create_schemes_mapping(scheme_from_id: str, scheme_to_id: str, mapping: Dict[str, str], wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
+def create_schemes_mapping(scheme_from_id: str, scheme_to_id: str, mapping: Dict[str, str], wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
     """save mapping between schemes with ids"""
     return f.post_schemes_mapping(SchemesFixMapping(schemeFromId=scheme_from_id, schemeToId=scheme_to_id, data=mapping), wait=wait, auth=auth, conn_url=conn_url)
 
 
-def delete_schemes(wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def delete_schemes(wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """delete all schemes"""
     return f.delete_schemes(wait=wait, auth=auth, conn_url=conn_url)
 
 
-def delete_scheme(id: str, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def delete_scheme(id: str, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """delete scheme by id"""
     return f.delete_schemes_id(id, wait=wait, auth=auth, conn_url=conn_url)
 
 
-def delete_schemes_mapping(scheme_from_id: str, scheme_to_id: str, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def delete_schemes_mapping(scheme_from_id: str, scheme_to_id: str, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """delete mapping between schemes with ids"""
     return f.delete_schemes_mapping(SchemesIds(schemeFromId=scheme_from_id, schemeToId=scheme_to_id), wait=wait, auth=auth, conn_url=conn_url)
 
 # Common
 
 
-def check_auth(auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def check_auth(*, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """check auth in core for current user"""
     return f.get_check_auth(auth=auth, conn_url=conn_url)
 
@@ -252,70 +252,70 @@ def ping() -> Alias.Info:
     return f.get_ping()
 
 
-# def get_mappings(auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultDocMappingsFull:
+# def get_mappings(*, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultDocMappingsFull:
 #     """outdate\n
 #     return list: for each doc - map from scheme to mapping ids"""
 #     return f.get_mapping(auth=auth, conn_url=conn_url)
 
 
-# def get_mapping(id: str, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultMapping:
+# def get_mapping(id: str, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultMapping:
 #     """return mapping by \"id\""""
 #     return f.get_mapping_id(id, auth=auth, conn_url=conn_url)
 
 
-# def create_mapping(docs_ids: List[str], scheme_id: str, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+# def create_mapping(docs_ids: List[str], scheme_id: str, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
 #     """try to do and save mapping docs with \"docs_ids\" with scheme with \"scheme_id\", ignore if failed"""
 #     return f.post_mapping(DocsAndScheme(docsIds=docs_ids, schemeId=scheme_id), wait=wait, auth=auth, conn_url=conn_url)
 
 
-# def delete_mapping(doc_id: str, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+# def delete_mapping(doc_id: str, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
 #     """delete mappings for doc with \"doc_id\""""
 #     return f.delete_mapping_id(doc_id, wait=wait, auth=auth, conn_url=conn_url)
 
 
-# def delete_all(wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+# def delete_all(wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
 #     """for admin: delete all"""
 #     return f.delete_all(wait=wait, auth=auth, conn_url=conn_url)
 
 # UserShare
 
 
-def get_shared_collection(id: str, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultLogins:
+def get_shared_collection(id: str, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultLogins:
     """return list logins to which user has given access to the collection with \"id\""""
     return f.get_share_collection_id(id, auth=auth, conn_url=conn_url)
 
 
-def get_shared_scheme(id: str, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultLogins:
+def get_shared_scheme(id: str, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultLogins:
     """return list logins to which user has given access to the scheme with \"id\""""
     return f.get_share_scheme_id(id, auth=auth, conn_url=conn_url)
 
 
-def get_shared_app(id: str, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultLogins:
+def get_shared_app(id: str, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultLogins:
     """return list logins to which user has given access to the app with \"id\""""
     return f.get_share_userApp_id(id, auth=auth, conn_url=conn_url)
 
 
-def get_shared_by_login(login: str, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultSharedForLogin:
+def get_shared_by_login(login: str, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultSharedForLogin:
     """return structure with all info about share to user with \"login\""""
     return f.get_share_login(login, auth=auth, conn_url=conn_url)
 
 
-def share_collection(id: str, user_logins: List[str], wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def share_collection(id: str, user_logins: List[str], wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """gives access to the collection with \"id\" to all users with \"user_logins\""""
     return f.post_share_collection_id(id, SharedWithUsers(userLogins=user_logins), wait=wait, auth=auth, conn_url=conn_url)
 
 
-def share_scheme(id: str, user_logins: List[str], wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def share_scheme(id: str, user_logins: List[str], wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """gives access to the scheme with \"id\" to all users with \"user_logins\""""
     return f.post_share_scheme_id(id, SharedWithUsers(userLogins=user_logins), wait=wait, auth=auth, conn_url=conn_url)
 
 
-def share_app(id: str, user_logins: List[str], wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def share_app(id: str, user_logins: List[str], wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """gives access to the app with \"id\" to all users with \"user_logins\""""
     return f.post_share_userApp_id(id, SharedWithUsers(userLogins=user_logins), wait=wait, auth=auth, conn_url=conn_url)
 
 
-def share(user_logins: List[str], collections_ids: Optional[List[str]] = None, schemes_ids: Optional[List[str]] = None, user_apps_ids: Optional[List[str]] = None, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def share(user_logins: List[str], collections_ids: Optional[List[str]] = None, schemes_ids: Optional[List[str]] = None, user_apps_ids: Optional[List[str]] = None, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """gives access to everything listed to all users with \"user_logins\""""
     assert user_logins is not None, "\"user_logins\" is empty"
     collections_ids = [] if collections_ids is None else collections_ids
@@ -324,7 +324,7 @@ def share(user_logins: List[str], collections_ids: Optional[List[str]] = None, s
     return f.post_share(Shared(userLogins=user_logins, collectionsIds=collections_ids, schemesIds=schemes_ids, userAppsIds=user_apps_ids), wait=wait, auth=auth, conn_url=conn_url)
 
 
-def delete_shared(user_logins: List[str], collections_ids: Optional[List[str]] = None, schemes_ids: Optional[List[str]] = None, user_apps_ids: Optional[List[str]] = None, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def delete_shared(user_logins: List[str], collections_ids: Optional[List[str]] = None, schemes_ids: Optional[List[str]] = None, user_apps_ids: Optional[List[str]] = None, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """removes access to everything listed to all users with \"user_logins\""""
     assert user_logins is not None, "\"user_logins\" is empty"
     collections_ids = [] if collections_ids is None else collections_ids
@@ -333,66 +333,66 @@ def delete_shared(user_logins: List[str], collections_ids: Optional[List[str]] =
     return f.delete_share(Shared(userLogins=user_logins, collectionsIds=collections_ids, schemesIds=schemes_ids, userAppsIds=user_apps_ids), wait=wait, auth=auth, conn_url=conn_url)
 
 
-def delete_shared_all(wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def delete_shared_all(wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """removes access to everything for all for current user"""
     return f.delete_share_all(wait=wait, auth=auth, conn_url=conn_url)
 
 # Registration
 
 
-def get_user(login: str, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def get_user(login: str, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """admin: displays saved information about the user"""
     return f.get_register_login(login, auth=auth, conn_url=conn_url)
 
 
-def get_users(auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultLogins:
+def get_users(*, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultLogins:
     """admin: returns a list of all logins"""
     return f.get_register_all(auth=auth, conn_url=conn_url)
 
 
-def create_user(auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def create_user(*, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """create user in malevich-core, all operations will continue on his behalf"""
     return f.post_register(auth=auth, conn_url=conn_url)
 
 
-def delete_user(auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def delete_user(*, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """delete current user, not raise if user not exist"""
     return f.delete_register(auth=auth, conn_url=conn_url)
 
 
-def delete_user_login(login: str, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> None:
+def delete_user_login(login: str, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> None:
     """admin: delete user by login"""
     f.delete_register_login(login, wait=wait, auth=auth, conn_url=conn_url)
 
 # UserApps
 
 
-def get_apps(auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultOwnAndSharedIds:
+def get_apps(*, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultOwnAndSharedIds:
     """return apps ids for current user"""
     return f.get_userApps(auth=auth, conn_url=conn_url)
 
 
-def get_apps_real(auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultOwnAndSharedIds:
+def get_apps_real(*, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultOwnAndSharedIds:
     """return apps real ids for current user"""
     return f.get_userApps_realIds(auth=auth, conn_url=conn_url)
 
 
-def get_apps_map(auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultOwnAndSharedIdsMap:
+def get_apps_map(*, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultOwnAndSharedIdsMap:
     """return apps ids with real ids for current user"""
     return f.get_userApps_mapIds(auth=auth, conn_url=conn_url)
 
 
-def get_app(id: str, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> UserApp:
+def get_app(id: str, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> UserApp:
     """return app by \"id\""""
     return f.get_userApps_id(id, auth=auth, conn_url=conn_url)
 
 
-def get_app_real(id: str, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> UserApp:
+def get_app_real(id: str, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> UserApp:
     """return app by \"real id\""""
     return f.get_userApps_realId(id, auth=auth, conn_url=conn_url)
 
 
-def create_app(app_id: str, processor_id: str, input_id: Optional[str]=None, output_id: Optional[str]=None, app_cfg: Optional[Union[Dict[str, Any], Alias.Json]] = None, image_ref: Optional[str] = None, image_auth: Optional[AUTH]=None, collections_from: Optional[Dict[str, str]]=None, extra_collections_from: Optional[Dict[str, str]]=None, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
+def create_app(app_id: str, processor_id: str, input_id: Optional[str]=None, output_id: Optional[str]=None, app_cfg: Optional[Union[Dict[str, Any], Alias.Json]] = None, image_ref: Optional[str] = None, image_auth: Optional[AUTH]=None, collections_from: Optional[Dict[str, str]]=None, extra_collections_from: Optional[Dict[str, str]]=None, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
     """create app\n
     \"app_cfg\" must be json or dict or None\n
     \"image_ref\" automatically generated by id, but this is not always True, it is better to set it\n
@@ -411,7 +411,7 @@ def create_app(app_id: str, processor_id: str, input_id: Optional[str]=None, out
     return f.post_userApps(app, wait=wait, auth=auth, conn_url=conn_url)
 
 
-def update_app(id: str, app_id: str, processor_id: str, input_id: Optional[str]=None, output_id: Optional[str]=None, app_cfg: Optional[Union[Dict[str, Any], Alias.Json]] = None, image_ref: Optional[str] = None, image_auth: Optional[AUTH]=None, collections_from: Optional[Dict[str, str]]=None, extra_collections_from: Optional[Dict[str, str]]=None, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def update_app(id: str, app_id: str, processor_id: str, input_id: Optional[str]=None, output_id: Optional[str]=None, app_cfg: Optional[Union[Dict[str, Any], Alias.Json]] = None, image_ref: Optional[str] = None, image_auth: Optional[AUTH]=None, collections_from: Optional[Dict[str, str]]=None, extra_collections_from: Optional[Dict[str, str]]=None, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """update app by \"id\"\n
     \"app_cfg\" must be json or dict or None\n
     \"image_ref\" automatically generated by id, but this is not always True, it is better to set it"""
@@ -429,44 +429,44 @@ def update_app(id: str, app_id: str, processor_id: str, input_id: Optional[str]=
     return f.post_userApps_id(id, app, wait=wait, auth=auth, conn_url=conn_url)
 
 
-def delete_apps(wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def delete_apps(wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """delete all user apps"""
     return f.delete_userApps(wait=wait, auth=auth, conn_url=conn_url)
 
 
-def delete_app(id: str, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def delete_app(id: str, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """delete user app by \"id\""""
     return f.delete_userApps_id(id, wait=wait, auth=auth, conn_url=conn_url)
 
 # UserTasks
 
 
-def get_tasks(auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultIds:
+def get_tasks(*, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultIds:
     """return tasks ids for current user"""
     return f.get_userTasks(auth=auth, conn_url=conn_url)
 
 
-def get_tasks_real(auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultIds:
+def get_tasks_real(*, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultIds:
     """return tasks real ids for current user"""
     return f.get_userTasks_realIds(auth=auth, conn_url=conn_url)
 
 
-def get_tasks_map(auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultIdsMap:
+def get_tasks_map(*, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultIdsMap:
     """return tasks ids with real ids for current user"""
     return f.get_userTasks_mapIds(auth=auth, conn_url=conn_url)
 
 
-def get_task(id: str, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> UserTask:
+def get_task(id: str, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> UserTask:
     """return task by \"id\""""
     return f.get_userTasks_id(id, auth=auth, conn_url=conn_url)
 
 
-def get_task_real(id: str, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> UserTask:
+def get_task_real(id: str, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> UserTask:
     """return task by \"real id\""""
     return f.get_userTasks_realId(id, auth=auth, conn_url=conn_url)
 
 
-def create_task(task_id: str, app_id: Optional[str] = None, apps_depends: Optional[List[str]] = None, tasks_depends: Optional[List[str]] = None, synthetic: bool = False, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
+def create_task(task_id: str, app_id: Optional[str] = None, apps_depends: Optional[List[str]] = None, tasks_depends: Optional[List[str]] = None, synthetic: bool = False, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
     """create task"""
     if synthetic:
         assert app_id is None, "app_id should be None for synthetic task"
@@ -480,7 +480,7 @@ def create_task(task_id: str, app_id: Optional[str] = None, apps_depends: Option
     return f.post_userTasks(task, wait=wait, auth=auth, conn_url=conn_url)
 
 
-def update_task(id: str, task_id: str, app_id: str, apps_depends: Optional[List[str]] = None, tasks_depends: Optional[List[str]] = None, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def update_task(id: str, task_id: str, app_id: str, apps_depends: Optional[List[str]] = None, tasks_depends: Optional[List[str]] = None, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """update task by \"id\""""
     if apps_depends is None:
         apps_depends = []
@@ -490,44 +490,44 @@ def update_task(id: str, task_id: str, app_id: str, apps_depends: Optional[List[
     return f.post_userTasks_id(id, task, wait=wait, auth=auth, conn_url=conn_url)
 
 
-def delete_tasks(wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def delete_tasks(wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """delete all user tasks"""
     return f.delete_userTasks(wait=wait, auth=auth, conn_url=conn_url)
 
 
-def delete_task(id: str, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def delete_task(id: str, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """delete user task by \"id\""""
     return f.delete_userTasks_id(id, wait=wait, auth=auth, conn_url=conn_url)
 
 # UserCfgs
 
 
-def get_cfgs(auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultIds:
+def get_cfgs(*, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultIds:
     """return cfgs ids for current user"""
     return f.get_userCfgs(auth=auth, conn_url=conn_url)
 
 
-def get_cfgs_real(auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultIds:
+def get_cfgs_real(*, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultIds:
     """return cfgs real ids for current user"""
     return f.get_userCfgs_realIds(auth=auth, conn_url=conn_url)
 
 
-def get_cfgs_map(auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultIdsMap:
+def get_cfgs_map(*, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultIdsMap:
     """return cfgs ids with real ids for current user"""
     return f.get_userCfgs_mapIds(auth=auth, conn_url=conn_url)
 
 
-def get_cfg(id: str, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultUserCfg:
+def get_cfg(id: str, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultUserCfg:
     """return cfg by \"id\""""
     return f.get_userCfgs_id(id, auth=auth, conn_url=conn_url)
 
 
-def get_cfg_real(id: str, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultUserCfg:
+def get_cfg_real(id: str, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultUserCfg:
     """return cfg by \"real id\""""
     return f.get_userCfgs_realId(id, auth=auth, conn_url=conn_url)
 
 
-def create_cfg(cfg_id: str, cfg: Union[Dict[str, Any], Alias.Json, Cfg], wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
+def create_cfg(cfg_id: str, cfg: Union[Dict[str, Any], Alias.Json, Cfg], wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
     """create configuration file\n
     \"cfg\" must be json or dict or Cfg\n
     return \"id\""""
@@ -539,7 +539,7 @@ def create_cfg(cfg_id: str, cfg: Union[Dict[str, Any], Alias.Json, Cfg], wait: b
     return f.post_userCfgs(user_cfg, wait=wait, auth=auth, conn_url=conn_url)
 
 
-def update_cfg(id: str, cfg_id: str, cfg: Union[Dict[str, Any], Alias.Json, Cfg], wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def update_cfg(id: str, cfg_id: str, cfg: Union[Dict[str, Any], Alias.Json, Cfg], wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """update configuration file\n
     \"cfg\" must be json or dict or Cfg"""
     if isinstance(cfg, Cfg):
@@ -550,112 +550,122 @@ def update_cfg(id: str, cfg_id: str, cfg: Union[Dict[str, Any], Alias.Json, Cfg]
     return f.post_userCfgs_id(id, user_cfg, wait=wait, auth=auth, conn_url=conn_url)
 
 
-def delete_cfgs(wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def delete_cfgs(wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """delete all user cfgs"""
     return f.delete_userCfgs(wait=wait, auth=auth, conn_url=conn_url)
 
 
-def delete_cfg(id: str, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def delete_cfg(id: str, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """delete user cfg by \"id\""""
     return f.delete_userCfgs_id(id, wait=wait, auth=auth, conn_url=conn_url)
 
 # OperationResults
 
 
-def get_operations_results(auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultIds:
+def get_operations_results(*, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultIds:
     """return list of operations ids"""
     return f.get_operationResults(auth=auth, conn_url=conn_url)
 
 
-def get_operation_result(id: str, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> str:
+def get_operation_result(id: str, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> str:
     """return result by operation \"id\" if operation status is \"OK\""""
     return f.get_operationResults_id(id, auth=auth, conn_url=conn_url)
 
 
-def delete_operations_results(wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def delete_operations_results(wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """delete all operations results"""
     return f.delete_operationResults(wait=wait, auth=auth, conn_url=conn_url)
 
 
-def delete_operation_result(id: str, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def delete_operation_result(id: str, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """delete operation result by \"id\""""
     return f.delete_operationResults_id(id, wait=wait, auth=auth, conn_url=conn_url)
 
 # TempRun
 
 
-def get_run_condition(id: str, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Condition:
+def get_run_condition(id: str, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Condition:
     """return run condition by operation \"id\" for running task"""
     return f.get_run_condition(id, auth=auth, conn_url=conn_url)
 
 
-def get_run_active_runs(auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultIds:
+def get_run_active_runs(*, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultIds:
     """return list running operationIds"""
     return f.get_run_activeRuns(auth=auth, conn_url=conn_url)
 
 
-def get_run_main_task_cfg(id: str, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> MainTaskCfg:
+def get_run_main_task_cfg(id: str, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> MainTaskCfg:
     """return mainTaskCfg by operation \"id\" for running task"""
     return f.get_run_mainTaskCfg(id, auth=auth, conn_url=conn_url)
 
 
-def get_task_runs(task_id: str, cfg_id: Optional[str]=None, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultIds:
+def get_task_runs(task_id: str, cfg_id: Optional[str]=None, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultIds:
     """return list running operationIds with \"task_id\" and \"cfg_id\" if specified"""
     return f.get_run_operationsIds(task_id, cfg_id, auth=auth, conn_url=conn_url)
 
 # Manager
 
 
-def logs(id: str, run_id: Optional[str] = None, force: bool=True, with_show: bool=True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> AppLogs:
+def logs(id: str, run_id: Optional[str] = None, force: bool=True, with_show: bool=True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> AppLogs:
     """return task logs by operation \"id\" and \"run_id\""""
     task = LogsTask(operationId=id, runId=run_id)
     return f.get_manager_logs(task, with_show=with_show, auth=auth, conn_url=conn_url)
 
 
-def logs_app(id: str, task_id: str, app_id: str, run_id: Optional[str] = None, force: bool=True, with_show: bool=True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> AppLogs:
+def logs_app(id: str, task_id: str, app_id: str, run_id: Optional[str] = None, force: bool=True, with_show: bool=True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> AppLogs:
     """return app logs by operation \"id\", \"run_id\", \"task_id\" (that "null" if not exist) and \"app_id\""""
     task = LogsTask(operationId=id, runId=run_id, appId=app_id, taskId=task_id, force=force)
     return f.get_manager_logs(task, with_show=with_show, auth=auth, conn_url=conn_url)
 
 
-def logs_clickhouse(auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Json:
+def logs_clickhouse(*, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Json:
     """return all clickhouse logs"""
     return f.get_clickhouse_all(auth=auth, conn_url=conn_url)
 
 
-def logs_clickhouse_id(id: str, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Json:
+def logs_clickhouse_id(id: str, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Json:
     """return clickhouse logs by operation \"id\""""
     return f.get_clickhouse_id(id, auth=auth, conn_url=conn_url)
 
 
-def get_dag_key_value(id: str, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Json:
+def get_dag_key_value(id: str, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Json:
     """return key-value cfg from dag by operation \"id\""""
     return f.get_manager_dagKeyValue_operationId(id, auth=auth, conn_url=conn_url)
 
 
-def update_dag_key_value(data: Dict[str, str], operationId: str, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> None:
+def update_dag_key_value(data: Dict[str, str], operationId: str, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> None:
     """update key-value cfg from dag by operation \"id\" and \"data\""""
     return f.post_manager_dagKeyValue(KeysValues(data=data, operationId=operationId), wait=wait, auth=auth, conn_url=conn_url)
 
 
-def get_app_info(id: str, parse: bool=False, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Union[Alias.Json, AppFunctionsInfo]:
+def get_app_info(id: str, parse: bool=False, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Union[Alias.Json, AppFunctionsInfo]:
     """return json with functions app info, id is appId"""
     return f.get_app_info(id, parse=parse, auth=auth, conn_url=conn_url)
 
 
-def get_app_info_by_real_id(id: str, parse: bool=False, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Union[Alias.Json, AppFunctionsInfo]:
+def get_app_info_by_real_id(id: str, parse: bool=False, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Union[Alias.Json, AppFunctionsInfo]:
     """return json with functions app info, id is real id for app"""
     return f.get_app_info_by_real_id(id, parse=parse, auth=auth, conn_url=conn_url)
 
 
-def get_task_schedules(operation_id: str, with_show: bool=True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Schedules:
+def get_image_info(image_ref: str, image_auth: Optional[AUTH]=None, parse: bool=False, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Union[Alias.Json, AppFunctionsInfo]:
+    """return json with functions image info"""
+    image_user = image_auth[0] if image_auth is not None else Config.USERNAME
+    image_token = image_auth[1] if image_auth is not None else Config.TOKEN
+    if Config.WITH_WARNINGS and (image_user is None or image_token is None):
+        Config.logger.warning("image_auth not set")
+    json_image = JsonImage(ref=image_ref, user=image_user, token=image_token)
+    return f.get_image_info(json_image, parse=parse, auth=auth, conn_url=conn_url)
+
+
+def get_task_schedules(operation_id: str, with_show: bool=True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Schedules:
     """return schedule ids by \"operation_id\""""
     operation = Operation(operationId=operation_id)
     return f.get_task_schedules(operation, with_show=with_show, auth=auth, conn_url=conn_url)
 
 
 # FIXME check component
-def task_full(task_id: str, cfg_id: str, info_url: Optional[str]=None, debug_mode: bool=False, core_manage: bool = False, single_request: bool = False, profile_mode: Optional[str] = None, with_show: bool=True, long: bool=False, long_timeout: Optional[int]=WAIT_RESULT_TIMEOUT, scaleInfo: List[ScaleInfo] = None, component: TaskComponent = None, policy: TaskPolicy = None, schedule: Optional[Schedule] = None, restrictions: Optional[Restrictions] = None, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> AppLogs:
+def task_full(task_id: str, cfg_id: str, info_url: Optional[str]=None, debug_mode: bool=False, core_manage: bool = False, single_request: bool = False, profile_mode: Optional[str] = None, with_show: bool=True, long: bool=False, long_timeout: Optional[int]=WAIT_RESULT_TIMEOUT, scaleInfo: List[ScaleInfo] = None, component: TaskComponent = None, policy: TaskPolicy = None, schedule: Optional[Schedule] = None, restrictions: Optional[Restrictions] = None, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> AppLogs:
     """prepare, run and stop task by \"task_id\", \"cfg_id\" and other
 
     Args:
@@ -688,7 +698,7 @@ def task_full(task_id: str, cfg_id: str, info_url: Optional[str]=None, debug_mod
     return f.post_manager_task(task, with_show=with_show, long=long, long_timeout=long_timeout, wait=wait, auth=auth, conn_url=conn_url)
 
 
-def task_prepare(task_id: str, cfg_id: Optional[str]=None, info_url: Optional[str]=None, debug_mode: bool=False, core_manage: bool = False, kafka_mode: bool = False, single_request: bool = False, kafka_mode_url_response: Optional[str] = None, with_listener: bool = False, tl_without_data: Optional[int] = None, wait_runs: bool = True, with_logs: bool = False, profile_mode: Optional[str] = None, with_show: bool=None, long: bool=False, long_timeout: int=WAIT_RESULT_TIMEOUT, scaleInfo: List[ScaleInfo] = None, component: TaskComponent = None, policy: TaskPolicy = None, restrictions: Optional[Restrictions] = None, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> AppLogs:
+def task_prepare(task_id: str, cfg_id: Optional[str]=None, info_url: Optional[str]=None, debug_mode: bool=False, core_manage: bool = False, kafka_mode: bool = False, single_request: bool = False, kafka_mode_url_response: Optional[str] = None, with_listener: bool = False, tl_without_data: Optional[int] = None, wait_runs: bool = True, with_logs: bool = False, profile_mode: Optional[str] = None, with_show: bool=None, long: bool=False, long_timeout: int=WAIT_RESULT_TIMEOUT, scaleInfo: List[ScaleInfo] = None, component: TaskComponent = None, policy: TaskPolicy = None, restrictions: Optional[Restrictions] = None, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> AppLogs:
     """prepare task by \"task_id\", \"cfg_id\" and other, return operation_id
 
     Args:
@@ -731,7 +741,7 @@ def task_prepare(task_id: str, cfg_id: Optional[str]=None, info_url: Optional[st
     return f.post_manager_task(task, with_show=with_show, long=long, long_timeout=long_timeout, wait=wait, auth=auth, conn_url=conn_url)
 
 
-def task_run(operation_id: str, cfg_id: Optional[str]=None, info_url: Optional[str]=None, debug_mode: Optional[bool]=None, run_id: Optional[str] = None, single_request: Optional[bool] = None, profile_mode: Optional[str] = None, with_show: bool=None, long: bool=False, long_timeout: int=WAIT_RESULT_TIMEOUT, with_logs: bool = False, schedule: Optional[Schedule] = None, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Optional[AppLogs]:
+def task_run(operation_id: str, cfg_id: Optional[str]=None, info_url: Optional[str]=None, debug_mode: Optional[bool]=None, run_id: Optional[str] = None, single_request: Optional[bool] = None, profile_mode: Optional[str] = None, with_show: bool=None, long: bool=False, long_timeout: int=WAIT_RESULT_TIMEOUT, with_logs: bool = False, schedule: Optional[Schedule] = None, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Optional[AppLogs]:
     """run prepared task by \"operation_id\" with \"cfg_id\" and other overridden parameters
 
     Args:
@@ -757,13 +767,13 @@ def task_run(operation_id: str, cfg_id: Optional[str]=None, info_url: Optional[s
     return f.post_manager_task_run(task, with_show=with_show, long=long, long_timeout=long_timeout, wait=wait, auth=auth, conn_url=conn_url)
 
 
-def task_unschedule(schedule_id: str, with_show: bool=True, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+def task_unschedule(schedule_id: str, with_show: bool=True, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
     """unschedule task by \"schedule_id\""""
     operation = UnscheduleOperation(scheduleId=schedule_id)
     return f.post_manager_task_unschedule(operation, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url)
 
 
-def task_stop(operation_id: str, with_logs: bool = False, info_url: Optional[str] = None, with_show: bool=None, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Optional[AppLogs]:
+def task_stop(operation_id: str, with_logs: bool = False, info_url: Optional[str] = None, with_show: bool=None, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Optional[AppLogs]:
     """stop task by \"operation_id\"
 
      Args:
@@ -779,37 +789,37 @@ def task_stop(operation_id: str, with_logs: bool = False, info_url: Optional[str
     return f.post_manager_task_stop(task, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url)
 
 
-def task_stop_all(with_logs: bool = False, info_url: Optional[str] = None, with_show: bool=True, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Json:
+def task_stop_all(with_logs: bool = False, info_url: Optional[str] = None, with_show: bool=True, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Json:
     """stop task by \"operation_id\""""
     task = StopOperationMany(withLogs=with_logs, infoUrl=info_url)
     return f.post_manager_task_stop_all(task, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url)
 
 
-def task_resume(operation_id: str, with_show: bool=True, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Empty:
+def task_resume(operation_id: str, with_show: bool=True, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Empty:
     """resume task by \"operation_id\""""
     task = Operation(operationId=operation_id)
     return f.post_manager_task_resume(task, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url)
 
 
-def task_pause(operation_id: str, with_show: bool=True, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Empty:
+def task_pause(operation_id: str, with_show: bool=True, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Empty:
     """pause task by \"operation_id\""""
     task = Operation(operationId=operation_id)
     return f.post_manager_task_pause(task, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url)
 
 
-def app_stop(operation_id: str, task_id: Optional[str], app_id: str, run_id: str, with_show: bool=True, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Empty:
+def app_stop(operation_id: str, task_id: Optional[str], app_id: str, run_id: str, with_show: bool=True, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Empty:
     """stop app by \"operation_id\", \"task_id\" and \"app_id\""""
     app_manage = AppManage(operationId=operation_id, taskId=task_id, appId=app_id, runId=run_id)
     return f.post_manager_app_stop(app_manage, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url)
 
 
-def app_resume(operation_id: str, task_id: Optional[str], app_id: str, run_id: str, with_show: bool=True, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Empty:
+def app_resume(operation_id: str, task_id: Optional[str], app_id: str, run_id: str, with_show: bool=True, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Empty:
     """resume app by \"operation_id\", \"task_id\" and \"app_id\""""
     app_manage = AppManage(operationId=operation_id, taskId=task_id, appId=app_id, runId=run_id)
     return f.post_manager_app_resume(app_manage, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url)
 
 
-def app_pause(operation_id: str, task_id: Optional[str], app_id: str, run_id: str, with_show: bool=True, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Empty:
+def app_pause(operation_id: str, task_id: Optional[str], app_id: str, run_id: str, with_show: bool=True, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Empty:
     """pause app by \"operation_id\", \"task_id\" and \"app_id\""""
     app_manage = AppManage(operationId=operation_id, taskId=task_id, appId=app_id, runId=run_id)
     return f.post_manager_app_pause(app_manage, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url)
@@ -817,7 +827,7 @@ def app_pause(operation_id: str, task_id: Optional[str], app_id: str, run_id: st
 # kafka
 
 
-async def kafka_send(operation_id: str, run_id: Optional[str] = None, data: Dict[str, str] = None, metadata: Optional[Dict[str, Union[str, Dict[str, Any]]]] = None, with_show: bool=False, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Union[Alias.Info, KafkaMsg]:   # TODO add tl
+async def kafka_send(operation_id: str, run_id: Optional[str] = None, data: Dict[str, str] = None, metadata: Optional[Dict[str, Union[str, Dict[str, Any]]]] = None, with_show: bool=False, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Union[Alias.Info, KafkaMsg]:   # TODO add tl
     """send msg to kafka for task by \"operation_id\", \"run_id\" and data"""
     assert data is not None, "data should exists in kafka_send"
     if run_id is None:
@@ -839,33 +849,33 @@ async def kafka_send(operation_id: str, run_id: Optional[str] = None, data: Dict
 # other
 
 
-def create_collection_from_file(filename: str, name: Optional[str]=None, metadata: Optional[Union[Dict[str, Any], str]]=None, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
+def create_collection_from_file(filename: str, name: Optional[str]=None, metadata: Optional[Union[Dict[str, Any], str]]=None, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
     """create collection\n
     return collection id"""
     return fh.create_collection_from_file_df(filename, name, metadata, auth=auth, conn_url=conn_url)
 
 
-def create_collection_from_df(data: pd.DataFrame, name: Optional[str]=None, metadata: Optional[Union[Dict[str, Any], str]]=None, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
+def create_collection_from_df(data: pd.DataFrame, name: Optional[str]=None, metadata: Optional[Union[Dict[str, Any], str]]=None, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Id:
     """create collection\n
     return collection id"""
     return fh.create_collection_from_df(data, name, metadata, auth=auth, conn_url=conn_url)
 
 
-def get_collection_to_df(id: str, offset: int = 0, limit: int = -1, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> pd.DataFrame:
+def get_collection_to_df(id: str, offset: int = 0, limit: int = -1, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> pd.DataFrame:
     """return df from collection by \"id\", pagination: unlimited - limit < 0"""
     collection = get_collection(id, offset, limit, auth=auth, conn_url=conn_url)
     records = list(map(lambda x: json.loads(x.data), collection.docs))
     return pd.DataFrame.from_records(records)
 
 
-def get_collection_by_name_to_df(name: str, operation_id: Optional[str]=None, run_id: Optional[str]=None, offset: int = 0, limit: int = -1, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> pd.DataFrame:
+def get_collection_by_name_to_df(name: str, operation_id: Optional[str]=None, run_id: Optional[str]=None, offset: int = 0, limit: int = -1, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> pd.DataFrame:
     """return df from collection by \"name\" and mb also operation_id and run_id with which it was saved. raise if there are multiple collections, pagination: unlimited - limit < 0"""
     collection = get_collection_by_name(name, operation_id, run_id, offset, limit, auth=auth, conn_url=conn_url)
     records = list(map(lambda x: json.loads(x.data), collection.docs))
     return pd.DataFrame.from_records(records)
 
 
-def create_schemes_by_path(path: str, wait: bool = True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Dict[str, Alias.Id]:
+def create_schemes_by_path(path: str, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Dict[str, Alias.Id]:
     """schemes are created from json along the path to the directory, scheme_name - is the name of the file without '.json', returned a dict from the name of the created scheme to id"""
     res = dict()
     for filename in os.listdir(path):

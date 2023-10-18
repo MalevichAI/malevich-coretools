@@ -124,6 +124,7 @@ MANAGER_DAG_KEY_VALUE = lambda wait: with_wait(f"{MANAGER_MAIN}/dagKeyValue", wa
 MANAGER_DAG_KEY_VALUE_OPERATION_ID = lambda operationId: f"{MANAGER_MAIN}/dagKeyValue/{operationId}"
 MANAGER_APP_INFO = lambda appId: f"{MANAGER_MAIN}/appInfo/{appId}"
 MANAGER_APP_INFO_REAL_ID = lambda appId: f"{MANAGER_MAIN}/appInfo/realId/{appId}"
+MANAGER_IMAGE_INFO = f"{MANAGER_MAIN}/imageInfo"
 MANAGER_TASK_SCHEDULES = f"{MANAGER_MAIN}/task/schedules"
 MANAGER_TASK = lambda wait: with_wait(f"{MANAGER_MAIN}/task", wait)
 MANAGER_TASK_RUN = lambda wait: with_wait(f"{MANAGER_MAIN}/task/run", wait)
