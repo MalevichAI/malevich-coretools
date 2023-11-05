@@ -103,6 +103,8 @@ class UserApp(BaseModel):
     outputId: Optional[Alias.Id]
     cfg: Optional[Alias.Json]
     image: JsonImage
+    platform: str
+    platformSettings: Optional[str]
     collectionsFrom: Optional[Dict[str, str]]
     extraCollectionsFrom: Optional[Dict[str, str]]
 
@@ -391,3 +393,4 @@ class AppFunctionsInfo(BaseModel):
     schemes: Dict[str, str] = dict()
     inits: Dict[str, InitInfo] = dict()
     logs: Optional[str] = None
+    instanceInfo: Optional[str] = None  # json with info about instance

@@ -12,6 +12,7 @@ LONG_SLEEP_TIME = 1             # second
 WAIT_RESULT_TIMEOUT = 60 * 60   # hour
 AIOHTTP_TIMEOUT = aiohttp.ClientTimeout(total=60 * 10) # 10 min
 AIOHTTP_TIMEOUT_MINI = aiohttp.ClientTimeout(total=60 * 5) # 5 min
+POSSIBLE_APPS_PLATFORMS = {"base", "vast"}
 # endpoints
 
 def with_wait(url, wait) -> str:
