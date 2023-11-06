@@ -333,7 +333,7 @@ def parse(
 
 
 def vast_settings(
-    id: Optional[str] = None, query: Optional[Union[str, Dict[str, Any]]] = None
+    id: Optional[int] = None, query: Optional[Union[str, Dict[str, Any]]] = None
 ) -> str:
     """
     Platform settings for create app:\n
@@ -349,6 +349,7 @@ def vast_settings(
     """
     res = {}
     if id is not None:
+        assert isinstance(id, int), "wrong id type"
         assert query is None, "id and query set"
         res["id"] = id
     elif query is not None:
