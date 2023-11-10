@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from typing import Union
 
 import pandas as pd
@@ -10,6 +11,7 @@ from malevich_coretools.abstract import *  # noqa: F403
 from malevich_coretools.secondary import Config, to_json
 from malevich_coretools.secondary.const import (
     POSSIBLE_APPS_PLATFORMS,
+    SCHEME_PATTERN,
     WAIT_RESULT_TIMEOUT,
 )
 from malevich_coretools.secondary.helpers import rand_str
@@ -434,6 +436,7 @@ def create_scheme(
     """create scheme\n
     \"scheme_data\" must be json or dict
     return \"id\" """
+    assert re.fullmatch(SCHEME_PATTERN, name) is not None, f"wrong scheme name: {name}"
     scheme_json = to_json(scheme_data)
     scheme = SchemeWithName(data=scheme_json, name=name)
     return f.post_schemes(scheme, wait=wait, auth=auth, conn_url=conn_url)
@@ -451,6 +454,7 @@ def update_scheme(
     """update scheme\n
     \"scheme_data\" must be json or dict
     return \"id\" """
+    assert re.fullmatch(SCHEME_PATTERN, name) is not None, f"wrong scheme name: {name}"
     scheme_json = to_json(scheme_data)
     scheme = SchemeWithName(data=scheme_json, name=name)
     return f.post_schemes_id(id, scheme, wait=wait, auth=auth, conn_url=conn_url)
