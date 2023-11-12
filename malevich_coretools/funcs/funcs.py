@@ -414,6 +414,20 @@ def get_run_mainTaskCfg(id: str, *args, **kwargs) -> MainTaskCfg:
 def get_run_operationsIds(task_id: str, cfg_id: Optional[str]=None, *args, **kwargs) -> ResultIds:
     return model_from_json(send_to_core_get(TEMP_RUN_OPERATIONS_IDS(task_id, cfg_id), *args, **kwargs), ResultIds)
 
+# AdminController
+
+
+def get_admin_runs(*args, **kwargs) -> AdminRunsInfo:
+    return model_from_json(send_to_core_get(ADMIN_RUNS, *args, **kwargs), AdminRunsInfo)
+
+
+def get_admin_runs_info(data: OperationOrNone, *args, **kwargs) -> Union[Alias.Json, Alias.Info]:
+    return send_to_core_modify(ADMIN_RUNS_INFO, data, *args, **kwargs)
+
+
+def delete_admin_runs(data: AdminStopOperation, *args, **kwargs) -> Alias.Json:
+    return send_to_core_modify(ADMIN_RUNS, data, is_post=False, *args, **kwargs)
+
 # ManagerController
 
 

@@ -92,26 +92,26 @@ class User(BaseModel):
 
 class JsonImage(BaseModel):
     ref: str
-    user: Optional[str]
-    token: Optional[str]
+    user: Optional[str] = None
+    token: Optional[str] = None
 
 
 class UserApp(BaseModel):
     appId: Alias.Id
-    inputId: Optional[Alias.Id]
+    inputId: Optional[Alias.Id] = None
     processorId: Alias.Id
-    outputId: Optional[Alias.Id]
-    cfg: Optional[Alias.Json]
+    outputId: Optional[Alias.Id] = None
+    cfg: Optional[Alias.Json] = None
     image: JsonImage
     platform: str
-    platformSettings: Optional[str]
-    collectionsFrom: Optional[Dict[str, str]]
-    extraCollectionsFrom: Optional[Dict[str, str]]
+    platformSettings: Optional[str] = None
+    collectionsFrom: Optional[Dict[str, str]] = None
+    extraCollectionsFrom: Optional[Dict[str, str]] = None
 
 
 class UserTask(BaseModel):
     taskId: Alias.Id
-    appId: Optional[Alias.Id]
+    appId: Optional[Alias.Id] = None
     appsDepends: List[Alias.Id]
     tasksDepends: List[Alias.Id]
     synthetic: bool
@@ -335,14 +335,14 @@ class AppLog(BaseModel):
 
 
 class AppLogs(BaseModel):
-    operationId: str
+    operationId: Alias.Id
     dagLogs: str
     data: Dict[str, AppLog]
     error: Optional[str] = None
 
 
 class LogsTask(BaseModel):
-    operationId: str
+    operationId: Alias.Id
     appId: Optional[str] = None
     taskId: Optional[str] = None
     runId: Optional[str] = None
@@ -394,3 +394,30 @@ class AppFunctionsInfo(BaseModel):
     inits: Dict[str, InitInfo] = dict()
     logs: Optional[str] = None
     instanceInfo: Optional[str] = None  # json with info about instance
+
+
+class TaskInfo(BaseModel):
+    taskId: str
+    apps: Dict[str, UserApp]
+    tasks: Dict[str, UserTask]
+    cfg: str
+    login: str
+
+
+class AdminRunInfo(BaseModel):
+    operationId: Alias.Id
+    taskInfo: TaskInfo
+    cfgId: str
+
+
+class AdminRunsInfo(BaseModel):
+    data: List[AdminRunInfo]
+
+
+class OperationOrNone(BaseModel):
+    operationId: Optional[Alias.Id] = None
+
+
+class AdminStopOperation(BaseModel):
+    operationId: Optional[Alias.Id]
+    withLogs: bool

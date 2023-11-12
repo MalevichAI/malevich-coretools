@@ -1589,7 +1589,7 @@ def task_stop_all(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Json:
-    """stop task by \"operation_id\" """
+    """stop all tasks"""
     task = StopOperationMany(withLogs=with_logs, infoUrl=info_url)
     return f.post_manager_task_stop_all(
         task, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url

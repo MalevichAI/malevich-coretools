@@ -13,9 +13,9 @@ WAIT_RESULT_TIMEOUT = 60 * 60   # hour
 AIOHTTP_TIMEOUT = aiohttp.ClientTimeout(total=60 * 10) # 10 min
 AIOHTTP_TIMEOUT_MINI = aiohttp.ClientTimeout(total=60 * 5) # 5 min
 POSSIBLE_APPS_PLATFORMS = {"base", "vast"}
-SCHEME_PATTERN = r"\w+"
-# endpoints
+SCHEME_PATTERN = r"[a-zA-Z_]\w+"
 
+# endpoints
 def with_wait(url, wait) -> str:
     return url if wait is None else f"{url}?wait={bool_to_str(wait)}"    # always first
 
@@ -116,6 +116,11 @@ TEMP_RUN_CONDITION = lambda operationId: f"{TEMP_RUN_MAIN}/condition/{operationI
 TEMP_RUN_ACTIVE_RUNS = f"{TEMP_RUN_MAIN}/activeRuns"
 TEMP_RUN_MAIN_TASK_CFG = lambda operationId: f"{TEMP_RUN_MAIN}/mainTaskCfg/{operationId}"
 TEMP_RUN_OPERATIONS_IDS = lambda taskId, cfgId: f"{TEMP_RUN_MAIN}/operationsIds/{taskId}" if cfgId is None else f"{TEMP_RUN_MAIN}/operationsIds/{taskId}/{cfgId}"
+
+## AdminController
+ADMIN_MAIN = f"{API_VERSION}/admin"
+ADMIN_RUNS = f"{ADMIN_MAIN}/runs"
+ADMIN_RUNS_INFO = f"{ADMIN_MAIN}/runs/info"
 
 ## ManagerController
 MANAGER_MAIN = f"{API_VERSION}/manager"
