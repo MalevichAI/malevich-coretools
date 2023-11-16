@@ -797,6 +797,7 @@ def create_app(
     extra_collections_from: Optional[Dict[str, str]] = None,
     wait: bool = True,
     *,
+    use_system_auth: bool = True,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Id:
@@ -808,8 +809,8 @@ def create_app(
         platform in POSSIBLE_APPS_PLATFORMS
     ), f"wrong platform: {platform}, possible platforms: {POSSIBLE_APPS_PLATFORMS}"
     app_cfg_json = None if app_cfg is None else to_json(app_cfg)
-    image_user = image_auth[0] if image_auth is not None else Config.USERNAME
-    image_token = image_auth[1] if image_auth is not None else Config.TOKEN
+    image_user = image_auth[0] if image_auth is not None else Config.USERNAME if use_system_auth else None
+    image_token = image_auth[1] if image_auth is not None else Config.TOKEN if use_system_auth else None
     if Config.WITH_WARNINGS and (image_user is None or image_token is None):
         Config.logger.warning("image_auth not set")
     if image_ref is None:
@@ -847,6 +848,7 @@ def update_app(
     extra_collections_from: Optional[Dict[str, str]] = None,
     wait: bool = True,
     *,
+    use_system_auth: bool = True,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Info:
@@ -857,8 +859,8 @@ def update_app(
         platform in POSSIBLE_APPS_PLATFORMS
     ), f"wrong platform: {platform}, possible platforms: {POSSIBLE_APPS_PLATFORMS}"
     app_cfg_json = None if app_cfg is None else to_json(app_cfg)
-    image_user = image_auth[0] if image_auth is not None else Config.USERNAME
-    image_token = image_auth[1] if image_auth is not None else Config.TOKEN
+    image_user = image_auth[0] if image_auth is not None else Config.USERNAME if use_system_auth else None
+    image_token = image_auth[1] if image_auth is not None else Config.TOKEN if use_system_auth else None
     if Config.WITH_WARNINGS and (image_user is None or image_token is None):
         Config.logger.warning("image_auth not set")
     if image_ref is None:
@@ -1274,12 +1276,13 @@ def get_image_info(
     image_auth: Optional[AUTH] = None,
     parse: bool = False,
     *,
+    use_system_auth: bool = False,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Union[Alias.Json, AppFunctionsInfo]:
     """return json with functions image info"""
-    image_user = image_auth[0] if image_auth is not None else Config.USERNAME
-    image_token = image_auth[1] if image_auth is not None else Config.TOKEN
+    image_user = image_auth[0] if image_auth is not None else Config.USERNAME if use_system_auth else None
+    image_token = image_auth[1] if image_auth is not None else Config.TOKEN if use_system_auth else None
     if Config.WITH_WARNINGS and (image_user is None or image_token is None):
         Config.logger.warning("image_auth not set")
     json_image = JsonImage(ref=image_ref, user=image_user, token=image_token)
