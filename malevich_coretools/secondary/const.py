@@ -19,7 +19,7 @@ SCHEME_PATTERN = r"[a-zA-Z_]\w+"
 def with_wait(url, wait) -> str:
     return url if wait is None else f"{url}?wait={bool_to_str(wait)}"    # always first
 
-def with_key_values(url: str, key_values: Dict[Optional[str], str]) -> str:
+def with_key_values(url: str, key_values: Dict[str, Optional[str]]) -> str:
     sep = "?"
     for key, value in key_values.items():
         if value is not None:
@@ -38,6 +38,8 @@ COLLECTIONS_MAIN = f"{API_VERSION}/collections"
 COLLECTIONS = lambda wait: with_wait(f"{COLLECTIONS_MAIN}/", wait)
 COLLECTIONS_IDS_NAME = lambda name, operation_id, run_id: with_key_values(f"{COLLECTIONS_MAIN}/ids/name/{name}", {"operationId": operation_id, "runId": run_id})
 COLLECTIONS_NAME = lambda name, operation_id, run_id, offset, limit: with_key_values(f"{COLLECTIONS_MAIN}/name/{name}", {"operationId": operation_id, "runId": run_id, "offset": offset, "limit": limit})
+COLLECTIONS_IDS_GROUP_NAME = lambda name, operation_id, run_id: with_key_values(f"{COLLECTIONS_MAIN}/ids/groupName/{name}", {"operationId": operation_id, "runId": run_id})
+COLLECTIONS_GROUP_NAME = lambda name, operation_id, run_id: with_key_values(f"{COLLECTIONS_MAIN}/groupName/{name}", {"operationId": operation_id, "runId": run_id})
 COLLECTIONS_ID = lambda id, offset, limit: with_key_values(f"{COLLECTIONS_MAIN}/{id}", {"offset": offset, "limit": limit})
 COLLECTIONS_ID_MODIFY = lambda id, wait: with_wait(f"{COLLECTIONS_MAIN}/{id}", wait)
 COLLECTIONS_ID_S3 = lambda id, wait: with_wait(f"{COLLECTIONS_MAIN}/s3/{id}", wait)

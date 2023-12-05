@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import subprocess
 from typing import Union
 
 import pandas as pd
@@ -16,18 +17,20 @@ from malevich_coretools.secondary.const import (
 )
 from malevich_coretools.secondary.helpers import rand_str
 
+__unique_digest_substring = "@sha256:"
+
 # config
 
 
 def set_host_port(host_port: str) -> None:
-    """update host and port for malevich-core, example: \"http://localhost:8080/\" """
+    """update host and port for malevich-core, example: `http://localhost:8080/` """
     assert len(host_port) > 0, "empty host port"
     host_port = host_port if host_port[-1] == "/" else f"{host_port}/"
     Config.HOST_PORT = host_port
 
 
 def set_conn_url(conn_url: str) -> None:
-    """analogue set_host_port; update conn_url for malevich-core, example: \"http://localhost:8080/\" """
+    """analogue set_host_port; update `conn_url` for malevich-core, example: `http://localhost:8080/` """
     set_host_port(conn_url)
 
 
@@ -57,20 +60,48 @@ def update_core_credentials(username: USERNAME, password: PASSWORD) -> None:
     Config.CORE_PASSWORD = password
 
 
+def digest_by_image(image_ref: str, username: Optional[str] = None, password: Optional[str] = None) -> Optional[str]:
+    """return image in digest format by `image_ref`, if fail - return None and log error. If `image_ref` in digest format - return itself without check
+
+    Args:
+        image_ref (str): image_ref
+        username (Optional[str], optional): username if necessary. Defaults to None.
+        password (Optional[str], optional): password if necessary. Defaults to None.
+
+    Returns:
+        Optional[str]: image_ref in digest format or None if failed
+    """
+    if __unique_digest_substring in image_ref:
+        return image_ref
+    if username is None and password is None:
+        cmd = ["skopeo", "inspect", "--no-creds", f"docker://{image_ref}"]
+    else:
+        cmd = ["skopeo", "inspect", "--username", username, "--password", password, f"docker://{image_ref}"]
+    result = subprocess.run(cmd, capture_output=True)
+    info = result.stdout.decode("utf-8")
+    if info != "":
+        digest = json.loads(info)["Digest"]
+        return f"{image_ref[:len(image_ref) if (index := image_ref.rfind(':')) == -1 else index]}@{digest}"
+    else:
+        info = result.stderr.decode("utf-8")
+        Config.logger.error(info)
+        return None
+
+
 # Docs
 
 
 def get_docs(
     *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
 ) -> ResultIds:
-    """return list ids"""
+    """return list ids """
     return f.get_docs(auth=auth, conn_url=conn_url)
 
 
 def get_doc(
     id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
 ) -> ResultDoc:
-    """return doc by \"id\" """
+    """return doc by `id` """
     return f.get_docs_id(id, auth=auth, conn_url=conn_url)
 
 
@@ -82,7 +113,7 @@ def create_doc(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Id:
-    """save doc with \"data\" and \"name\", return \"id\" """
+    """save doc with `data` and `name`, return `id` """
     return f.post_docs(
         DocWithName(data=data, name=name), wait=wait, auth=auth, conn_url=conn_url
     )
@@ -97,7 +128,7 @@ def update_doc(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Id:
-    """update doc by \"id\", return \"id\" """
+    """update doc by `id`, return `id` """
     return f.post_docs_id(
         id, DocWithName(data=data, name=name), wait=wait, auth=auth, conn_url=conn_url
     )
@@ -110,7 +141,7 @@ def delete_doc(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Info:
-    """delete doc by \"id\" """
+    """delete doc by `id` """
     return f.delete_docs_id(id, wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -139,7 +170,7 @@ def get_collections_by_name(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> ResultOwnAndSharedIds:
-    """return 2 list: own collections ids and shared collections ids by \"name\" and mb also operation_id and run_id with which it was saved"""
+    """return 2 list: own collections ids and shared collections ids by `name` and mb also `operation_id` and `run_id` with which it was saved"""
     assert not (
         operation_id is None and run_id is not None
     ), "if run_id set, operation_id should be set too"
@@ -156,7 +187,7 @@ def get_collection(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> ResultCollection:
-    """return collection by \"id\", pagination: unlimited - limit < 0"""
+    """return collection by `id`, pagination: unlimited - `limit` < 0"""
     return f.get_collections_id(id, offset, limit, auth=auth, conn_url=conn_url)
 
 
@@ -170,12 +201,40 @@ def get_collection_by_name(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> ResultCollection:
-    """return collection by \"name\" and mb also operation_id and run_id with which it was saved. raise if there are multiple collections, pagination: unlimited - limit < 0"""
+    """return collection by `name` and mb also `operation_id` and `run_id` with which it was saved. raise if there are multiple collections, pagination: unlimited - `limit` < 0"""
     assert not (
         operation_id is None and run_id is not None
     ), "if run_id set, operation_id should be set too"
     return f.get_collection_name(
         name, operation_id, run_id, offset, limit, auth=auth, conn_url=conn_url
+    )
+
+
+def get_collections_ids_by_group_name(
+    group_name: str,
+    operation_id: str,
+    run_id: Optional[str] = None,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+) -> ResultIds:
+    """return collections ids by `group_name`, `operation_id` and `run_id` with which it was saved"""
+    return f.get_collections_ids_groupName(
+        group_name, operation_id, run_id, auth=auth, conn_url=conn_url
+    )
+
+
+def get_collections_by_group_name(
+    group_name: str,
+    operation_id: str,
+    run_id: Optional[str] = None,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+) -> ResultCollections:
+    """return collections by `group_name`, `operation_id` and `run_id` with which it was saved"""
+    return f.get_collections_groupName(
+        group_name, operation_id, run_id, auth=auth, conn_url=conn_url
     )
 
 
@@ -188,7 +247,7 @@ def create_collection(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Id:
-    """save collection by list docs \"ids\", return id"""
+    """save collection by list docs `ids`, return id"""
     return f.post_collections(
         DocsCollection(data=ids, name=name, metadata=metadata),
         wait=wait,
@@ -207,7 +266,7 @@ def update_collection(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Id:
-    """update collection with \"id\" by list docs \"ids\", return \"id\" """
+    """update collection with `id` by list docs `ids`, return `id` """
     return f.post_collections_id(
         id,
         DocsCollection(data=ids, name=name, metadata=metadata),
@@ -245,7 +304,7 @@ def create_collection_by_docs(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Id:
-    """save collection by \"docs\", return \"id\" """
+    """save collection by `docs`, return `id` """
     return f.post_collections_data(
         DocsDataCollection(data=docs, name=name, metadata=metadata),
         wait=wait,
@@ -262,7 +321,7 @@ def add_to_collection(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Info:
-    """add to collection with \"id\" docs with \"ids\" """
+    """add to collection with `id` docs with `ids` """
     return f.post_collections_id_add(
         id, DocsCollectionChange(data=ids), wait=wait, auth=auth, conn_url=conn_url
     )
@@ -276,7 +335,7 @@ def copy_collection(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Id:
-    """copy collection with \"id\", if not \"full_copy\" docs same as in collection with \"id\" """
+    """copy collection with `id`, if not `full_copy` docs same as in collection with `id` """
     return f.post_collections_id_copy(
         id, full_copy=full_copy, wait=wait, auth=auth, conn_url=conn_url
     )
@@ -291,7 +350,7 @@ def apply_scheme(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Id:
-    """apply scheme with \"scheme_name\" to collection with \"coll_id\" return new collection with another \"coll_id\" """
+    """apply scheme with `scheme_name` to collection with `coll_id` return new collection with another `coll_id` """
     return f.post_collections_id_applyScheme(
         coll_id,
         FixScheme(schemeName=scheme_name, mode=mode),
@@ -310,7 +369,7 @@ def fix_scheme(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Info:
-    """optimization to core (not necessary call), sets the schema with \"scheme_name\" for the collection with \"coll_id\" """
+    """optimization to core (not necessary call), sets the schema with `scheme_name` for the collection with `coll_id` """
     fix_scheme_data = FixScheme(schemeName=scheme_name, mode=mode)
     return f.post_collections_id_fixScheme(
         coll_id, fix_scheme_data, wait=wait, auth=auth, conn_url=conn_url
@@ -324,7 +383,7 @@ def unfix_scheme(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Info:
-    """unfix scheme for collection with \"coll_id\" """
+    """unfix scheme for collection with `coll_id` """
     return f.post_collections_id_unfixScheme(
         coll_id, wait=wait, auth=auth, conn_url=conn_url
     )
@@ -338,7 +397,7 @@ def update_metadata(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Info:
-    """update metadata for collection with \"coll_id\" """
+    """update `metadata` for collection with `coll_id` """
     collection_metadata = CollectionMetadata(data=metadata)
     return f.post_collections_metadata(
         coll_id, collection_metadata, wait=wait, auth=auth, conn_url=conn_url
@@ -359,7 +418,7 @@ def delete_collection(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Info:
-    """delete collection with \"id\" """
+    """delete collection with `id` """
     return f.delete_collections_id(id, wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -370,7 +429,7 @@ def s3_delete_collection(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Info:
-    """delete collection from s3 by key (that =id if not specified in s3_save_collection)"""
+    """delete collection from s3 by `key` (that =id if not specified in s3_save_collection)"""
     return f.delete_collections_id_s3(key, wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -382,7 +441,7 @@ def delete_from_collection(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Info:
-    """delete docs with \"ids\" from collection with \"id\" """
+    """delete docs with `ids` from collection with `id` """
     return f.delete_collections_id_del(
         id, DocsCollectionChange(data=ids), wait=wait, auth=auth, conn_url=conn_url
     )
@@ -401,14 +460,14 @@ def get_schemes(
 def get_scheme(
     id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
 ) -> ResultScheme:
-    """return scheme by id"""
+    """return scheme by `id` """
     return f.get_schemes_id(id, auth=auth, conn_url=conn_url)
 
 
 def get_scheme_raw(
     id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
 ) -> Alias.Json:
-    """return raw scheme data by id"""
+    """return raw scheme data by `id` """
     return f.get_schemes_id_raw(id, auth=auth, conn_url=conn_url)
 
 
@@ -434,8 +493,8 @@ def create_scheme(
     conn_url: Optional[str] = None,
 ) -> Alias.Id:
     """create scheme\n
-    \"scheme_data\" must be json or dict
-    return \"id\" """
+    `scheme_data` must be json or dict
+    return `id` """
     assert re.fullmatch(SCHEME_PATTERN, name) is not None, f"wrong scheme name: {name}"
     scheme_json = to_json(scheme_data)
     scheme = SchemeWithName(data=scheme_json, name=name)
@@ -452,8 +511,8 @@ def update_scheme(
     conn_url: Optional[str] = None,
 ) -> Alias.Id:
     """update scheme\n
-    \"scheme_data\" must be json or dict
-    return \"id\" """
+    `scheme_data` must be json or dict
+    return `id` """
     assert re.fullmatch(SCHEME_PATTERN, name) is not None, f"wrong scheme name: {name}"
     scheme_json = to_json(scheme_data)
     scheme = SchemeWithName(data=scheme_json, name=name)
@@ -494,7 +553,7 @@ def delete_scheme(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Info:
-    """delete scheme by id"""
+    """delete scheme by `id` """
     return f.delete_schemes_id(id, wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -526,7 +585,7 @@ def check_auth(
 
 
 def ping() -> Alias.Info:
-    """return \"pong\" """
+    """return `pong` """
     return f.get_ping()
 
 
@@ -537,17 +596,17 @@ def ping() -> Alias.Info:
 
 
 # def get_mapping(id: str, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultMapping:
-#     """return mapping by \"id\""""
+#     """return mapping by `id`"""
 #     return f.get_mapping_id(id, auth=auth, conn_url=conn_url)
 
 
 # def create_mapping(docs_ids: List[str], scheme_id: str, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
-#     """try to do and save mapping docs with \"docs_ids\" with scheme with \"scheme_id\", ignore if failed"""
+#     """try to do and save mapping docs with `docs_ids` with scheme with `scheme_id`, ignore if failed"""
 #     return f.post_mapping(DocsAndScheme(docsIds=docs_ids, schemeId=scheme_id), wait=wait, auth=auth, conn_url=conn_url)
 
 
 # def delete_mapping(doc_id: str, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
-#     """delete mappings for doc with \"doc_id\""""
+#     """delete mappings for doc with `doc_id`"""
 #     return f.delete_mapping_id(doc_id, wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -561,28 +620,28 @@ def ping() -> Alias.Info:
 def get_shared_collection(
     id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
 ) -> ResultLogins:
-    """return list logins to which user has given access to the collection with \"id\" """
+    """return list logins to which user has given access to the collection with `id` """
     return f.get_share_collection_id(id, auth=auth, conn_url=conn_url)
 
 
 def get_shared_scheme(
     id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
 ) -> ResultLogins:
-    """return list logins to which user has given access to the scheme with \"id\" """
+    """return list logins to which user has given access to the scheme with `id` """
     return f.get_share_scheme_id(id, auth=auth, conn_url=conn_url)
 
 
 def get_shared_app(
     id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
 ) -> ResultLogins:
-    """return list logins to which user has given access to the app with \"id\" """
+    """return list logins to which user has given access to the app with `id` """
     return f.get_share_userApp_id(id, auth=auth, conn_url=conn_url)
 
 
 def get_shared_by_login(
     login: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
 ) -> ResultSharedForLogin:
-    """return structure with all info about share to user with \"login\" """
+    """return structure with all info about share to user with `login` """
     return f.get_share_login(login, auth=auth, conn_url=conn_url)
 
 
@@ -594,7 +653,7 @@ def share_collection(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Info:
-    """gives access to the collection with \"id\" to all users with \"user_logins\" """
+    """gives access to the collection with `id` to all users with `user_logins` """
     return f.post_share_collection_id(
         id,
         SharedWithUsers(userLogins=user_logins),
@@ -612,7 +671,7 @@ def share_scheme(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Info:
-    """gives access to the scheme with \"id\" to all users with \"user_logins\" """
+    """gives access to the scheme with `id` to all users with `user_logins` """
     return f.post_share_scheme_id(
         id,
         SharedWithUsers(userLogins=user_logins),
@@ -630,7 +689,7 @@ def share_app(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Info:
-    """gives access to the app with \"id\" to all users with \"user_logins\" """
+    """gives access to the app with `id` to all users with `user_logins` """
     return f.post_share_userApp_id(
         id,
         SharedWithUsers(userLogins=user_logins),
@@ -650,7 +709,7 @@ def share(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Info:
-    """gives access to everything listed to all users with \"user_logins\" """
+    """gives access to everything listed to all users with `user_logins` """
     assert user_logins is not None, '"user_logins" is empty'
     collections_ids = [] if collections_ids is None else collections_ids
     schemes_ids = [] if schemes_ids is None else schemes_ids
@@ -678,7 +737,7 @@ def delete_shared(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Info:
-    """removes access to everything listed to all users with \"user_logins\" """
+    """removes access to everything listed to all users with `user_logins` """
     assert user_logins is not None, '"user_logins" is empty'
     collections_ids = [] if collections_ids is None else collections_ids
     schemes_ids = [] if schemes_ids is None else schemes_ids
@@ -741,7 +800,7 @@ def delete_user_login(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> None:
-    """admin: delete user by login"""
+    """admin: delete user by `login` """
     f.delete_register_login(login, wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -772,14 +831,14 @@ def get_apps_map(
 def get_app(
     id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
 ) -> UserApp:
-    """return app by \"id\" """
+    """return app by `id` """
     return f.get_userApps_id(id, auth=auth, conn_url=conn_url)
 
 
 def get_app_real(
     id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
 ) -> UserApp:
-    """return app by \"real id\" """
+    """return app by real `id` """
     return f.get_userApps_realId(id, auth=auth, conn_url=conn_url)
 
 
@@ -802,9 +861,9 @@ def create_app(
     conn_url: Optional[str] = None,
 ) -> Alias.Id:
     """create app\n
-    \"app_cfg\" must be json or dict or None\n
-    \"image_ref\" automatically generated by id, but this is not always True, it is better to set it\n
-    return \"id\" """
+    `app_cfg` must be json or dict or None\n
+    `image_ref` automatically generated by id, but this is not always True, it is better to set it\n
+    return `id` """
     assert (
         platform in POSSIBLE_APPS_PLATFORMS
     ), f"wrong platform: {platform}, possible platforms: {POSSIBLE_APPS_PLATFORMS}"
@@ -852,9 +911,9 @@ def update_app(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Info:
-    """update app by \"id\"\n
-    \"app_cfg\" must be json or dict or None\n
-    \"image_ref\" automatically generated by id, but this is not always True, it is better to set it"""
+    """update app by `id`\n
+    `app_cfg` must be json or dict or None\n
+    `image_ref` automatically generated by id, but this is not always True, it is better to set it"""
     assert (
         platform in POSSIBLE_APPS_PLATFORMS
     ), f"wrong platform: {platform}, possible platforms: {POSSIBLE_APPS_PLATFORMS}"
@@ -897,7 +956,7 @@ def delete_app(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Info:
-    """delete user app by \"id\" """
+    """delete user app by `id` """
     return f.delete_userApps_id(id, wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -928,14 +987,14 @@ def get_tasks_map(
 def get_task(
     id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
 ) -> UserTask:
-    """return task by \"id\" """
+    """return task by `id` """
     return f.get_userTasks_id(id, auth=auth, conn_url=conn_url)
 
 
 def get_task_real(
     id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
 ) -> UserTask:
-    """return task by \"real id\" """
+    """return task by real `id` """
     return f.get_userTasks_realId(id, auth=auth, conn_url=conn_url)
 
 
@@ -980,7 +1039,7 @@ def update_task(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Info:
-    """update task by \"id\" """
+    """update task by `id` """
     if apps_depends is None:
         apps_depends = []
     if tasks_depends is None:
@@ -1008,7 +1067,7 @@ def delete_task(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Info:
-    """delete user task by \"id\" """
+    """delete user task by `id` """
     return f.delete_userTasks_id(id, wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -1039,14 +1098,14 @@ def get_cfgs_map(
 def get_cfg(
     id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
 ) -> ResultUserCfg:
-    """return cfg by \"id\" """
+    """return cfg by `id` """
     return f.get_userCfgs_id(id, auth=auth, conn_url=conn_url)
 
 
 def get_cfg_real(
     id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
 ) -> ResultUserCfg:
-    """return cfg by \"real id\" """
+    """return cfg by real `id` """
     return f.get_userCfgs_realId(id, auth=auth, conn_url=conn_url)
 
 
@@ -1059,8 +1118,8 @@ def create_cfg(
     conn_url: Optional[str] = None,
 ) -> Alias.Id:
     """create configuration file\n
-    \"cfg\" must be json or dict or Cfg\n
-    return \"id\" """
+    `cfg` must be json or dict or Cfg\n
+    return `id` """
     if isinstance(cfg, Cfg):
         cfg_json = cfg.json()
     else:
@@ -1079,7 +1138,7 @@ def update_cfg(
     conn_url: Optional[str] = None,
 ) -> Alias.Info:
     """update configuration file\n
-    \"cfg\" must be json or dict or Cfg"""
+    `cfg` must be json or dict or Cfg"""
     if isinstance(cfg, Cfg):
         cfg_json = cfg.json()
     else:
@@ -1102,7 +1161,7 @@ def delete_cfg(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Info:
-    """delete user cfg by \"id\" """
+    """delete user cfg by `id` """
     return f.delete_userCfgs_id(id, wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -1119,7 +1178,7 @@ def get_operations_results(
 def get_operation_result(
     id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
 ) -> str:
-    """return result by operation \"id\" if operation status is \"OK\" """
+    """return result by operation `id` if operation status is `OK` """
     return f.get_operationResults_id(id, auth=auth, conn_url=conn_url)
 
 
@@ -1137,7 +1196,7 @@ def delete_operation_result(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Info:
-    """delete operation result by \"id\" """
+    """delete operation result by `id` """
     return f.delete_operationResults_id(id, wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -1147,7 +1206,7 @@ def delete_operation_result(
 def get_run_condition(
     id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
 ) -> Condition:
-    """return run condition by operation \"id\" for running task"""
+    """return run condition by operation `id` for running task"""
     return f.get_run_condition(id, auth=auth, conn_url=conn_url)
 
 
@@ -1161,7 +1220,7 @@ def get_run_active_runs(
 def get_run_main_task_cfg(
     id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
 ) -> MainTaskCfg:
-    """return mainTaskCfg by operation \"id\" for running task"""
+    """return mainTaskCfg by operation `id` for running task"""
     return f.get_run_mainTaskCfg(id, auth=auth, conn_url=conn_url)
 
 
@@ -1172,7 +1231,7 @@ def get_task_runs(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> ResultIds:
-    """return list running operationIds with \"task_id\" and \"cfg_id\" if specified"""
+    """return list running operationIds with `task_id` and `cfg_id` if specified"""
     return f.get_run_operationsIds(task_id, cfg_id, auth=auth, conn_url=conn_url)
 
 
@@ -1188,7 +1247,7 @@ def logs(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> AppLogs:
-    """return task logs by operation \"id\" and \"run_id\" """
+    """return task logs by operation `id` and `run_id` """
     task = LogsTask(operationId=id, runId=run_id)
     return f.get_manager_logs(task, with_show=with_show, auth=auth, conn_url=conn_url)
 
@@ -1204,7 +1263,7 @@ def logs_app(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> AppLogs:
-    """return app logs by operation \"id\", \"run_id\", \"task_id\" (that "null" if not exist) and \"app_id\" """
+    """return app logs by operation `id`, `run_id`, `task_id` (that "null" if not exist) and `app_id` """
     task = LogsTask(
         operationId=id, runId=run_id, appId=app_id, taskId=task_id, force=force
     )
@@ -1221,14 +1280,14 @@ def logs_clickhouse(
 def logs_clickhouse_id(
     id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
 ) -> Alias.Json:
-    """return clickhouse logs by operation \"id\" """
+    """return clickhouse logs by operation `id` """
     return f.get_clickhouse_id(id, auth=auth, conn_url=conn_url)
 
 
 def get_dag_key_value(
     id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
 ) -> Alias.Json:
-    """return key-value cfg from dag by operation \"id\" """
+    """return key-value cfg from dag by operation `id` """
     return f.get_manager_dagKeyValue_operationId(id, auth=auth, conn_url=conn_url)
 
 
@@ -1240,7 +1299,7 @@ def update_dag_key_value(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> None:
-    """update key-value cfg from dag by operation \"id\" and \"data\" """
+    """update key-value cfg from dag by operation `id` and `data` """
     return f.post_manager_dagKeyValue(
         KeysValues(data=data, operationId=operationId),
         wait=wait,
@@ -1256,7 +1315,7 @@ def get_app_info(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Union[Alias.Json, AppFunctionsInfo]:
-    """return json with functions app info, id is appId"""
+    """return json with functions app info, `id` is appId"""
     return f.get_app_info(id, parse=parse, auth=auth, conn_url=conn_url)
 
 
@@ -1267,7 +1326,7 @@ def get_app_info_by_real_id(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Union[Alias.Json, AppFunctionsInfo]:
-    """return json with functions app info, id is real id for app"""
+    """return json with functions app info, `id` is real id for app"""
     return f.get_app_info_by_real_id(id, parse=parse, auth=auth, conn_url=conn_url)
 
 
@@ -1296,7 +1355,7 @@ def get_task_schedules(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Schedules:
-    """return schedule ids by \"operation_id\" """
+    """return schedule ids by `operation_id` """
     operation = Operation(operationId=operation_id)
     return f.get_task_schedules(
         operation, with_show=with_show, auth=auth, conn_url=conn_url
@@ -1325,7 +1384,7 @@ def task_full(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> AppLogs:
-    """prepare, run and stop task by \"task_id\", \"cfg_id\" and other
+    """prepare, run and stop task by `task_id`, `cfg_id` and other
 
     Args:
         task_id (str): task id
@@ -1343,7 +1402,7 @@ def task_full(
         policy: (TaskPolicy): policy for task
         schedule: (Optional[Schedule]): schedule task settings - return scheduleId instead of operationId
         restrictions: (Optional[Restrictions]): permissions to handle deployment
-        wait (bool): is it worth waiting for the result or immediately return operation_id
+        wait (bool): is it worth waiting for the result or immediately return `operation_id`
         auth (Optional[AUTH]): redefined auth if not None"""
     if scaleInfo is None:
         scaleInfo = []
@@ -1409,7 +1468,7 @@ def task_prepare(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> AppLogs:
-    """prepare task by \"task_id\", \"cfg_id\" and other, return operation_id
+    """prepare task by `task_id`, `cfg_id` and other, return `operation_id`
 
     Args:
         task_id (str): task id
@@ -1432,7 +1491,7 @@ def task_prepare(
         component: (TaskComponent): which component should run it (dag id, base id - None)
         policy: (TaskPolicy): policy for task
         restrictions: (Optional[Restrictions]): permissions to handle deployment
-        wait (bool): is it worth waiting for the result or immediately return operation_id
+        wait (bool): is it worth waiting for the result or immediately return `operation_id`
         auth (Optional[AUTH]): redefined auth if not None"""
     if kafka_mode_url_response is not None and kafka_mode is False:
         Config.logger.info(
@@ -1498,10 +1557,10 @@ def task_run(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Optional[AppLogs]:
-    """run prepared task by \"operation_id\" with \"cfg_id\" and other overridden parameters
+    """run prepared task by `operation_id` with `cfg_id` and other overridden parameters
 
     Args:
-        operation_id (str): operation_id, that returned from 'task_prepare'
+        operation_id (str): `operation_id`, that returned from 'task_prepare'
         cfg_id (Optional[str]): cfg id, override default cfg id (from 'task_prepare') if exist
         info_url (Optional[str]): Rewrite for this run if exist
         debug_mode (Optional[bool]): Rewrite for this run if exist
@@ -1513,7 +1572,7 @@ def task_run(
         long_timeout (Optional[int]): default timeout for long run (hour by default). If 'long=False' ignored. If None, then there is no limit. Doesn't stop the task, just stops trying to get the run result
         with_logs (bool): return run logs if True after end
         schedule: (Optional[Schedule]): schedule task runs settings - return scheduleId instead of operationId
-        wait (bool): is it worth waiting for the result or immediately return operation_id
+        wait (bool): is it worth waiting for the result or immediately return `operation_id`
         auth (Optional[AUTH]): redefined auth if not None"""
     if run_id is None:
         run_id = rand_str(15)
@@ -1549,7 +1608,7 @@ def task_unschedule(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Info:
-    """unschedule task by \"schedule_id\" """
+    """unschedule task by `schedule_id` """
     operation = UnscheduleOperation(scheduleId=schedule_id)
     return f.post_manager_task_unschedule(
         operation, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url
@@ -1566,14 +1625,14 @@ def task_stop(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Optional[AppLogs]:
-    """stop task by \"operation_id\"
+    """stop task by `operation_id`
 
     Args:
-       operation_id (str): operation_id, that returned from 'task_prepare', or just operation_id for runned task
+       operation_id (str): `operation_id`, that returned from 'task_prepare', or just operation_id for runned task
        with_logs (bool): return logs for task if True
        info_url (Optional[str]): send also result to info_url if it exist and 'with_logs=True'
        with_show (bool): show result (like for each operation, default equals with_logs arg)
-       wait (bool): is it worth waiting for the result or immediately return operation_id
+       wait (bool): is it worth waiting for the result or immediately return `operation_id`
        auth (Optional[AUTH]): redefined auth if not None"""
     if with_show is None:
         with_show = with_logs
@@ -1607,7 +1666,7 @@ def task_resume(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Empty:
-    """resume task by \"operation_id\" """
+    """resume task by `operation_id` """
     task = Operation(operationId=operation_id)
     return f.post_manager_task_resume(
         task, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url
@@ -1622,7 +1681,7 @@ def task_pause(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Empty:
-    """pause task by \"operation_id\" """
+    """pause task by `operation_id` """
     task = Operation(operationId=operation_id)
     return f.post_manager_task_pause(
         task, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url
@@ -1640,7 +1699,7 @@ def app_stop(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Empty:
-    """stop app by \"operation_id\", \"task_id\" and \"app_id\" """
+    """stop app by `operation_id`, `task_id` and `app_id` """
     app_manage = AppManage(
         operationId=operation_id, taskId=task_id, appId=app_id, runId=run_id
     )
@@ -1660,7 +1719,7 @@ def app_resume(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Empty:
-    """resume app by \"operation_id\", \"task_id\" and \"app_id\" """
+    """resume app by `operation_id`, `task_id` and `app_id` """
     app_manage = AppManage(
         operationId=operation_id, taskId=task_id, appId=app_id, runId=run_id
     )
@@ -1680,7 +1739,7 @@ def app_pause(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Empty:
-    """pause app by \"operation_id\", \"task_id\" and \"app_id\" """
+    """pause app by `operation_id`, `task_id` and `app_id` """
     app_manage = AppManage(
         operationId=operation_id, taskId=task_id, appId=app_id, runId=run_id
     )
@@ -1702,7 +1761,7 @@ async def kafka_send(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Union[Alias.Info, KafkaMsg]:  # TODO add tl
-    """send msg to kafka for task by \"operation_id\", \"run_id\" and data"""
+    """send msg to kafka for task by `operation_id`, `run_id` and `data` """
     assert data is not None, "data should exists in kafka_send"
     if run_id is None:
         run_id = rand_str(15)
@@ -1766,7 +1825,7 @@ def get_collection_to_df(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> pd.DataFrame:
-    """return df from collection by \"id\", pagination: unlimited - limit < 0"""
+    """return df from collection by `id`, pagination: unlimited - `limit` < 0"""
     collection = get_collection(id, offset, limit, auth=auth, conn_url=conn_url)
     records = list(map(lambda x: json.loads(x.data), collection.docs))
     return pd.DataFrame.from_records(records)
@@ -1782,7 +1841,7 @@ def get_collection_by_name_to_df(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> pd.DataFrame:
-    """return df from collection by \"name\" and mb also operation_id and run_id with which it was saved. raise if there are multiple collections, pagination: unlimited - limit < 0"""
+    """return df from collection by `name` and mb also `operation_id` and `run_id` with which it was saved. raise if there are multiple collections, pagination: unlimited - `limit` < 0"""
     collection = get_collection_by_name(
         name, operation_id, run_id, offset, limit, auth=auth, conn_url=conn_url
     )

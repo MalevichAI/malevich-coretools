@@ -54,6 +54,14 @@ def get_collection_name(name: str, operation_id: Optional[str], run_id: Optional
     return model_from_json(send_to_core_get(COLLECTIONS_NAME(name, operation_id, run_id, offset, limit), *args, **kwargs), ResultCollection)
 
 
+def get_collections_ids_groupName(name: str, operation_id: str, run_id: str, *args, **kwargs) -> ResultIds:
+    return model_from_json(send_to_core_get(COLLECTIONS_IDS_GROUP_NAME(name, operation_id, run_id), *args, **kwargs), ResultIds)
+
+
+def get_collections_groupName(name: str, operation_id: str, run_id: str, *args, **kwargs) -> ResultCollections:
+    return model_from_json(send_to_core_get(COLLECTIONS_GROUP_NAME(name, operation_id, run_id), *args, **kwargs), ResultCollections)
+
+
 def get_collections_id(id: str, offset: int, limit: int, *args, **kwargs) -> ResultCollection:
     return model_from_json(send_to_core_get(COLLECTIONS_ID(id, offset, limit), *args, **kwargs), ResultCollection)
 

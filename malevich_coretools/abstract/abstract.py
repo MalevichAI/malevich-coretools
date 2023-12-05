@@ -251,6 +251,10 @@ class ResultCollection(BaseModel):
     metadata: Optional[Alias.Json] = None
 
 
+class ResultCollections(BaseModel):
+    data: List[ResultCollection]
+
+
 class ResultScheme(BaseModel):
     data: Alias.Json
     name: str
