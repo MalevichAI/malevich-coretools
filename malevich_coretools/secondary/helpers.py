@@ -46,7 +46,7 @@ def __show_logs_result(res: LogsResult):  # noqa: ANN202
         print(res.data)
     for run_id, logs in res.logs.items():
         print(f"------- {run_id}:")
-        userLogs = res.userLogs[run_id]
+        userLogs = res.userLogs.get(run_id, "")
         if len(userLogs) > 0:
             print(userLogs)
             print("-------")
