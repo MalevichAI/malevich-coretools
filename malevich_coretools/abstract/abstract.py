@@ -332,6 +332,7 @@ class CollectionMetadata(BaseModel):
 class LogsResult(BaseModel):
     data: str
     logs: Dict[str, str]
+    userLogs: Dict[str, str] = {}
 
 
 class AppLog(BaseModel):

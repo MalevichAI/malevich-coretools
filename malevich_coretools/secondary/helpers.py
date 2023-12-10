@@ -44,9 +44,12 @@ def __show_logs_result(res: LogsResult):  # noqa: ANN202
     if len(res.data) > 0:
         print("------- main:")
         print(res.data)
-    for run_id, logs in res.logs.items():
+    for run_id, logs in res.userLogs.items():
         print(f"------- {run_id}:")
-        print(logs)
+        if len(logs) > 0:
+            print(logs)
+            print("-------")
+        print(res.logs[run_id])
 
 
 def __show_logs(app_logs: AppLogs, err: bool = False):  # noqa: ANN202

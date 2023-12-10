@@ -1109,6 +1109,23 @@ def get_cfg_real(
     return f.get_userCfgs_realId(id, auth=auth, conn_url=conn_url)
 
 
+def __fix_cfg(cfg: Union[Dict[str, Any], Alias.Json, Cfg]) -> str:
+    if isinstance(cfg, Cfg):
+        for app_setting in cfg.app_settings:
+            if isinstance(app_setting.saveCollectionsName, str):
+                app_setting.saveCollectionsName = [app_setting.saveCollectionsName]
+        cfg_json = cfg.json()
+    else:
+        if isinstance(cfg, Alias.Json):
+            cfg = json.loads(cfg)
+        assert isinstance(cfg, dict), "wrong cfg type"
+        for app_setting in cfg["app_settings"]:
+            if isinstance(name := app_setting.get("saveCollectionsName"), str):
+                app_setting["saveCollectionsName"] = [name]
+        cfg_json = json.dumps(cfg)
+    return cfg_json
+
+
 def create_cfg(
     cfg_id: str,
     cfg: Union[Dict[str, Any], Alias.Json, Cfg],
@@ -1120,11 +1137,7 @@ def create_cfg(
     """create configuration file\n
     `cfg` must be json or dict or Cfg\n
     return `id` """
-    if isinstance(cfg, Cfg):
-        cfg_json = cfg.json()
-    else:
-        cfg_json = to_json(cfg)
-    user_cfg = UserCfg(cfgId=cfg_id, cfg=cfg_json)
+    user_cfg = UserCfg(cfgId=cfg_id, cfg=__fix_cfg(cfg))
     return f.post_userCfgs(user_cfg, wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -1139,11 +1152,7 @@ def update_cfg(
 ) -> Alias.Info:
     """update configuration file\n
     `cfg` must be json or dict or Cfg"""
-    if isinstance(cfg, Cfg):
-        cfg_json = cfg.json()
-    else:
-        cfg_json = to_json(cfg)
-    user_cfg = UserCfg(cfgId=cfg_id, cfg=cfg_json)
+    user_cfg = UserCfg(cfgId=cfg_id, cfg=__fix_cfg(cfg))
     return f.post_userCfgs_id(id, user_cfg, wait=wait, auth=auth, conn_url=conn_url)
 
 
