@@ -447,6 +447,60 @@ def delete_from_collection(
     )
 
 
+# CollectionObjects
+
+
+def get_collection_objects(
+    path: Optional[str] = None,
+    recursive: Optional[str] = None,
+    *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+) -> FilesDirs:
+    """return struct with list of paths: directories and files: walk if `recursive` else ls"""
+    return f.get_collection_objects(path, recursive, auth=auth, conn_url=conn_url)
+
+
+def get_collection_object(
+    path: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+) -> bytes:
+    """return collection object bytes by `path`"""
+    return f.get_collection_object(
+        path, auth=auth, conn_url=conn_url
+    )
+
+
+def update_collection_object(
+    path: str,
+    data: bytes,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+) -> Alias.Info:
+    """update collection object with `path` by `data` """
+    return f.post_collections_object(path, data, wait=wait, auth=auth, conn_url=conn_url)
+
+
+def delete_collection_objects(
+    wait: bool = True, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+) -> Alias.Info:
+    """delete all collection objects"""
+    return f.delete_collection_objects(wait=wait, auth=auth, conn_url=conn_url)
+
+
+def delete_collection_object(
+    path: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+) -> Alias.Info:
+    """delete collection object with `path` (or directory with them) """
+    return f.delete_collection_object(path, wait=wait, auth=auth, conn_url=conn_url)
+
+
 # Scheme
 
 

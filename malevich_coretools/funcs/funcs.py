@@ -121,6 +121,29 @@ def delete_collections_id_s3(key: str, wait: bool, *args, **kwargs) -> Alias.Inf
 def delete_collections_id_del(id: str, data: DocsCollectionChange, wait: bool, *args, **kwargs) -> Alias.Info:
     return send_to_core_modify(COLLECTIONS_ID_DEL(id, wait), data, *args, **kwargs, is_post=False)
 
+# CollectionObjectsController
+
+
+def get_collection_objects(path: Optional[str], recursive: Optional[str], *args, **kwargs) -> FilesDirs:
+    return model_from_json(send_to_core_get(COLLECTION_OBJECTS_ALL_GET(path, recursive), *args, **kwargs), FilesDirs)
+
+
+def get_collection_object(path: str, *args, **kwargs) -> bytes:
+    return send_to_core_get(COLLECTION_OBJECTS_PATH(path, None), is_text=None, *args, **kwargs)
+
+
+def post_collections_object(path: str, data: bytes, wait: bool, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify_raw(COLLECTION_OBJECTS_PATH(path, wait), data, *args, **kwargs)
+
+
+def delete_collection_objects(wait: bool, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify(COLLECTION_OBJECTS_ALL(wait), *args, **kwargs, is_post=False)
+
+
+def delete_collection_object(path: str, wait: bool, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify(COLLECTION_OBJECTS_PATH(path, wait), *args, **kwargs, is_post=False)
+
+
 # SchemeController
 
 
@@ -599,7 +622,7 @@ def __check_response(path: str, response: Response, show_func: Optional[Callable
     response.raise_for_status()
 
 
-def send_to_core_get(path: str, with_auth=True, show_func: Optional[Callable]=None, is_text=False, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Optional[str]:
+def send_to_core_get(path: str, with_auth=True, show_func: Optional[Callable]=None, is_text=False, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Optional[Union[str, bytes]]:
     host = Config.HOST_PORT if conn_url is None else conn_url
     assert host is not None, "host port not set"
     if auth is None or not with_auth:
@@ -608,10 +631,12 @@ def send_to_core_get(path: str, with_auth=True, show_func: Optional[Callable]=No
     __check_response(f"{host}{path}", response, show_func)
     if response.status_code == HTTPStatus.NO_CONTENT:
         return None
-    if is_text:
+    if is_text is True:
         return response.text
-    else:
+    elif is_text is False:
         return response.json()
+    else:
+        return response.content
 
 
 def send_to_core_modify(path: str, operation: Optional[Any] = None, with_auth: bool=True, with_show: Optional[bool]=None, show_func: Optional[Callable]=None, is_post: bool=True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> str:  # noqa: ANN401
@@ -626,6 +651,30 @@ def send_to_core_modify(path: str, operation: Optional[Any] = None, with_auth: b
         response = requests.post(f"{host}{path}", data=operation, headers=HEADERS, auth=auth if with_auth else None)
     else:   # delete
         response = requests.delete(f"{host}{path}", data=operation, headers=HEADERS, auth=auth if with_auth else None)
+    __check_response(f"{host}{path}", response, show_func=show_func)
+    if response.status_code == HTTPStatus.NO_CONTENT:
+        return ""
+    result = response.text
+    if with_show is None:
+        with_show = Config.VERBOSE
+    if with_show:
+        if show_func is None:
+            Config.logger.info(result)
+        else:
+            show_func(result)
+    return result
+
+
+def send_to_core_modify_raw(path: str, data: bytes, with_auth: bool=True, with_show: Optional[bool]=None, show_func: Optional[Callable]=None, is_post: bool=True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> str:  # noqa: ANN401
+    """modify: post by default, else - delete"""
+    host = Config.HOST_PORT if conn_url is None else conn_url
+    assert host is not None, "host port not set"
+    if auth is None:
+        auth = (Config.CORE_USERNAME, Config.CORE_PASSWORD)
+    if is_post:
+        response = requests.post(f"{host}{path}", data=data, headers=HEADERS_RAW, auth=auth if with_auth else None)
+    else:   # delete
+        response = requests.delete(f"{host}{path}", data=data, headers=HEADERS_RAW, auth=auth if with_auth else None)
     __check_response(f"{host}{path}", response, show_func=show_func)
     if response.status_code == HTTPStatus.NO_CONTENT:
         return ""

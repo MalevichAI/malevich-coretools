@@ -17,8 +17,8 @@ def admin_get_run_info(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Info:
-    """return run info by operation \"id\""""
-    data = OperationOrNone(id)
+    """return run info by operation `id`"""
+    data = OperationOrNone(operationId=id)
     return f.get_admin_runs_info(data, auth=auth, conn_url=conn_url)
 
 
@@ -39,7 +39,7 @@ def admin_delete_run(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Json:
-    """delete run by operation \"id\""""
+    """delete run by operation `id`"""
     data = AdminStopOperation(operationId=id, withLogs=withLogs)
     return f.delete_admin_runs(data, auth=auth, conn_url=conn_url)
 
@@ -51,5 +51,5 @@ def admin_delete_runs(
     conn_url: Optional[str] = None,
 ) -> Alias.Json:
     """delete all runs"""
-    data = AdminStopOperation(operationId=None, withLogs=withLogs)
+    data = AdminStopOperation(withLogs=withLogs)
     return f.delete_admin_runs(data, auth=auth, conn_url=conn_url)

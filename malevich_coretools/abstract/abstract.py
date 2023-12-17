@@ -211,6 +211,11 @@ class ResultIds(BaseModel):
     ids: List[Alias.Id]
 
 
+class FilesDirs(BaseModel):
+    files: List[str]
+    directories: List[str]
+
+
 class ResultDoc(BaseModel):
     data: Alias.Json
     name: str
@@ -424,5 +429,5 @@ class OperationOrNone(BaseModel):
 
 
 class AdminStopOperation(BaseModel):
-    operationId: Optional[Alias.Id]
+    operationId: Optional[Alias.Id] = None
     withLogs: bool

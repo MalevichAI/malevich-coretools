@@ -7,6 +7,7 @@ from malevich_coretools.secondary.helpers import bool_to_str
 # const
 API_VERSION = "api/v1"
 HEADERS = {'Content-type': 'application/json', 'Accept': 'application/json', 'User-Agent': 'malevich user agent'}
+HEADERS_RAW = {'Content-type': 'text/plain; base64', 'Accept': 'application/json', 'User-Agent': 'malevich user agent'}
 SLEEP_TIME = 0.1
 LONG_SLEEP_TIME = 1             # second
 WAIT_RESULT_TIMEOUT = 60 * 60   # hour
@@ -51,6 +52,12 @@ COLLECTIONS_APPLY_SCHEME = lambda id, wait: with_wait(f"{COLLECTIONS_MAIN}/{id}/
 COLLECTIONS_FIX_SCHEME = lambda id, wait: with_wait(f"{COLLECTIONS_MAIN}/{id}/fixScheme", wait)
 COLLECTIONS_UNFIX_SCHEME = lambda id, wait: with_wait(f"{COLLECTIONS_MAIN}/{id}/unfixScheme", wait)
 COLLECTIONS_METADATA = lambda id, wait: with_wait(f"{COLLECTIONS_MAIN}/{id}/metadata", wait)
+
+## CollectionObjectsController
+COLLECTION_OBJECTS_MAIN = f"{API_VERSION}/collectionObjects"
+COLLECTION_OBJECTS_ALL_GET = lambda path, recursive: with_key_values(f"{COLLECTION_OBJECTS_MAIN}/all", {"path": path, "recursive": recursive})
+COLLECTION_OBJECTS_ALL = lambda wait: with_wait(f"{COLLECTION_OBJECTS_MAIN}/all", wait)
+COLLECTION_OBJECTS_PATH = lambda path, wait: with_key_values(f"{COLLECTION_OBJECTS_MAIN}/", {"path": path, "wait": None if wait is None else bool_to_str(wait)})
 
 ## SchemeController
 SCHEMES_MAIN = f"{API_VERSION}/schemes"
