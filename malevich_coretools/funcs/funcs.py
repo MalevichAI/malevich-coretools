@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import json
 from asyncio import exceptions
 from http import HTTPStatus
 from typing import Any, Callable, Optional
@@ -646,7 +647,7 @@ def send_to_core_modify(path: str, operation: Optional[Any] = None, with_auth: b
     if auth is None:
         auth = (Config.CORE_USERNAME, Config.CORE_PASSWORD)
     if operation is not None:
-        operation = operation.json()
+        operation = json.dumps(operation.model_dump())
     if is_post:
         response = requests.post(f"{host}{path}", data=operation, headers=HEADERS, auth=auth if with_auth else None)
     else:   # delete
@@ -695,7 +696,7 @@ async def send_to_core_post_async(path: str, operation: Optional[str] = None, wi
     if auth is None or not with_auth:
         auth = aiohttp.BasicAuth(login=Config.CORE_USERNAME, password=Config.CORE_PASSWORD, encoding='utf-8') if with_auth else None
     if operation is not None:
-        operation = operation.json()
+        operation = json.dumps(operation.model_dump())
 
     async with aiohttp.ClientSession(auth=auth, connector=aiohttp.TCPConnector(verify_ssl=False), timeout=AIOHTTP_TIMEOUT) as session:
         async with session.post(f"{host}{path}", data=operation, headers=HEADERS) as response:
