@@ -133,8 +133,16 @@ def get_collection_object(path: str, *args, **kwargs) -> bytes:
     return send_to_core_get(COLLECTION_OBJECTS_PATH(path, None), is_text=None, *args, **kwargs)
 
 
+def get_collection_object_presigned_url(path: str, callback_url: Optional[str], expires_in: int, wait: bool, *args, **kwargs) -> str:
+    return send_to_core_get(COLLECTION_OBJECTS_PRESIGN_PUT(path, callback_url, expires_in, wait), is_text=True, *args, **kwargs)
+
+
 def post_collections_object(path: str, data: bytes, wait: bool, *args, **kwargs) -> Alias.Info:
     return send_to_core_modify_raw(COLLECTION_OBJECTS_PATH(path, wait), data, *args, **kwargs)
+
+
+def post_collections_object_presigned(signature: str, data: bytes, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify_raw(COLLECTION_OBJECTS_PRESIGN(signature), data, *args, **kwargs)
 
 
 def delete_collection_objects(wait: bool, *args, **kwargs) -> Alias.Info:
@@ -143,6 +151,46 @@ def delete_collection_objects(wait: bool, *args, **kwargs) -> Alias.Info:
 
 def delete_collection_object(path: str, wait: bool, *args, **kwargs) -> Alias.Info:
     return send_to_core_modify(COLLECTION_OBJECTS_PATH(path, wait), *args, **kwargs, is_post=False)
+
+
+# EndpointController
+
+
+def get_endpoints(*args, **kwargs) -> str:
+    return send_to_core_get(ENDPOINTS_ALL(None), *args, **kwargs)  # TOOD model_from_json
+
+
+def run_endpoint(hash: str, *args, **kwargs) -> Union[AppLogs, Any]:
+    res = send_to_core_modify(ENDPOINTS_RUN(hash), with_show=True, show_func=show_logs_func, *args, **kwargs)
+    try:
+        res = AppLogs.parse_raw(res)
+    except BaseException:
+        pass
+    return res
+
+
+def create_endpoint(data: Endpoint, wait: bool, *args, **kwargs) -> str:
+    return send_to_core_modify(ENDPOINTS_CREATE(wait), data, *args, **kwargs)
+
+
+def update_endpoint(data: Endpoint, wait: bool, *args, **kwargs) -> str:
+    return send_to_core_modify(ENDPOINTS_UPDATE(wait), data, *args, **kwargs)
+
+
+def pause_endpoint(hash: str, wait: bool, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify(ENDPOINTS_PAUSE(hash, wait), *args, **kwargs)
+
+
+def resume_endpoint(hash: str, wait: bool, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify(ENDPOINTS_RESUME(hash, wait), *args, **kwargs)
+
+
+def delete_endpoints(wait: bool, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify(ENDPOINTS_ALL(wait), *args, **kwargs, is_post=False)
+
+
+def delete_endpoint(hash: str, wait: bool, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify(ENDPOINTS(hash, wait), *args, **kwargs, is_post=False)
 
 
 # SchemeController

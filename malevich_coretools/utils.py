@@ -471,6 +471,19 @@ def get_collection_object(
     )
 
 
+def get_collection_object_presigned_url(
+    path: str,
+    expires_in: int,
+    callback_url: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+) -> Alias.Info:
+    """get presigned url to load object with `path`, valid only `expiresIn` seconds, one-time use"""
+    return f.get_collection_object_presigned_url(path, callback_url, expires_in, wait=wait, auth=auth, conn_url=conn_url)
+
+
 def update_collection_object(
     path: str,
     data: bytes,
@@ -481,6 +494,17 @@ def update_collection_object(
 ) -> Alias.Info:
     """update collection object with `path` by `data` """
     return f.post_collections_object(path, data, wait=wait, auth=auth, conn_url=conn_url)
+
+
+def update_collection_object_presigned(
+    signature: str,
+    data: bytes,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+) -> Alias.Info:
+    """update collection object with by `data` with presigned `signature`"""
+    return f.post_collections_object_presigned(signature, data, auth=auth, conn_url=conn_url)
 
 
 def delete_collection_objects(
@@ -499,6 +523,93 @@ def delete_collection_object(
 ) -> Alias.Info:
     """delete collection object with `path` (or directory with them) """
     return f.delete_collection_object(path, wait=wait, auth=auth, conn_url=conn_url)
+
+
+# Endpoint
+
+
+def get_endpoints(
+    *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+) -> FilesDirs:
+    return f.get_endpoints(auth=auth, conn_url=conn_url)
+
+
+def run_endpoint(
+    hash: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+) -> Union[AppLogs, Any]:
+    return f.run_endpoint(hash, auth=auth, conn_url=conn_url)
+
+
+def create_endpoint(
+    task_id: Optional[str] = None,
+    cfg_id: Optional[str] = None,
+    callback_url: Optional[str] = None,
+    sla: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+) -> str:
+    """return hash, url - api/v1/endpoints/run/{hash}"""
+    data = Endpoint(taskid=task_id, cfgId=cfg_id, callbackUrl=callback_url, sla=sla)
+    return f.create_endpoint(data, wait=wait, auth=auth, conn_url=conn_url)
+
+
+def update_endpoint(
+    hash: str,
+    task_id: Optional[str] = None,
+    cfg_id: Optional[str] = None,
+    callback_url: Optional[str] = None,
+    sla: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+) -> str:
+    """return hash, url - api/v1/endpoints/run/{hash}"""
+    data = Endpoint(hash=hash, taskid=task_id, cfgId=cfg_id, callbackUrl=callback_url, sla=sla)
+    return f.update_endpoint(data, wait=wait, auth=auth, conn_url=conn_url)
+
+
+def pause_endpoint(
+    hash: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+) -> Alias.Info:
+    return f.pause_endpoint(hash, wait=wait, auth=auth, conn_url=conn_url)
+
+
+def resume_endpoint(
+    hash: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+) -> Alias.Info:
+    return f.resume_endpoint(hash, wait=wait, auth=auth, conn_url=conn_url)
+
+
+def delete_endpoints(
+    wait: bool = True, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+) -> Alias.Info:
+    """delete all endpoints"""
+    return f.delete_endpoints(wait=wait, auth=auth, conn_url=conn_url)
+
+
+def delete_endpoint(
+    hash: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+) -> Alias.Info:
+    """delete endpoint with `hash` """
+    return f.delete_endpoint(hash, wait=wait, auth=auth, conn_url=conn_url)
 
 
 # Scheme

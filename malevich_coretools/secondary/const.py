@@ -58,6 +58,18 @@ COLLECTION_OBJECTS_MAIN = f"{API_VERSION}/collectionObjects"
 COLLECTION_OBJECTS_ALL_GET = lambda path, recursive: with_key_values(f"{COLLECTION_OBJECTS_MAIN}/all", {"path": path, "recursive": recursive})
 COLLECTION_OBJECTS_ALL = lambda wait: with_wait(f"{COLLECTION_OBJECTS_MAIN}/all", wait)
 COLLECTION_OBJECTS_PATH = lambda path, wait: with_key_values(f"{COLLECTION_OBJECTS_MAIN}/", {"path": path, "wait": None if wait is None else bool_to_str(wait)})
+COLLECTION_OBJECTS_PRESIGN_PUT = lambda path, callback_url, expires_in, wait: with_key_values(f"{COLLECTION_OBJECTS_MAIN}/presign/put", {"path": path, "callback_url": callback_url, "expiresIn": expires_in, "wait": bool_to_str(wait)})
+COLLECTION_OBJECTS_PRESIGN = lambda signature: with_key_values(f"{COLLECTION_OBJECTS_MAIN}/presign", {"signature": signature})
+
+## EndpointController
+ENDPOINTS_MAIN = f"{API_VERSION}/endpoints"
+ENDPOINTS = lambda hash, wait: with_wait(f"{ENDPOINTS_MAIN}/{hash}", wait)
+ENDPOINTS_ALL = lambda wait: with_wait(f"{ENDPOINTS_MAIN}/all", wait)
+ENDPOINTS_RUN = lambda hash: f"{ENDPOINTS_MAIN}/run/{hash}"
+ENDPOINTS_CREATE = lambda wait: with_wait(f"{ENDPOINTS_MAIN}/create", wait)
+ENDPOINTS_UPDATE = lambda wait: with_wait(f"{ENDPOINTS_MAIN}/update", wait)
+ENDPOINTS_PAUSE = lambda hash, wait: with_wait(f"{ENDPOINTS_MAIN}/pause/{hash}", wait)
+ENDPOINTS_RESUME = lambda hash, wait: with_wait(f"{ENDPOINTS_MAIN}/resume/{hash}", wait)
 
 ## SchemeController
 SCHEMES_MAIN = f"{API_VERSION}/schemes"

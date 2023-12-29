@@ -431,3 +431,11 @@ class OperationOrNone(BaseModel):
 class AdminStopOperation(BaseModel):
     operationId: Optional[Alias.Id] = None
     withLogs: bool
+
+
+class Endpoint(BaseModel):
+    hash: Optional[str] = None
+    taskid: Optional[str] = None
+    cfgId: Optional[str] = None
+    callbackUrl: Optional[str] = None
+    sla: Optional[str] = None
