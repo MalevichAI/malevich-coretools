@@ -156,12 +156,12 @@ def delete_collection_object(path: str, wait: bool, *args, **kwargs) -> Alias.In
 # EndpointController
 
 
-def get_endpoints(*args, **kwargs) -> str:
-    return send_to_core_get(ENDPOINTS_ALL(None), *args, **kwargs)  # TOOD model_from_json
+def get_endpoints(*args, **kwargs) -> Endpoints:
+    return model_from_json(send_to_core_get(ENDPOINTS_ALL(None), *args, **kwargs), Endpoints)
 
 
-def run_endpoint(hash: str, *args, **kwargs) -> Union[AppLogs, Any]:
-    res = send_to_core_modify(ENDPOINTS_RUN(hash), with_show=True, show_func=show_logs_func, *args, **kwargs)
+def run_endpoint(hash: str, with_show: bool, *args, **kwargs) -> Union[AppLogs, Any]:
+    res = send_to_core_modify(ENDPOINTS_RUN(hash), with_show=with_show, show_func=show_logs_func, *args, **kwargs)
     try:
         res = AppLogs.parse_raw(res)
     except BaseException:

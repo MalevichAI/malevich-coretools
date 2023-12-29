@@ -503,7 +503,7 @@ def update_collection_object_presigned(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Alias.Info:
-    """update collection object with by `data` with presigned `signature`"""
+    """update collection object by `data` with presigned `signature`"""
     return f.post_collections_object_presigned(signature, data, auth=auth, conn_url=conn_url)
 
 
@@ -530,17 +530,20 @@ def delete_collection_object(
 
 def get_endpoints(
     *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
-) -> FilesDirs:
+) -> Endpoints:
+    """get registered endpoints structs"""
     return f.get_endpoints(auth=auth, conn_url=conn_url)
 
 
 def run_endpoint(
     hash: str,
+    with_show: bool = True,
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> Union[AppLogs, Any]:
-    return f.run_endpoint(hash, auth=auth, conn_url=conn_url)
+    """run by endpoint, failed if `taskId`, `cfgId` not set or it is not active"""
+    return f.run_endpoint(hash, with_show=with_show, auth=auth, conn_url=conn_url)
 
 
 def create_endpoint(
@@ -548,13 +551,14 @@ def create_endpoint(
     cfg_id: Optional[str] = None,
     callback_url: Optional[str] = None,
     sla: Optional[str] = None,
+    active: Optional[bool] = None,
     wait: bool = True,
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> str:
-    """return hash, url - api/v1/endpoints/run/{hash}"""
-    data = Endpoint(taskid=task_id, cfgId=cfg_id, callbackUrl=callback_url, sla=sla)
+    """create endpoint, return hash, url - api/v1/endpoints/run/{hash}. fields may not be initialized - this will only cause an error at startup"""
+    data = Endpoint(taskId=task_id, cfgId=cfg_id, callbackUrl=callback_url, sla=sla, active=active)
     return f.create_endpoint(data, wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -564,13 +568,14 @@ def update_endpoint(
     cfg_id: Optional[str] = None,
     callback_url: Optional[str] = None,
     sla: Optional[str] = None,
+    active: Optional[bool] = None,
     wait: bool = True,
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
 ) -> str:
-    """return hash, url - api/v1/endpoints/run/{hash}"""
-    data = Endpoint(hash=hash, taskid=task_id, cfgId=cfg_id, callbackUrl=callback_url, sla=sla)
+    """update endpoint, return hash, url - api/v1/endpoints/run/{hash}. update field if it is not None"""
+    data = Endpoint(hash=hash, taskId=task_id, cfgId=cfg_id, callbackUrl=callback_url, sla=sla, active=active)
     return f.update_endpoint(data, wait=wait, auth=auth, conn_url=conn_url)
 
 

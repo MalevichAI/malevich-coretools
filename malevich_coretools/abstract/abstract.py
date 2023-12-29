@@ -435,7 +435,12 @@ class AdminStopOperation(BaseModel):
 
 class Endpoint(BaseModel):
     hash: Optional[str] = None
-    taskid: Optional[str] = None
+    taskId: Optional[str] = None
     cfgId: Optional[str] = None
     callbackUrl: Optional[str] = None
     sla: Optional[str] = None
+    active: Optional[bool] = None
+
+
+class Endpoints(BaseModel):
+    data: List[Endpoint]
