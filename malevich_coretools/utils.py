@@ -754,9 +754,9 @@ def check_auth(
     return f.get_check_auth(auth=auth, conn_url=conn_url)
 
 
-def ping() -> Alias.Info:
+def ping(conn_url: Optional[str] = None) -> Alias.Info:
     """return `pong` """
-    return f.get_ping(with_auth=False)
+    return f.get_ping(with_auth=False, conn_url=conn_url)
 
 
 # def get_mappings(*, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultDocMappingsFull:
