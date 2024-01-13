@@ -346,8 +346,8 @@ class AppLog(BaseModel):
 
 class AppLogs(BaseModel):
     operationId: Alias.Id
-    dagLogs: str
-    data: Dict[str, AppLog]
+    dagLogs: str = ""
+    data: Dict[str, AppLog] = {}
     error: Optional[str] = None
 
 

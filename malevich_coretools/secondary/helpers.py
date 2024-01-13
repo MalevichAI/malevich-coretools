@@ -1,15 +1,18 @@
 import json
 import random as rand
 import string
-from typing import Any, Callable, Dict, Tuple, Union
+from typing import Any, Callable, Dict, Optional, Tuple, Union
 
 from pydantic import BaseModel
 
 from malevich_coretools.abstract.abstract import Alias, AppLogs, LogsResult
 from malevich_coretools.secondary import Config
+from malevich_coretools.secondary.kafka import handle_logs
 
 __mini__delimiter = "-" * 25
 __delimiter = "-" * 50
+__colors = [f"\x1b[{i};20m" for i in range(31, 38)]
+__color_reset = "\x1b[0m"
 
 
 def to_json(data: Union[Dict[str, Any], Alias.Json], condition_and_msg: Tuple[Callable[[Dict[str, Any]], bool], str] = (lambda _: True, "")) -> str:
@@ -53,7 +56,7 @@ def __show_logs_result(res: LogsResult):  # noqa: ANN202
         print(logs)
 
 
-def __show_logs(app_logs: AppLogs, err: bool = False):  # noqa: ANN202
+def show_logs(app_logs: AppLogs, err: bool = False) -> None:  # noqa: ANN202
     show = Config.logger.error if err else Config.logger.info
     show(f"operation_id = {app_logs.operationId}")
     if app_logs.error is not None:
@@ -73,10 +76,51 @@ def __show_logs(app_logs: AppLogs, err: bool = False):  # noqa: ANN202
         print(__delimiter)
 
 
+def show_logs_colored(app_logs: AppLogs, colors_dict: Optional[Dict[str, str]] = None) -> None:
+    """colors_dict - should be unique for all app_logs by operation_id"""
+    def format(log, color: Optional[str]) -> None:
+        if color is None:
+            Config.logger.warning(log)
+        else:
+            Config.logger.warning(color + log + __color_reset)
+
+    def get_color(name: str) -> str:
+        if colors_dict is None:
+            return None
+        color = colors_dict.get(name, None)
+        if color is None:
+            color = __colors[len(colors_dict) % len(__colors)]
+            colors_dict[name] = color
+        return color
+
+    if app_logs.error is not None:
+        format(f"error: {app_logs.error}", get_color("error"))
+    if len(app_logs.dagLogs) > 0:
+        color = get_color("dagLogs")
+        for line in app_logs.dagLogs.splitlines():
+            format(f"dag: {line}", color)
+    for app_name, app_log in app_logs.data.items():
+        color = get_color(f"${app_name}")
+        for i, logs_result in enumerate(app_log.data):
+            app_name_prefix = f"{app_name}${i}" if i != 0 else app_name
+            if len(logs_result.data) > 0:
+                for line in logs_result.data.splitlines():
+                    format(f"{app_name_prefix}$main: {line}", color)
+            if len(logs_result.logs) > 0:
+                for run_id, logs in logs_result.logs.items():
+                    user_logs = logs_result.userLogs.get(run_id, "")
+                    if len(user_logs) > 0:
+                        for line in user_logs.splitlines():
+                            format(f"{app_name_prefix}${run_id}: {line}", color)
+                    if len(logs) > 0:
+                        for line in logs.splitlines():
+                            format(f"{app_name_prefix}${run_id}: {line}", color)
+
+
 def show_logs_func(data: str, err: bool = False):  # noqa: ANN201
     try:
         app_logs = AppLogs.parse_raw(data)
-        __show_logs(app_logs, err=err)
+        show_logs(app_logs, err=err)
     except BaseException:
         Config.logger.error("decode logs failed")
         show = Config.logger.error if err else Config.logger.info
@@ -92,3 +136,9 @@ def show_fail_app_info(data: str, err: bool):  # noqa: ANN201
     except BaseException:
         Config.logger.error("decode unsuccessful app_info fail")
         print(data)
+
+
+def logs_streaming(operation_id: str, kafka_host_port: Optional[str] = None, app_logs_show: Callable[[AppLogs], None] = show_logs_colored) -> None:
+    colors_dict = {}
+    for appLogs in handle_logs(operation_id, kafka_host_port=kafka_host_port):
+        app_logs_show(appLogs, colors_dict=colors_dict)
