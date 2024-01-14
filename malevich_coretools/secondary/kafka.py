@@ -2,7 +2,7 @@ from typing import Generator, Optional
 
 from kafka import KafkaConsumer
 
-from malevich_coretools import AppLogs
+from malevich_coretools.abstract import AppLogs
 from malevich_coretools.secondary import Config
 
 
