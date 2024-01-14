@@ -2,3 +2,4 @@ requests
 pydantic
 pandas
 aiohttp
+kafka-python

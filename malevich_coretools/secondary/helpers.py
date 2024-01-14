@@ -7,10 +7,10 @@ from pydantic import BaseModel
 
 from malevich_coretools.abstract.abstract import Alias, AppLogs, LogsResult
 from malevich_coretools.secondary import Config
-from malevich_coretools.secondary.kafka import handle_logs
+from malevich_coretools.secondary.kafka_utils import handle_logs
 
 __mini__delimiter = "-" * 25
-__delimiter = "-" * 50
+__delimiter = "-" * 50 
 __colors = [f"\x1b[{i};20m" for i in range(31, 38)]
 __color_reset = "\x1b[0m"
 
