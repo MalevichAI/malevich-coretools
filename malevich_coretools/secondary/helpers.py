@@ -10,7 +10,7 @@ from malevich_coretools.secondary import Config
 from malevich_coretools.secondary.kafka_utils import handle_logs
 
 __mini__delimiter = "-" * 25
-__delimiter = "-" * 50 
+__delimiter = "-" * 50
 __colors = [f"\x1b[{i};20m" for i in range(31, 38)]
 __color_reset = "\x1b[0m"
 
