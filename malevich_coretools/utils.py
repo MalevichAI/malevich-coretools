@@ -9,6 +9,22 @@ import pandas as pd
 import malevich_coretools.funcs.funcs as f
 import malevich_coretools.funcs.helpers as fh
 from malevich_coretools.abstract import *  # noqa: F403
+from malevich_coretools.batch import (  # noqa: F401
+    Batcher,
+    BatcherRaiseOption,
+    DefferOperation,
+)
+from malevich_coretools.funcs.helpers import (  # noqa: F401
+    create_app_settings,
+    create_endpoint_override,
+    create_restrictions,
+    create_run_settings,
+    create_task_component,
+    create_task_policy,
+    create_user_config,
+    raw_collection_from_df,
+    raw_collection_from_file,
+)
 from malevich_coretools.secondary import Config, to_json
 from malevich_coretools.secondary.const import (
     POSSIBLE_APPS_PLATFORMS,
@@ -66,7 +82,11 @@ def update_core_credentials(username: USERNAME, password: PASSWORD) -> None:
     Config.CORE_PASSWORD = password
 
 
-def digest_by_image(image_ref: str, username: Optional[str] = None, password: Optional[str] = None) -> Optional[str]:
+def digest_by_image(
+    image_ref: str,
+    username: Optional[str] = None,
+    password: Optional[str] = None,
+) -> Optional[str]:
     """return image in digest format by `image_ref`, if fail - return None and log error. If `image_ref` in digest format - return itself without check
 
     Args:
@@ -98,16 +118,31 @@ def digest_by_image(image_ref: str, username: Optional[str] = None, password: Op
 
 
 def get_docs(
-    *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultIds:
     """return list ids """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getDocs", result_model=ResultIds)
     return f.get_docs(auth=auth, conn_url=conn_url)
 
 
 def get_doc(
-    id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultDoc:
     """return doc by `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getDocById", vars={"id": id}, result_model=ResultDoc)
     return f.get_docs_id(id, auth=auth, conn_url=conn_url)
 
 
@@ -118,10 +153,16 @@ def create_doc(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Id:
     """save doc with `data` and `name`, return `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = DocWithName(data=data, name=name)
+    if batcher is not None:
+        return batcher.add("postDoc", data=data)
     return f.post_docs(
-        DocWithName(data=data, name=name), wait=wait, auth=auth, conn_url=conn_url
+        data, wait=wait, auth=auth, conn_url=conn_url
     )
 
 
@@ -133,10 +174,16 @@ def update_doc(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Id:
     """update doc by `id`, return `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = DocWithName(data=data, name=name)
+    if batcher is not None:
+        return batcher.add("postDocById", data=data, vars={"id": id})
     return f.post_docs_id(
-        id, DocWithName(data=data, name=name), wait=wait, auth=auth, conn_url=conn_url
+        id, data, wait=wait, auth=auth, conn_url=conn_url
     )
 
 
@@ -146,15 +193,28 @@ def delete_doc(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """delete doc by `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteDocById", vars={"id": id})
     return f.delete_docs_id(id, wait=wait, auth=auth, conn_url=conn_url)
 
 
 def delete_docs(
-    wait: bool = True, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """delete all docs"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteDocs")
     return f.delete_docs(wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -162,9 +222,16 @@ def delete_docs(
 
 
 def get_collections(
-    *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultOwnAndSharedIds:
     """return 2 list: own collections ids and shared collections ids"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getCollections", result_model=ResultOwnAndSharedIds)
     return f.get_collections(auth=auth, conn_url=conn_url)
 
 
@@ -175,26 +242,19 @@ def get_collections_by_name(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultOwnAndSharedIds:
     """return 2 list: own collections ids and shared collections ids by `name` and mb also `operation_id` and `run_id` with which it was saved"""
     assert not (
         operation_id is None and run_id is not None
     ), "if run_id set, operation_id should be set too"
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getCollectionsByNameAndOperationId", vars={"name": name, "operationId": operation_id, "runId": run_id}, result_model=ResultOwnAndSharedIds)
     return f.get_collections_name(
         name, operation_id, run_id, auth=auth, conn_url=conn_url
     )
-
-
-def get_collection(
-    id: str,
-    offset: int = 0,
-    limit: int = -1,
-    *,
-    auth: Optional[AUTH] = None,
-    conn_url: Optional[str] = None,
-) -> ResultCollection:
-    """return collection by `id`, pagination: unlimited - `limit` < 0"""
-    return f.get_collections_id(id, offset, limit, auth=auth, conn_url=conn_url)
 
 
 def get_collection_by_name(
@@ -206,14 +266,36 @@ def get_collection_by_name(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultCollection:
     """return collection by `name` and mb also `operation_id` and `run_id` with which it was saved. raise if there are multiple collections, pagination: unlimited - `limit` < 0"""
     assert not (
         operation_id is None and run_id is not None
     ), "if run_id set, operation_id should be set too"
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getCollectionByName", vars={"name": name, "operationId": operation_id, "runId": run_id, "offset": offset, "limit": limit}, result_model=ResultCollection)
     return f.get_collection_name(
         name, operation_id, run_id, offset, limit, auth=auth, conn_url=conn_url
     )
+
+
+def get_collection(
+    id: str,
+    offset: int = 0,
+    limit: int = -1,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> ResultCollection:
+    """return collection by `id`, pagination: unlimited - `limit` < 0"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getCollectionById", vars={"id": id, "offset": offset, "limit": limit}, result_model=ResultCollection)
+    return f.get_collections_id(id, offset, limit, auth=auth, conn_url=conn_url)
 
 
 def get_collections_ids_by_group_name(
@@ -223,8 +305,13 @@ def get_collections_ids_by_group_name(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultIds:
     """return collections ids by `group_name`, `operation_id` and `run_id` with which it was saved"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getCollectionsIdsByGroupName", vars={"name": group_name, "operationId": operation_id, "runId": run_id}, result_model=ResultIds)
     return f.get_collections_ids_groupName(
         group_name, operation_id, run_id, auth=auth, conn_url=conn_url
     )
@@ -237,8 +324,13 @@ def get_collections_by_group_name(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultCollections:
     """return collections by `group_name`, `operation_id` and `run_id` with which it was saved"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getCollectionsByGroupName", vars={"name": group_name, "operationId": operation_id, "runId": run_id}, result_model=ResultCollections)
     return f.get_collections_groupName(
         group_name, operation_id, run_id, auth=auth, conn_url=conn_url
     )
@@ -252,10 +344,16 @@ def create_collection(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Id:
     """save collection by list docs `ids`, return id"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = DocsCollection(data=ids, name=name, metadata=metadata)
+    if batcher is not None:
+        return batcher.add("postCollection", data=data)
     return f.post_collections(
-        DocsCollection(data=ids, name=name, metadata=metadata),
+        data,
         wait=wait,
         auth=auth,
         conn_url=conn_url,
@@ -271,11 +369,17 @@ def update_collection(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Id:
     """update collection with `id` by list docs `ids`, return `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = DocsCollection(data=ids, name=name, metadata=metadata)
+    if batcher is not None:
+        return batcher.add("postCollectionById", data=data, vars={"id": id})
     return f.post_collections_id(
         id,
-        DocsCollection(data=ids, name=name, metadata=metadata),
+        data,
         wait=wait,
         auth=auth,
         conn_url=conn_url,
@@ -290,11 +394,17 @@ def s3_put_collection(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """is_csv = false -> save json, key by default = id"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = PostS3Settings(isCsv=is_csv, key=key)
+    if batcher is not None:
+        return batcher.add("postCollectionByIdS3", data=data, vars={"id": id})
     return f.post_collections_id_s3(
         id,
-        PostS3Settings(isCsv=is_csv, key=key),
+        data,
         wait=wait,
         auth=auth,
         conn_url=conn_url,
@@ -309,10 +419,16 @@ def create_collection_by_docs(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Id:
     """save collection by `docs`, return `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = DocsDataCollection(data=docs, name=name, metadata=metadata)
+    if batcher is not None:
+        return batcher.add("postCollectionByDocs", data=data)
     return f.post_collections_data(
-        DocsDataCollection(data=docs, name=name, metadata=metadata),
+        data,
         wait=wait,
         auth=auth,
         conn_url=conn_url,
@@ -326,10 +442,16 @@ def add_to_collection(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """add to collection with `id` docs with `ids` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = DocsCollectionChange(data=ids)
+    if batcher is not None:
+        return batcher.add("postCollectionByIdAdd", data=data, vars={"id": id})
     return f.post_collections_id_add(
-        id, DocsCollectionChange(data=ids), wait=wait, auth=auth, conn_url=conn_url
+        id, data, wait=wait, auth=auth, conn_url=conn_url
     )
 
 
@@ -340,8 +462,13 @@ def copy_collection(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Id:
     """copy collection with `id`, if not `full_copy` docs same as in collection with `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("postCollectionByIdCopy", vars={"id": id, "fullCopy": full_copy})
     return f.post_collections_id_copy(
         id, full_copy=full_copy, wait=wait, auth=auth, conn_url=conn_url
     )
@@ -355,11 +482,17 @@ def apply_scheme(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Id:
     """apply scheme with `scheme_name` to collection with `coll_id` return new collection with another `coll_id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = FixScheme(schemeName=scheme_name, mode=mode)
+    if batcher is not None:
+        return batcher.add("postCollectionApplyScheme", data=data, vars={"id": coll_id})
     return f.post_collections_id_applyScheme(
         coll_id,
-        FixScheme(schemeName=scheme_name, mode=mode),
+        data,
         wait=wait,
         auth=auth,
         conn_url=conn_url,
@@ -374,11 +507,16 @@ def fix_scheme(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """optimization to core (not necessary call), sets the schema with `scheme_name` for the collection with `coll_id` """
-    fix_scheme_data = FixScheme(schemeName=scheme_name, mode=mode)
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = FixScheme(schemeName=scheme_name, mode=mode)
+    if batcher is not None:
+        return batcher.add("postCollectionFixScheme", data=data, vars={"id": coll_id})
     return f.post_collections_id_fixScheme(
-        coll_id, fix_scheme_data, wait=wait, auth=auth, conn_url=conn_url
+        coll_id, data, wait=wait, auth=auth, conn_url=conn_url
     )
 
 
@@ -388,8 +526,13 @@ def unfix_scheme(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """unfix scheme for collection with `coll_id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("postCollectionUnfixScheme", vars={"id": coll_id})
     return f.post_collections_id_unfixScheme(
         coll_id, wait=wait, auth=auth, conn_url=conn_url
     )
@@ -402,18 +545,31 @@ def update_metadata(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """update `metadata` for collection with `coll_id` """
-    collection_metadata = CollectionMetadata(data=metadata)
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = CollectionMetadata(data=metadata)
+    if batcher is not None:
+        return batcher.add("postCollectionMetadata", data=data, vars={"id": coll_id})
     return f.post_collections_metadata(
-        coll_id, collection_metadata, wait=wait, auth=auth, conn_url=conn_url
+        coll_id, data, wait=wait, auth=auth, conn_url=conn_url
     )
 
 
 def delete_collections(
-    wait: bool = True, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """delete all collections"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteCollections")
     return f.delete_collections(wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -423,8 +579,13 @@ def delete_collection(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """delete collection with `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteCollectionById", vars={"id": id})
     return f.delete_collections_id(id, wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -434,8 +595,13 @@ def s3_delete_collection(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """delete collection from s3 by `key` (that =id if not specified in s3_save_collection)"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteCollectionByIdS3", vars={"id": key})
     return f.delete_collections_id_s3(key, wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -446,10 +612,16 @@ def delete_from_collection(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """delete docs with `ids` from collection with `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = DocsCollectionChange(data=ids)
+    if batcher is not None:
+        return batcher.add("deleteCollectionByIdDel", data=data, vars={"id": id})
     return f.delete_collections_id_del(
-        id, DocsCollectionChange(data=ids), wait=wait, auth=auth, conn_url=conn_url
+        id, data, wait=wait, auth=auth, conn_url=conn_url
     )
 
 
@@ -459,9 +631,16 @@ def delete_from_collection(
 def get_collection_objects(
     path: Optional[str] = None,
     recursive: Optional[str] = None,
-    *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> FilesDirs:
     """return struct with list of paths: directories and files: walk if `recursive` else ls"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getCollectionObjects", vars={"path": path, "recursive": recursive}, result_model=FilesDirs)
     return f.get_collection_objects(path, recursive, auth=auth, conn_url=conn_url)
 
 
@@ -470,11 +649,34 @@ def get_collection_object(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> bytes:
     """return collection object bytes by `path`"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getCollectionObject", vars={"path": path})
     return f.get_collection_object(
         path, auth=auth, conn_url=conn_url
     )
+
+
+def post_collection_object_presigned_url(
+    path: str,
+    expires_in: int,
+    callback_url: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> str:
+    """get presigned url to put object with `path`, valid only `expiresIn` seconds, one-time use"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("presignCollectionObject", vars={"path": path, "callbackUrl": callback_url, "expiresIn": expires_in})
+    return f.post_collection_object_presigned_url(path, callback_url, expires_in, wait=wait, auth=auth, conn_url=conn_url)
 
 
 def get_collection_object_presigned_url(
@@ -485,9 +687,29 @@ def get_collection_object_presigned_url(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
-) -> Alias.Info:
-    """get presigned url to load object with `path`, valid only `expiresIn` seconds, one-time use"""
+    batcher: Optional[Batcher] = None,
+) -> str:
+    """get presigned url to get object with `path`, valid only `expiresIn` seconds, one-time use"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("presignGetCollectionObject", vars={"path": path, "callbackUrl": callback_url, "expiresIn": expires_in})
     return f.get_collection_object_presigned_url(path, callback_url, expires_in, wait=wait, auth=auth, conn_url=conn_url)
+
+
+def load_collection_object_presigned(
+    signature: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> bytes:
+    """get collection object by presigned `signature`"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getPresignCollectionObject", vars={"signature": signature})
+    return f.get_collections_object_presigned(signature, auth=auth, conn_url=conn_url)
 
 
 def update_collection_object(
@@ -497,8 +719,13 @@ def update_collection_object(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """update collection object with `path` by `data` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("postCollectionObject", data=data, vars={"path": path})
     return f.post_collections_object(path, data, wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -508,15 +735,28 @@ def update_collection_object_presigned(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """update collection object by `data` with presigned `signature`"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("postPresignCollectionObject", data=data, vars={"signature": signature})
     return f.post_collections_object_presigned(signature, data, auth=auth, conn_url=conn_url)
 
 
 def delete_collection_objects(
-    wait: bool = True, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """delete all collection objects"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteCollectionObjects")
     return f.delete_collection_objects(wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -526,8 +766,13 @@ def delete_collection_object(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """delete collection object with `path` (or directory with them) """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteCollectionObjectByPath", vars={"path": path})
     return f.delete_collection_object(path, wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -535,36 +780,70 @@ def delete_collection_object(
 
 
 def get_endpoints(
-    *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Endpoints:
     """get registered endpoints structs"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getEndpoints", result_model=Endpoints)
     return f.get_endpoints(auth=auth, conn_url=conn_url)
+
+
+def get_endpoint(
+    hash: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> Endpoint:
+    """get endpoint struct by hash"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("GetEndpointByHash", result_model=Endpoint)
+    return f.get_endpoint_by_hash(hash, auth=auth, conn_url=conn_url)
 
 
 def run_endpoint(
     hash: str,
+    endpoint_override: Optional[EndpointOverride] = None,
     with_show: bool = True,
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Union[AppLogs, Any]:
     """run by endpoint, failed if `taskId`, `cfgId` not set or it is not active"""
-    return f.run_endpoint(hash, with_show=with_show, auth=auth, conn_url=conn_url)
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("postEndpointRun", data=endpoint_override, vars={"hash": hash})
+    return f.run_endpoint(hash, endpoint_override, with_show=with_show, auth=auth, conn_url=conn_url)
 
 
 def create_endpoint(
     task_id: Optional[str] = None,
     cfg_id: Optional[str] = None,
-    callback_url: Optional[str] = None,
     sla: Optional[str] = None,
     active: Optional[bool] = None,
+    prepare: Optional[bool] = None,
+    run_settings: Optional[RunSettings] = None,
     wait: bool = True,
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> str:
     """create endpoint, return hash, url - api/v1/endpoints/run/{hash}. fields may not be initialized - this will only cause an error at startup"""
-    data = Endpoint(taskId=task_id, cfgId=cfg_id, callbackUrl=callback_url, sla=sla, active=active)
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = Endpoint(taskId=task_id, cfgId=cfg_id, sla=sla, active=active, prepare=prepare, runSettings=run_settings)
+    if batcher is not None:
+        return batcher.add("postEndpointCreate", data=data)
     return f.create_endpoint(data, wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -572,16 +851,22 @@ def update_endpoint(
     hash: str,
     task_id: Optional[str] = None,
     cfg_id: Optional[str] = None,
-    callback_url: Optional[str] = None,
     sla: Optional[str] = None,
     active: Optional[bool] = None,
+    prepare: Optional[bool] = None,
+    run_settings: Optional[RunSettings] = None,
     wait: bool = True,
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> str:
     """update endpoint, return hash, url - api/v1/endpoints/run/{hash}. update field if it is not None"""
-    data = Endpoint(hash=hash, taskId=task_id, cfgId=cfg_id, callbackUrl=callback_url, sla=sla, active=active)
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = Endpoint(hash=hash, taskId=task_id, cfgId=cfg_id, sla=sla, active=active, prepare=prepare, runSettings=run_settings)
+    if batcher is not None:
+        return batcher.add("postEndpointUpdate", data=data)
     return f.update_endpoint(data, wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -591,7 +876,12 @@ def pause_endpoint(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("postEndpointPause", vars={"hash": hash})
     return f.pause_endpoint(hash, wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -601,14 +891,27 @@ def resume_endpoint(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("postEndpointResume", vars={"hash": hash})
     return f.resume_endpoint(hash, wait=wait, auth=auth, conn_url=conn_url)
 
 
 def delete_endpoints(
-    wait: bool = True, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """delete all endpoints"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteEndpoints")
     return f.delete_endpoints(wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -618,8 +921,13 @@ def delete_endpoint(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """delete endpoint with `hash` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteEndpoint", vars={"hash": hash})
     return f.delete_endpoint(hash, wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -627,23 +935,46 @@ def delete_endpoint(
 
 
 def get_schemes(
-    *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultOwnAndSharedIds:
     """return 2 list: own schemes ids and shared schemes ids"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getSchemes", result_model=ResultOwnAndSharedIds)
     return f.get_schemes(auth=auth, conn_url=conn_url)
 
 
 def get_scheme(
-    id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultScheme:
     """return scheme by `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getSchemeById", vars={"id": id}, result_model=ResultScheme)
     return f.get_schemes_id(id, auth=auth, conn_url=conn_url)
 
 
 def get_scheme_raw(
-    id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Json:
     """return raw scheme data by `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getSchemeRawById", vars={"id": id})
     return f.get_schemes_id_raw(id, auth=auth, conn_url=conn_url)
 
 
@@ -653,8 +984,13 @@ def get_schemes_mapping(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultMapping:
     """return mapping by schemes ids, does not assume if it is not"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getSchemesMapping", vars={"schemeFromId": scheme_from_id, "schemeToId": scheme_to_id}, result_model=ResultMapping)
     return f.get_schemes_mapping(
         scheme_from_id, scheme_to_id, auth=auth, conn_url=conn_url
     )
@@ -667,14 +1003,19 @@ def create_scheme(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Id:
     """create scheme\n
     `scheme_data` must be json or dict
     return `id` """
     assert re.fullmatch(SCHEME_PATTERN, name) is not None, f"wrong scheme name: {name}"
+    if batcher is None:
+        batcher = Config.BATCHER
     scheme_json = to_json(scheme_data)
-    scheme = SchemeWithName(data=scheme_json, name=name)
-    return f.post_schemes(scheme, wait=wait, auth=auth, conn_url=conn_url)
+    data = SchemeWithName(data=scheme_json, name=name)
+    if batcher is not None:
+        return batcher.add("postScheme", data=data)
+    return f.post_schemes(data, wait=wait, auth=auth, conn_url=conn_url)
 
 
 def update_scheme(
@@ -685,14 +1026,19 @@ def update_scheme(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Id:
     """update scheme\n
     `scheme_data` must be json or dict
     return `id` """
     assert re.fullmatch(SCHEME_PATTERN, name) is not None, f"wrong scheme name: {name}"
+    if batcher is None:
+        batcher = Config.BATCHER
     scheme_json = to_json(scheme_data)
-    scheme = SchemeWithName(data=scheme_json, name=name)
-    return f.post_schemes_id(id, scheme, wait=wait, auth=auth, conn_url=conn_url)
+    data = SchemeWithName(data=scheme_json, name=name)
+    if batcher is not None:
+        return batcher.add("postSchemeById", data=data, vars={"id": id})
+    return f.post_schemes_id(id, data, wait=wait, auth=auth, conn_url=conn_url)
 
 
 def create_schemes_mapping(
@@ -703,12 +1049,18 @@ def create_schemes_mapping(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Id:
     """save mapping between schemes with ids"""
-    return f.post_schemes_mapping(
-        SchemesFixMapping(
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = SchemesFixMapping(
             schemeFromId=scheme_from_id, schemeToId=scheme_to_id, data=mapping
-        ),
+        )
+    if batcher is not None:
+        return batcher.add("postSchemesFixMapping", data=data)
+    return f.post_schemes_mapping(
+        data,
         wait=wait,
         auth=auth,
         conn_url=conn_url,
@@ -716,9 +1068,17 @@ def create_schemes_mapping(
 
 
 def delete_schemes(
-    wait: bool = True, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """delete all schemes"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteSchemes")
     return f.delete_schemes(wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -728,8 +1088,13 @@ def delete_scheme(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """delete scheme by `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteSchemeById", vars={"id": id})
     return f.delete_schemes_id(id, wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -740,10 +1105,16 @@ def delete_schemes_mapping(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """delete mapping between schemes with ids"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = SchemesIds(schemeFromId=scheme_from_id, schemeToId=scheme_to_id)
+    if batcher is not None:
+        return batcher.add("deleteSchemesMapping", data=data)
     return f.delete_schemes_mapping(
-        SchemesIds(schemeFromId=scheme_from_id, schemeToId=scheme_to_id),
+        data,
         wait=wait,
         auth=auth,
         conn_url=conn_url,
@@ -754,70 +1125,90 @@ def delete_schemes_mapping(
 
 
 def check_auth(
-    *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """check auth in core for current user"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("home")
     return f.get_check_auth(auth=auth, conn_url=conn_url)
 
 
-def ping(conn_url: Optional[str] = None) -> Alias.Info:
+def ping(
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> Alias.Info:
     """return `pong` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("ping")
     return f.get_ping(with_auth=False, conn_url=conn_url)
-
-
-# def get_mappings(*, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultDocMappingsFull:
-#     """outdate\n
-#     return list: for each doc - map from scheme to mapping ids"""
-#     return f.get_mapping(auth=auth, conn_url=conn_url)
-
-
-# def get_mapping(id: str, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> ResultMapping:
-#     """return mapping by `id`"""
-#     return f.get_mapping_id(id, auth=auth, conn_url=conn_url)
-
-
-# def create_mapping(docs_ids: List[str], scheme_id: str, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
-#     """try to do and save mapping docs with `docs_ids` with scheme with `scheme_id`, ignore if failed"""
-#     return f.post_mapping(DocsAndScheme(docsIds=docs_ids, schemeId=scheme_id), wait=wait, auth=auth, conn_url=conn_url)
-
-
-# def delete_mapping(doc_id: str, wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
-#     """delete mappings for doc with `doc_id`"""
-#     return f.delete_mapping_id(doc_id, wait=wait, auth=auth, conn_url=conn_url)
-
-
-# def delete_all(wait: bool = True, *, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
-#     """for admin: delete all"""
-#     return f.delete_all(wait=wait, auth=auth, conn_url=conn_url)
 
 # UserShare
 
 
 def get_shared_collection(
-    id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultLogins:
     """return list logins to which user has given access to the collection with `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getShareByCollection", vars={"id": id}, result_model=ResultLogins)
     return f.get_share_collection_id(id, auth=auth, conn_url=conn_url)
 
 
 def get_shared_scheme(
-    id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultLogins:
     """return list logins to which user has given access to the scheme with `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getShareByScheme", vars={"id": id}, result_model=ResultLogins)
     return f.get_share_scheme_id(id, auth=auth, conn_url=conn_url)
 
 
 def get_shared_app(
-    id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultLogins:
     """return list logins to which user has given access to the app with `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getShareByUserApp", vars={"id": id}, result_model=ResultLogins)
     return f.get_share_userApp_id(id, auth=auth, conn_url=conn_url)
 
 
 def get_shared_by_login(
-    login: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    login: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultSharedForLogin:
     """return structure with all info about share to user with `login` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getShareByLogin", vars={"login": login}, result_model=ResultSharedForLogin)
     return f.get_share_login(login, auth=auth, conn_url=conn_url)
 
 
@@ -828,11 +1219,17 @@ def share_collection(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """gives access to the collection with `id` to all users with `user_logins` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = SharedWithUsers(userLogins=user_logins)
+    if batcher is not None:
+        return batcher.add("postShareByCollection", data=data, vars={"id": id})
     return f.post_share_collection_id(
         id,
-        SharedWithUsers(userLogins=user_logins),
+        data,
         wait=wait,
         auth=auth,
         conn_url=conn_url,
@@ -846,11 +1243,17 @@ def share_scheme(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """gives access to the scheme with `id` to all users with `user_logins` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = SharedWithUsers(userLogins=user_logins)
+    if batcher is not None:
+        return batcher.add("postShareByScheme", data=data, vars={"id": id})
     return f.post_share_scheme_id(
         id,
-        SharedWithUsers(userLogins=user_logins),
+        data,
         wait=wait,
         auth=auth,
         conn_url=conn_url,
@@ -864,11 +1267,17 @@ def share_app(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """gives access to the app with `id` to all users with `user_logins` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = SharedWithUsers(userLogins=user_logins)
+    if batcher is not None:
+        return batcher.add("postShareByUserApp", data=data, vars={"id": id})
     return f.post_share_userApp_id(
         id,
-        SharedWithUsers(userLogins=user_logins),
+        data,
         wait=wait,
         auth=auth,
         conn_url=conn_url,
@@ -884,19 +1293,25 @@ def share(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """gives access to everything listed to all users with `user_logins` """
     assert user_logins is not None, '"user_logins" is empty'
+    if batcher is None:
+        batcher = Config.BATCHER
     collections_ids = [] if collections_ids is None else collections_ids
     schemes_ids = [] if schemes_ids is None else schemes_ids
     user_apps_ids = [] if user_apps_ids is None else user_apps_ids
+    data = Shared(
+        userLogins=user_logins,
+        collectionsIds=collections_ids,
+        schemesIds=schemes_ids,
+        userAppsIds=user_apps_ids,
+    )
+    if batcher is not None:
+        return batcher.add("postShare", data=data)
     return f.post_share(
-        Shared(
-            userLogins=user_logins,
-            collectionsIds=collections_ids,
-            schemesIds=schemes_ids,
-            userAppsIds=user_apps_ids,
-        ),
+        data,
         wait=wait,
         auth=auth,
         conn_url=conn_url,
@@ -912,19 +1327,25 @@ def delete_shared(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """removes access to everything listed to all users with `user_logins` """
     assert user_logins is not None, '"user_logins" is empty'
+    if batcher is None:
+        batcher = Config.BATCHER
     collections_ids = [] if collections_ids is None else collections_ids
     schemes_ids = [] if schemes_ids is None else schemes_ids
     user_apps_ids = [] if user_apps_ids is None else user_apps_ids
+    data = Shared(
+        userLogins=user_logins,
+        collectionsIds=collections_ids,
+        schemesIds=schemes_ids,
+        userAppsIds=user_apps_ids,
+    )
+    if batcher is not None:
+        return batcher.add("deleteShare", data=data)
     return f.delete_share(
-        Shared(
-            userLogins=user_logins,
-            collectionsIds=collections_ids,
-            schemesIds=schemes_ids,
-            userAppsIds=user_apps_ids,
-        ),
+        data,
         wait=wait,
         auth=auth,
         conn_url=conn_url,
@@ -932,9 +1353,17 @@ def delete_shared(
 
 
 def delete_shared_all(
-    wait: bool = True, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """removes access to everything for all for current user"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteShareAll")
     return f.delete_share_all(wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -942,31 +1371,49 @@ def delete_shared_all(
 
 
 def get_user(
-    login: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    login: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """admin: displays saved information about the user"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getRegisterByLogin", vars={"login": login})
     return f.get_register_login(login, auth=auth, conn_url=conn_url)
 
 
 def get_users(
-    *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultLogins:
     """admin: returns a list of all logins"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getRegisterAll", result_model=ResultLogins)
     return f.get_register_all(auth=auth, conn_url=conn_url)
 
 
 def create_user(
-    *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """create user in malevich-core, all operations will continue on his behalf"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        if auth is None:
+            auth = (Config.CORE_USERNAME, Config.CORE_PASSWORD)
+        data = User(login=auth[0], password=auth[1])
+        return batcher.add("postRegister", data=data)
     return f.post_register(auth=auth, conn_url=conn_url)
-
-
-def delete_user(
-    *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
-) -> Alias.Info:
-    """delete current user, not raise if user not exist"""
-    return f.delete_register(auth=auth, conn_url=conn_url)
 
 
 def delete_user_login(
@@ -975,46 +1422,102 @@ def delete_user_login(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> None:
     """admin: delete user by `login` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteRegisterByLogin", vars={"login": login})
     f.delete_register_login(login, wait=wait, auth=auth, conn_url=conn_url)
+
+
+def delete_user(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> Alias.Info:
+    """delete current user, not raise if user not exist"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteRegister")
+    return f.delete_register(auth=auth, conn_url=conn_url)
 
 
 # UserApps
 
 
 def get_apps(
-    *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultOwnAndSharedIds:
     """return apps ids for current user"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getApps", result_model=ResultOwnAndSharedIds)
     return f.get_userApps(auth=auth, conn_url=conn_url)
 
 
 def get_apps_real(
-    *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultOwnAndSharedIds:
     """return apps real ids for current user"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getAppsReal", result_model=ResultOwnAndSharedIds)
     return f.get_userApps_realIds(auth=auth, conn_url=conn_url)
 
 
 def get_apps_map(
-    *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultOwnAndSharedIdsMap:
     """return apps ids with real ids for current user"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getAppsMapIds", result_model=ResultOwnAndSharedIdsMap)
     return f.get_userApps_mapIds(auth=auth, conn_url=conn_url)
 
 
 def get_app(
-    id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None
 ) -> UserApp:
     """return app by `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getAppById", vars={"id": id}, result_model=UserApp)
     return f.get_userApps_id(id, auth=auth, conn_url=conn_url)
 
 
 def get_app_real(
-    id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> UserApp:
     """return app by real `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getAppByRealId", vars={"id": id}, result_model=UserApp)
     return f.get_userApps_realId(id, auth=auth, conn_url=conn_url)
 
 
@@ -1035,6 +1538,7 @@ def create_app(
     use_system_auth: bool = True,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Id:
     """create app\n
     `app_cfg` must be json or dict or None\n
@@ -1043,13 +1547,15 @@ def create_app(
         platform in POSSIBLE_APPS_PLATFORMS
     ), f"wrong platform: {platform}, possible platforms: {POSSIBLE_APPS_PLATFORMS}"
     assert image_ref is not None, "image_ref not set"
+    if batcher is None:
+        batcher = Config.BATCHER
     app_cfg_json = None if app_cfg is None else to_json(app_cfg)
     image_user = image_auth[0] if image_auth is not None else Config.USERNAME if use_system_auth else None
     image_token = image_auth[1] if image_auth is not None else Config.TOKEN if use_system_auth else None
     if Config.WITH_WARNINGS and (image_user is None or image_token is None):
         Config.logger.warning("image_auth not set")
     json_image = JsonImage(ref=image_ref, user=image_user, token=image_token)
-    app = UserApp(
+    data = UserApp(
         appId=app_id,
         inputId=input_id,
         processorId=processor_id,
@@ -1061,7 +1567,9 @@ def create_app(
         collectionsFrom=collections_from,
         extraCollectionsFrom=extra_collections_from,
     )
-    return f.post_userApps(app, wait=wait, auth=auth, conn_url=conn_url)
+    if batcher is not None:
+        return batcher.add("postApp", data=data)
+    return f.post_userApps(data, wait=wait, auth=auth, conn_url=conn_url)
 
 
 def update_app(
@@ -1082,6 +1590,7 @@ def update_app(
     use_system_auth: bool = True,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """update app by `id`\n
     `app_cfg` must be json or dict or None"""
@@ -1089,13 +1598,15 @@ def update_app(
         platform in POSSIBLE_APPS_PLATFORMS
     ), f"wrong platform: {platform}, possible platforms: {POSSIBLE_APPS_PLATFORMS}"
     assert image_ref is not None, "image_ref not set"
+    if batcher is None:
+        batcher = Config.BATCHER
     app_cfg_json = None if app_cfg is None else to_json(app_cfg)
     image_user = image_auth[0] if image_auth is not None else Config.USERNAME if use_system_auth else None
     image_token = image_auth[1] if image_auth is not None else Config.TOKEN if use_system_auth else None
     if Config.WITH_WARNINGS and (image_user is None or image_token is None):
         Config.logger.warning("image_auth not set")
     json_image = JsonImage(ref=image_ref, user=image_user, token=image_token)
-    app = UserApp(
+    data = UserApp(
         appId=app_id,
         inputId=input_id,
         processorId=processor_id,
@@ -1107,13 +1618,23 @@ def update_app(
         collectionsFrom=collections_from,
         extraCollectionsFrom=extra_collections_from,
     )
-    return f.post_userApps_id(id, app, wait=wait, auth=auth, conn_url=conn_url)
+    if batcher is not None:
+        return batcher.add("postAppById", data=data, vars={"id": id})
+    return f.post_userApps_id(id, data, wait=wait, auth=auth, conn_url=conn_url)
 
 
 def delete_apps(
-    wait: bool = True, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """delete all user apps"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteApps")
     return f.delete_userApps(wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -1123,8 +1644,13 @@ def delete_app(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """delete user app by `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteAppById", vars={"id": id})
     return f.delete_userApps_id(id, wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -1132,37 +1658,74 @@ def delete_app(
 
 
 def get_tasks(
-    *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultIds:
     """return tasks ids for current user"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getTasks", result_model=ResultIds)
     return f.get_userTasks(auth=auth, conn_url=conn_url)
 
 
 def get_tasks_real(
-    *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultIds:
     """return tasks real ids for current user"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getTasksReal", result_model=ResultIds)
     return f.get_userTasks_realIds(auth=auth, conn_url=conn_url)
 
 
 def get_tasks_map(
-    *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultIdsMap:
     """return tasks ids with real ids for current user"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getTasksMapIds", result_model=ResultIdsMap)
     return f.get_userTasks_mapIds(auth=auth, conn_url=conn_url)
 
 
 def get_task(
-    id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> UserTask:
     """return task by `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getTaskById", vars={"id": id}, result_model=UserTask)
     return f.get_userTasks_id(id, auth=auth, conn_url=conn_url)
 
 
 def get_task_real(
-    id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> UserTask:
     """return task by real `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getTaskByRealId", vars={"id": id}, result_model=UserTask)
     return f.get_userTasks_realId(id, auth=auth, conn_url=conn_url)
 
 
@@ -1176,24 +1739,29 @@ def create_task(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Id:
     """create task"""
     if synthetic:
         assert app_id is None, "app_id should be None for synthetic task"
     else:
         assert app_id is not None, "app_id should be not None for not synthetic task"
+    if batcher is None:
+        batcher = Config.BATCHER
     if apps_depends is None:
         apps_depends = []
     if tasks_depends is None:
         tasks_depends = []
-    task = UserTask(
+    data = UserTask(
         taskId=task_id,
         appId=app_id,
         appsDepends=apps_depends,
         tasksDepends=tasks_depends,
         synthetic=synthetic,
     )
-    return f.post_userTasks(task, wait=wait, auth=auth, conn_url=conn_url)
+    if batcher is not None:
+        return batcher.add("postTask", data=data)
+    return f.post_userTasks(data, wait=wait, auth=auth, conn_url=conn_url)
 
 
 def update_task(
@@ -1206,25 +1774,38 @@ def update_task(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """update task by `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
     if apps_depends is None:
         apps_depends = []
     if tasks_depends is None:
         tasks_depends = []
-    task = UserTask(
+    data = UserTask(
         taskId=task_id,
         appId=app_id,
         appsDepends=apps_depends,
         tasksDepends=tasks_depends,
     )
-    return f.post_userTasks_id(id, task, wait=wait, auth=auth, conn_url=conn_url)
+    if batcher is not None:
+        return batcher.add("postTaskById", data=data, vars={"id": id})
+    return f.post_userTasks_id(id, data, wait=wait, auth=auth, conn_url=conn_url)
 
 
 def delete_tasks(
-    wait: bool = True, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """delete all user tasks"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteTasks")
     return f.delete_userTasks(wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -1234,8 +1815,13 @@ def delete_task(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """delete user task by `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteTaskById", vars={"id": id})
     return f.delete_userTasks_id(id, wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -1243,37 +1829,74 @@ def delete_task(
 
 
 def get_cfgs(
-    *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultIds:
     """return cfgs ids for current user"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getCfgs", result_model=ResultIds)
     return f.get_userCfgs(auth=auth, conn_url=conn_url)
 
 
 def get_cfgs_real(
-    *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultIds:
     """return cfgs real ids for current user"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getCfgsReal", result_model=ResultIds)
     return f.get_userCfgs_realIds(auth=auth, conn_url=conn_url)
 
 
 def get_cfgs_map(
-    *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultIdsMap:
     """return cfgs ids with real ids for current user"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getCfgsMapIds", result_model=ResultIdsMap)
     return f.get_userCfgs_mapIds(auth=auth, conn_url=conn_url)
 
 
 def get_cfg(
-    id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultUserCfg:
     """return cfg by `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getCfgById", vars={"id": id}, result_model=ResultUserCfg)
     return f.get_userCfgs_id(id, auth=auth, conn_url=conn_url)
 
 
 def get_cfg_real(
-    id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultUserCfg:
     """return cfg by real `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getCfgByRealId", vars={"id": id}, result_model=ResultUserCfg)
     return f.get_userCfgs_realId(id, auth=auth, conn_url=conn_url)
 
 
@@ -1301,12 +1924,17 @@ def create_cfg(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Id:
     """create configuration file\n
     `cfg` must be json or dict or Cfg\n
     return `id` """
-    user_cfg = UserCfg(cfgId=cfg_id, cfg=__fix_cfg(cfg))
-    return f.post_userCfgs(user_cfg, wait=wait, auth=auth, conn_url=conn_url)
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = UserCfg(cfgId=cfg_id, cfg=__fix_cfg(cfg))
+    if batcher is not None:
+        return batcher.add("postCfg", data=data)
+    return f.post_userCfgs(data, wait=wait, auth=auth, conn_url=conn_url)
 
 
 def update_cfg(
@@ -1317,17 +1945,30 @@ def update_cfg(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """update configuration file\n
     `cfg` must be json or dict or Cfg"""
-    user_cfg = UserCfg(cfgId=cfg_id, cfg=__fix_cfg(cfg))
-    return f.post_userCfgs_id(id, user_cfg, wait=wait, auth=auth, conn_url=conn_url)
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = UserCfg(cfgId=cfg_id, cfg=__fix_cfg(cfg))
+    if batcher is not None:
+        return batcher.add("postCfgById", data=data, vars={"id": id})
+    return f.post_userCfgs_id(id, data, wait=wait, auth=auth, conn_url=conn_url)
 
 
 def delete_cfgs(
-    wait: bool = True, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """delete all user cfgs"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteCfgs")
     return f.delete_userCfgs(wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -1337,8 +1978,13 @@ def delete_cfg(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """delete user cfg by `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteCfgs", vars={"id": id})
     return f.delete_userCfgs_id(id, wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -1346,23 +1992,46 @@ def delete_cfg(
 
 
 def get_operations_results(
-    *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultIds:
     """return list of operations ids"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getOperationResults", result_model=ResultIds)
     return f.get_operationResults(auth=auth, conn_url=conn_url)
 
 
 def get_operation_result(
-    id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> str:
     """return result by operation `id` if operation status is `OK` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getOperationResultById", vars={"id": id})
     return f.get_operationResults_id(id, auth=auth, conn_url=conn_url)
 
 
 def delete_operations_results(
-    wait: bool = True, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """delete all operations results"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteOperationResults")
     return f.delete_operationResults(wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -1372,8 +2041,13 @@ def delete_operation_result(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """delete operation result by `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteOperationResultById", vars={"id": id})
     return f.delete_operationResults_id(id, wait=wait, auth=auth, conn_url=conn_url)
 
 
@@ -1381,23 +2055,46 @@ def delete_operation_result(
 
 
 def get_run_condition(
-    id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Condition:
     """return run condition by operation `id` for running task"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getCondition", vars={"operationId": id}, result_model=Condition)
     return f.get_run_condition(id, auth=auth, conn_url=conn_url)
 
 
 def get_run_active_runs(
-    *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultIds:
     """return list running operationIds"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getActiveRuns", result_model=ResultIds)
     return f.get_run_activeRuns(auth=auth, conn_url=conn_url)
 
 
 def get_run_main_task_cfg(
-    id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> MainTaskCfg:
     """return mainTaskCfg by operation `id` for running task"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getMainTaskCfg", vars={"operationId": id}, result_model=MainTaskCfg)
     return f.get_run_mainTaskCfg(id, auth=auth, conn_url=conn_url)
 
 
@@ -1407,8 +2104,16 @@ def get_task_runs(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> ResultIds:
     """return list running operationIds with `task_id` and `cfg_id` if specified"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        vars = {"taskId": task_id}
+        if cfg_id is not None:
+            vars["cfgId"] = cfg_id
+        return batcher.add("getOperationsIds", vars=vars, result_model=ResultIds)
     return f.get_run_operationsIds(task_id, cfg_id, auth=auth, conn_url=conn_url)
 
 
@@ -1423,10 +2128,15 @@ def logs(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> AppLogs:
     """return task logs by operation `id` and `run_id` """
-    task = LogsTask(operationId=id, runId=run_id)
-    return f.get_manager_logs(task, with_show=with_show, auth=auth, conn_url=conn_url)
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = LogsTask(operationId=id, runId=run_id, force=force)
+    if batcher is not None:
+        return batcher.add("logs", data=data, result_model=AppLogs)
+    return f.get_manager_logs(data, with_show=with_show, auth=auth, conn_url=conn_url)
 
 
 def logs_app(
@@ -1439,32 +2149,60 @@ def logs_app(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> AppLogs:
     """return app logs by operation `id`, `run_id`, `task_id` (that "null" if not exist) and `app_id` """
-    task = LogsTask(
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = LogsTask(
         operationId=id, runId=run_id, appId=app_id, taskId=task_id, force=force
     )
-    return f.get_manager_logs(task, with_show=with_show, auth=auth, conn_url=conn_url)
+    if batcher is not None:
+        return batcher.add("logs", data=data, result_model=AppLogs)
+    return f.get_manager_logs(data, with_show=with_show, auth=auth, conn_url=conn_url)
 
 
 def logs_clickhouse(
-    *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Json:
     """return all clickhouse logs"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("clickhouseAll")
     return f.get_clickhouse_all(auth=auth, conn_url=conn_url)
 
 
 def logs_clickhouse_id(
-    id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Json:
     """return clickhouse logs by operation `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("clickhouseId", vars={"operationId": id})
     return f.get_clickhouse_id(id, auth=auth, conn_url=conn_url)
 
 
 def get_dag_key_value(
-    id: str, *, auth: Optional[AUTH] = None, conn_url: Optional[str] = None
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Json:
     """return key-value cfg from dag by operation `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getDagKeyValue", vars={"operationId": id})
     return f.get_manager_dagKeyValue_operationId(id, auth=auth, conn_url=conn_url)
 
 
@@ -1475,10 +2213,16 @@ def update_dag_key_value(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> None:
     """update key-value cfg from dag by operation `id` and `data` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = KeysValues(data=data, operationId=operationId)
+    if batcher is not None:
+        return batcher.add("postDagKeyValue", data=data)
     return f.post_manager_dagKeyValue(
-        KeysValues(data=data, operationId=operationId),
+        data,
         wait=wait,
         auth=auth,
         conn_url=conn_url,
@@ -1491,8 +2235,13 @@ def get_app_info(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Union[Alias.Json, AppFunctionsInfo]:
     """return json with functions app info, `id` is appId"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("appInfo", vars={"appId": id}, result_model=AppFunctionsInfo if parse else None)
     return f.get_app_info(id, parse=parse, auth=auth, conn_url=conn_url)
 
 
@@ -1502,8 +2251,13 @@ def get_app_info_by_real_id(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Union[Alias.Json, AppFunctionsInfo]:
     """return json with functions app info, `id` is real id for app"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("appInfoRealId", vars={"appId": id}, result_model=AppFunctionsInfo if parse else None)
     return f.get_app_info_by_real_id(id, parse=parse, auth=auth, conn_url=conn_url)
 
 
@@ -1515,14 +2269,19 @@ def get_image_info(
     use_system_auth: bool = False,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Union[Alias.Json, AppFunctionsInfo]:
     """return json with functions image info"""
+    if batcher is None:
+        batcher = Config.BATCHER
     image_user = image_auth[0] if image_auth is not None else Config.USERNAME if use_system_auth else None
     image_token = image_auth[1] if image_auth is not None else Config.TOKEN if use_system_auth else None
     if Config.WITH_WARNINGS and (image_user is None or image_token is None):
         Config.logger.warning("image_auth not set")
-    json_image = JsonImage(ref=image_ref, user=image_user, token=image_token)
-    return f.get_image_info(json_image, parse=parse, auth=auth, conn_url=conn_url)
+    data = JsonImage(ref=image_ref, user=image_user, token=image_token)
+    if batcher is not None:
+        return batcher.add("imageInfo", data=data, result_model=AppFunctionsInfo if parse else None)
+    return f.get_image_info(data, parse=parse, auth=auth, conn_url=conn_url)
 
 
 def get_task_schedules(
@@ -1531,11 +2290,16 @@ def get_task_schedules(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Schedules:
     """return schedule ids by `operation_id` """
-    operation = Operation(operationId=operation_id)
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = Operation(operationId=operation_id)
+    if batcher is not None:
+        return batcher.add("sendTaskSchedules", data=data, result_model=Schedules)
     return f.get_task_schedules(
-        operation, with_show=with_show, auth=auth, conn_url=conn_url
+        data, with_show=with_show, auth=auth, conn_url=conn_url
     )
 
 
@@ -1560,6 +2324,7 @@ def task_full(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> AppLogs:
     """prepare, run and stop task by `task_id`, `cfg_id` and other
 
@@ -1581,6 +2346,8 @@ def task_full(
         restrictions: (Optional[Restrictions]): permissions to handle deployment
         wait (bool): is it worth waiting for the result or immediately return `operation_id`
         auth (Optional[AUTH]): redefined auth if not None"""
+    if batcher is None:
+        batcher = Config.BATCHER
     if scaleInfo is None:
         scaleInfo = []
     if component is None:
@@ -1589,7 +2356,7 @@ def task_full(
         policy = TaskPolicy()
     if restrictions is None:
         restrictions = Restrictions()
-    task = MainTask(
+    data = MainTask(
         taskId=task_id,
         cfgId=cfg_id,
         infoUrl=info_url,
@@ -1608,8 +2375,10 @@ def task_full(
         schedule=schedule,
         restrictions=restrictions,
     )
+    if batcher is not None:
+        return batcher.add("sendTask", data=data, result_model=AppLogs)
     return f.post_manager_task(
-        task,
+        data,
         with_show=with_show,
         long=long,
         long_timeout=long_timeout,
@@ -1644,6 +2413,7 @@ def task_prepare(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> AppLogs:
     """prepare task by `task_id`, `cfg_id` and other, return `operation_id`
 
@@ -1670,6 +2440,8 @@ def task_prepare(
         restrictions: (Optional[Restrictions]): permissions to handle deployment
         wait (bool): is it worth waiting for the result or immediately return `operation_id`
         auth (Optional[AUTH]): redefined auth if not None"""
+    if batcher is None:
+        batcher = Config.BATCHER
     if kafka_mode_url_response is not None and kafka_mode is False:
         Config.logger.info(
             '"kafka_mode_url_response" ignored because "kafka_mode" = False'
@@ -1685,7 +2457,7 @@ def task_prepare(
         policy = TaskPolicy()
     if restrictions is None:
         restrictions = Restrictions()
-    task = MainTask(
+    data = MainTask(
         taskId=task_id,
         cfgId=cfg_id,
         infoUrl=info_url,
@@ -1705,8 +2477,10 @@ def task_prepare(
         policy=policy,
         restrictions=restrictions,
     )
+    if batcher is not None:
+        return batcher.add("sendTask", data=data, result_model=AppLogs)
     return f.post_manager_task(
-        task,
+        data,
         with_show=with_show,
         long=long,
         long_timeout=long_timeout,
@@ -1733,6 +2507,7 @@ def task_run(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Optional[AppLogs]:
     """run prepared task by `operation_id` with `cfg_id` and other overridden parameters
 
@@ -1751,11 +2526,13 @@ def task_run(
         schedule: (Optional[Schedule]): schedule task runs settings - return scheduleId instead of operationId
         wait (bool): is it worth waiting for the result or immediately return `operation_id`
         auth (Optional[AUTH]): redefined auth if not None"""
+    if batcher is None:
+        batcher = Config.BATCHER
     if run_id is None:
         run_id = rand_str(15)
     if with_show is None:
         with_show = with_logs
-    task = RunTask(
+    data = RunTask(
         operationId=operation_id,
         cfgId=cfg_id,
         infoUrl=info_url,
@@ -1766,8 +2543,10 @@ def task_run(
         withLogs=with_logs,
         schedule=schedule,
     )
+    if batcher is not None:
+        return batcher.add("sendTaskRun", data=data, result_model=AppLogs if with_logs or schedule is not None else None)
     return f.post_manager_task_run(
-        task,
+        data,
         with_show=with_show,
         long=long,
         long_timeout=long_timeout,
@@ -1784,11 +2563,16 @@ def task_unschedule(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Info:
     """unschedule task by `schedule_id` """
-    operation = UnscheduleOperation(scheduleId=schedule_id)
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = UnscheduleOperation(scheduleId=schedule_id)
+    if batcher is not None:
+        return batcher.add("sendTaskUnschedule", data=data)
     return f.post_manager_task_unschedule(
-        operation, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url
+        data, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url
     )
 
 
@@ -1801,6 +2585,7 @@ def task_stop(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Optional[AppLogs]:
     """stop task by `operation_id`
 
@@ -1811,11 +2596,15 @@ def task_stop(
        with_show (bool): show result (like for each operation, default equals with_logs arg)
        wait (bool): is it worth waiting for the result or immediately return `operation_id`
        auth (Optional[AUTH]): redefined auth if not None"""
+    if batcher is None:
+        batcher = Config.BATCHER
     if with_show is None:
         with_show = with_logs
-    task = StopOperation(operationId=operation_id, withLogs=with_logs, infoUrl=info_url)
+    data = StopOperation(operationId=operation_id, withLogs=with_logs, infoUrl=info_url)
+    if batcher is not None:
+        return batcher.add("sendTaskStop", data=data, result_model=AppLogs if with_logs else None)
     return f.post_manager_task_stop(
-        task, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url
+        data, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url
     )
 
 
@@ -1827,11 +2616,16 @@ def task_stop_all(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Json:
     """stop all tasks"""
-    task = StopOperationMany(withLogs=with_logs, infoUrl=info_url)
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = StopOperationMany(withLogs=with_logs, infoUrl=info_url)
+    if batcher is not None:
+        return batcher.add("sendTaskStopAll", data=data, result_model=AppLogs if with_logs else None)
     return f.post_manager_task_stop_all(
-        task, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url
+        data, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url
     )
 
 
@@ -1842,11 +2636,16 @@ def task_resume(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Empty:
     """resume task by `operation_id` """
-    task = Operation(operationId=operation_id)
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = Operation(operationId=operation_id)
+    if batcher is not None:
+        return batcher.add("sendTaskResume", data=data)
     return f.post_manager_task_resume(
-        task, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url
+        data, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url
     )
 
 
@@ -1857,11 +2656,16 @@ def task_pause(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Empty:
     """pause task by `operation_id` """
-    task = Operation(operationId=operation_id)
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = Operation(operationId=operation_id)
+    if batcher is not None:
+        return batcher.add("sendTaskPause", data=data)
     return f.post_manager_task_pause(
-        task, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url
+        data, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url
     )
 
 
@@ -1875,13 +2679,18 @@ def app_stop(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Empty:
     """stop app by `operation_id`, `task_id` and `app_id` """
-    app_manage = AppManage(
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = AppManage(
         operationId=operation_id, taskId=task_id, appId=app_id, runId=run_id
     )
+    if batcher is not None:
+        return batcher.add("sendAppStop", data=data)
     return f.post_manager_app_stop(
-        app_manage, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url
+        data, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url
     )
 
 
@@ -1895,13 +2704,18 @@ def app_resume(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Empty:
     """resume app by `operation_id`, `task_id` and `app_id` """
-    app_manage = AppManage(
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = AppManage(
         operationId=operation_id, taskId=task_id, appId=app_id, runId=run_id
     )
+    if batcher is not None:
+        return batcher.add("sendAppResume", data=data)
     return f.post_manager_app_resume(
-        app_manage, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url
+        data, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url
     )
 
 
@@ -1915,13 +2729,18 @@ def app_pause(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Empty:
     """pause app by `operation_id`, `task_id` and `app_id` """
-    app_manage = AppManage(
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = AppManage(
         operationId=operation_id, taskId=task_id, appId=app_id, runId=run_id
     )
+    if batcher is not None:
+        return batcher.add("sendAppPause", data=data)
     return f.post_manager_app_pause(
-        app_manage, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url
+        data, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url
     )
 
 
@@ -1937,9 +2756,12 @@ async def kafka_send(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Union[Alias.Info, KafkaMsg]:  # TODO add tl
     """send msg to kafka for task by `operation_id`, `run_id` and `data` """
     assert data is not None, "data should exists in kafka_send"
+    if batcher is None:
+        batcher = Config.BATCHER
     if run_id is None:
         run_id = rand_str(15)
     if metadata is not None:
@@ -1953,11 +2775,13 @@ async def kafka_send(
                 Config.logger.warning(f"wrong metadata type, ignore {key}")
     else:
         real_metadata = {}
-    kafka_msg = KafkaMsg(
+    data = KafkaMsg(
         operationId=operation_id, runId=run_id, data=data, metadata=real_metadata
     )
+    if batcher is not None:
+        return batcher.add("sendKafkaMsg", data=data, result_model=KafkaMsg)
     return await f.kafka_send(
-        kafka_msg, with_show=with_show, auth=auth, conn_url=conn_url
+        data, with_show=with_show, auth=auth, conn_url=conn_url
     )
 
 
@@ -1971,11 +2795,12 @@ def create_collection_from_file(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Id:
     """create collection\n
     return collection id"""
     return fh.create_collection_from_file_df(
-        filename, name, metadata, auth=auth, conn_url=conn_url
+        filename, name, metadata, auth=auth, conn_url=conn_url, batcher=batcher
     )
 
 
@@ -1986,11 +2811,12 @@ def create_collection_from_df(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Alias.Id:
     """create collection\n
     return collection id"""
     return fh.create_collection_from_df(
-        data, name, metadata, auth=auth, conn_url=conn_url
+        data, name, metadata, auth=auth, conn_url=conn_url, batcher=batcher
     )
 
 
@@ -2001,9 +2827,10 @@ def get_collection_to_df(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> pd.DataFrame:
     """return df from collection by `id`, pagination: unlimited - `limit` < 0"""
-    collection = get_collection(id, offset, limit, auth=auth, conn_url=conn_url)
+    collection = get_collection(id, offset, limit, auth=auth, conn_url=conn_url, batcher=batcher)
     records = list(map(lambda x: json.loads(x.data), collection.docs))
     return pd.DataFrame.from_records(records)
 
@@ -2017,10 +2844,11 @@ def get_collection_by_name_to_df(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> pd.DataFrame:
     """return df from collection by `name` and mb also `operation_id` and `run_id` with which it was saved. raise if there are multiple collections, pagination: unlimited - `limit` < 0"""
     collection = get_collection_by_name(
-        name, operation_id, run_id, offset, limit, auth=auth, conn_url=conn_url
+        name, operation_id, run_id, offset, limit, auth=auth, conn_url=conn_url, batcher=batcher
     )
     records = list(map(lambda x: json.loads(x.data), collection.docs))
     return pd.DataFrame.from_records(records)
@@ -2032,6 +2860,7 @@ def create_schemes_by_path(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
 ) -> Dict[str, Alias.Id]:
     """schemes are created from json along the path to the directory, scheme_name - is the name of the file without '.json', returned a dict from the name of the created scheme to id"""
     res = dict()
@@ -2041,16 +2870,6 @@ def create_schemes_by_path(
             with open(f"{path}/{filename}") as f:
                 data = f.read()
             res[name] = create_scheme(
-                data, name, wait=wait, auth=auth, conn_url=conn_url
+                data, name, wait=wait, auth=auth, conn_url=conn_url, batcher=batcher
             )
     return res
-
-
-def create_app_settings(
-    app_id: str,
-    task_id: Optional[str] = None,
-    save_collections_names: Optional[Union[str, List[str]]] = None,
-) -> AppSettings:  # FIXME
-    return AppSettings(
-        appId=app_id, taskId=task_id, saveCollectionsName=save_collections_names
-    )

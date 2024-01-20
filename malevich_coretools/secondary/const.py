@@ -59,6 +59,7 @@ COLLECTION_OBJECTS_ALL_GET = lambda path, recursive: with_key_values(f"{COLLECTI
 COLLECTION_OBJECTS_ALL = lambda wait: with_wait(f"{COLLECTION_OBJECTS_MAIN}/all", wait)
 COLLECTION_OBJECTS_PATH = lambda path, wait: with_key_values(f"{COLLECTION_OBJECTS_MAIN}/", {"path": path, "wait": None if wait is None else bool_to_str(wait)})
 COLLECTION_OBJECTS_PRESIGN_PUT = lambda path, callback_url, expires_in, wait: with_key_values(f"{COLLECTION_OBJECTS_MAIN}/presign/put", {"path": path, "callback_url": callback_url, "expiresIn": expires_in, "wait": bool_to_str(wait)})
+COLLECTION_OBJECTS_PRESIGN_GET = lambda path, callback_url, expires_in, wait: with_key_values(f"{COLLECTION_OBJECTS_MAIN}/presign/get", {"path": path, "callback_url": callback_url, "expiresIn": expires_in, "wait": bool_to_str(wait)})
 COLLECTION_OBJECTS_PRESIGN = lambda signature: with_key_values(f"{COLLECTION_OBJECTS_MAIN}/presign", {"signature": signature})
 
 ## EndpointController
@@ -169,3 +170,5 @@ MANAGER_APP_PAUSE = lambda wait: with_wait(f"{MANAGER_MAIN}/app/pause", wait)
 KAFKA_SEND = f"{MANAGER_MAIN}/kafkaMsg"
 
 ## BatchController
+BATCH_MAIN = f"{API_VERSION}/batch"
+BATCH = f"{BATCH_MAIN}/"

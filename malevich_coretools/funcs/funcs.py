@@ -10,6 +10,7 @@ import requests
 from requests.models import Response
 
 from malevich_coretools.abstract.abstract import *  # noqa: F403
+from malevich_coretools.funcs.checks import check_profile_mode
 from malevich_coretools.secondary import Config, model_from_json, show_logs_func
 from malevich_coretools.secondary.const import *  # noqa: F403
 from malevich_coretools.secondary.helpers import show_fail_app_info
@@ -133,8 +134,16 @@ def get_collection_object(path: str, *args, **kwargs) -> bytes:
     return send_to_core_get(COLLECTION_OBJECTS_PATH(path, None), is_text=None, *args, **kwargs)
 
 
-def get_collection_object_presigned_url(path: str, callback_url: Optional[str], expires_in: int, wait: bool, *args, **kwargs) -> str:
+def post_collection_object_presigned_url(path: str, callback_url: Optional[str], expires_in: int, wait: bool, *args, **kwargs) -> str:
     return send_to_core_get(COLLECTION_OBJECTS_PRESIGN_PUT(path, callback_url, expires_in, wait), is_text=True, *args, **kwargs)
+
+
+def get_collection_object_presigned_url(path: str, callback_url: Optional[str], expires_in: int, wait: bool, *args, **kwargs) -> str:
+    return send_to_core_get(COLLECTION_OBJECTS_PRESIGN_GET(path, callback_url, expires_in, wait), is_text=True, *args, **kwargs)
+
+
+def get_collections_object_presigned(signature: str, *args, **kwargs) -> bytes:
+    return send_to_core_get(COLLECTION_OBJECTS_PRESIGN(signature), is_text=None, *args, **kwargs)
 
 
 def post_collections_object(path: str, data: bytes, wait: bool, *args, **kwargs) -> Alias.Info:
@@ -160,8 +169,12 @@ def get_endpoints(*args, **kwargs) -> Endpoints:
     return model_from_json(send_to_core_get(ENDPOINTS_ALL(None), *args, **kwargs), Endpoints)
 
 
-def run_endpoint(hash: str, with_show: bool, *args, **kwargs) -> Union[AppLogs, Any]:
-    res = send_to_core_modify(ENDPOINTS_RUN(hash), with_show=with_show, show_func=show_logs_func, *args, **kwargs)
+def get_endpoint_by_hash(hash: str, *args, **kwargs) -> Endpoint:
+    return model_from_json(send_to_core_get(ENDPOINTS(hash, None), *args, **kwargs), Endpoint)
+
+
+def run_endpoint(hash: str, data: Optional[EndpointOverride], with_show: bool, *args, **kwargs) -> Union[AppLogs, Any]:
+    res = send_to_core_modify(ENDPOINTS_RUN(hash), data, with_show=with_show, show_func=show_logs_func, *args, **kwargs)
     try:
         res = AppLogs.parse_raw(res)
     except BaseException:
@@ -560,7 +573,7 @@ def get_task_schedules(data: Operation, with_show: bool, *args, **kwargs) -> Sch
 
 
 def post_manager_task(data: MainTask, with_show: bool, long: bool, long_timeout: int, wait: bool, auth: Optional[AUTH], conn_url: Optional[str]=None, *args, **kwargs) -> AppLogs:
-    __check_profile_mode(data.profileMode)
+    check_profile_mode(data.profileMode)
     res = send_to_core_modify(MANAGER_TASK(wait and not long), data, with_show=with_show, show_func=show_logs_func, auth=auth, conn_url=conn_url, *args, **kwargs)
     if wait and long:
         res = asyncio.run(__get_result(res, timeout=long_timeout, auth=auth))
@@ -568,7 +581,7 @@ def post_manager_task(data: MainTask, with_show: bool, long: bool, long_timeout:
 
 
 def post_manager_task_run(data: RunTask, with_show: bool, long: bool, long_timeout: int, wait: bool, auth: Optional[AUTH], conn_url: Optional[str]=None, *args, **kwargs) -> Optional[AppLogs]:
-    __check_profile_mode(data.profileMode)
+    check_profile_mode(data.profileMode)
     res = send_to_core_modify(MANAGER_TASK_RUN(wait and not long), data, with_show=with_show, show_func=show_logs_func, auth=auth, conn_url=conn_url, *args, **kwargs)
     if wait and long:
         res = asyncio.run(__get_result(res, timeout=long_timeout, auth=auth))
@@ -617,6 +630,12 @@ async def kafka_send(data: KafkaMsg, *args, **kwargs) -> Union[Alias.Info, Kafka
         return KafkaMsg.parse_raw(result)
     except BaseException:
         return result
+
+# BatchController
+
+
+def post_batch(data: BatchOperations, *args, **kwargs) -> BatchResponses:
+    return model_from_json(send_to_core_modify(BATCH, data, *args, **kwargs), BatchResponses)
 
 
 ##################################
@@ -756,7 +775,3 @@ async def send_to_core_post_async(path: str, operation: Optional[str] = None, wi
         else:
             show_func(result)
     return result
-
-
-def __check_profile_mode(profile_mode: Optional[str]):  # noqa: ANN202
-    assert profile_mode in [None, "no", "all", "time", "df_info", "df_show"], f"wrong profile_mode: {profile_mode}"

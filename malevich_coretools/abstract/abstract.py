@@ -2,13 +2,19 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 from pydantic import BaseModel
 
+from malevich_coretools.batch import (  # noqa: F401
+    BatchOperation,
+    BatchOperations,
+    DefferOperation,
+)
+
 DEFAULT_MSG_URL = None
 
 # aliases
 class Alias:
     Json = str
     Info = str
-    Id = str
+    Id = Union[DefferOperation, str]
     Login = str
     Doc = str
     Empty = str
@@ -105,8 +111,8 @@ class UserApp(BaseModel):
     image: JsonImage
     platform: str
     platformSettings: Optional[str] = None
-    collectionsFrom: Optional[Dict[str, str]] = None
-    extraCollectionsFrom: Optional[Dict[str, str]] = None
+    collectionsFrom: Optional[Dict[str, Alias.Id]] = None
+    extraCollectionsFrom: Optional[Dict[str, Alias.Id]] = None
 
 
 class UserTask(BaseModel):
@@ -159,7 +165,7 @@ class Schedules(BaseModel):
 
 
 class UnscheduleOperation(BaseModel):
-    scheduleId: str
+    scheduleId: Alias.Id
 
 
 class Restrictions(BaseModel):
@@ -218,7 +224,7 @@ class FilesDirs(BaseModel):
 
 class ResultDoc(BaseModel):
     data: Alias.Json
-    name: str
+    name: Alias.Id
     id: Alias.Id
 
 
@@ -244,7 +250,7 @@ class ResultOwnAndSharedIdsMap(BaseModel):
 class Scheme(BaseModel):
     data: str
     name: str
-    id: str
+    id: Alias.Id
 
 
 class ResultCollection(BaseModel):
@@ -289,15 +295,15 @@ class ResultUserCfg(BaseModel):
 
 # TODO add smth from Cfg
 class AppSettings(BaseModel):
-    taskId: Optional[str] = None
-    appId: str
-    saveCollectionsName: Optional[Union[str, List[str]]] = None
+    taskId: Optional[Alias.Id] = None
+    appId: Alias.Id
+    saveCollectionsName: Union[str, List[str]]
 
 
 class Cfg(BaseModel):
-    collections: Dict[str, Union[Alias.Id, Dict[str, Any]]] = {}
-    different: Dict[str, str] = {}
-    schemes_aliases: Dict[str, str] = {}
+    collections: Dict[Alias.Id, Union[Alias.Id, Dict[str, Any]]] = {}
+    different: Dict[Alias.Id, Alias.Id] = {}
+    schemes_aliases: Dict[Alias.Id, Alias.Id] = {}
     msg_url: str = DEFAULT_MSG_URL
     init_apps_update: Dict[str, bool] = {}
     app_settings: List[AppSettings] = []
@@ -353,19 +359,19 @@ class AppLogs(BaseModel):
 
 class LogsTask(BaseModel):
     operationId: Alias.Id
-    appId: Optional[str] = None
-    taskId: Optional[str] = None
-    runId: Optional[str] = None
+    appId: Optional[Alias.Id] = None
+    taskId: Optional[Alias.Id] = None
+    runId: Optional[Alias.Id] = None
     force: bool = True
 
 
 class PostS3Settings(BaseModel):
     isCsv: bool = True
-    key: Optional[str] = None
+    key: Optional[Alias.Id] = None
 
 
 class FunctionInfo(BaseModel):
-    id: str
+    id: Alias.Id
     name: str
     arguments: List[Tuple[str, Optional[str]]]
     finishMsg: Optional[str]
@@ -388,7 +394,7 @@ class OutputFunctionInfo(FunctionInfo):
 
 
 class InitInfo(BaseModel):
-    id: str
+    id: Alias.Id
     enable: bool
     tl: Optional[int]
     prepare: bool
@@ -397,27 +403,27 @@ class InitInfo(BaseModel):
 
 
 class AppFunctionsInfo(BaseModel):
-    inputs: Dict[str, InputFunctionInfo] = dict()
-    processors: Dict[str, ProcessorFunctionInfo] = dict()
-    outputs: Dict[str, OutputFunctionInfo] = dict()
-    schemes: Dict[str, str] = dict()
-    inits: Dict[str, InitInfo] = dict()
+    inputs: Dict[Alias.Id, InputFunctionInfo] = dict()
+    processors: Dict[Alias.Id, ProcessorFunctionInfo] = dict()
+    outputs: Dict[Alias.Id, OutputFunctionInfo] = dict()
+    schemes: Dict[Alias.Id, str] = dict()
+    inits: Dict[Alias.Id, InitInfo] = dict()
     logs: Optional[str] = None
     instanceInfo: Optional[str] = None  # json with info about instance
 
 
 class TaskInfo(BaseModel):
-    taskId: str
-    apps: Dict[str, UserApp]
-    tasks: Dict[str, UserTask]
-    cfg: str
-    login: str
+    taskId: Alias.Id
+    apps: Dict[Alias.Id, UserApp]
+    tasks: Dict[Alias.Id, UserTask]
+    cfg: Alias.Json
+    login: Alias.Login
 
 
 class AdminRunInfo(BaseModel):
     operationId: Alias.Id
     taskInfo: TaskInfo
-    cfgId: str
+    cfgId: Alias.Id
 
 
 class AdminRunsInfo(BaseModel):
@@ -433,14 +439,56 @@ class AdminStopOperation(BaseModel):
     withLogs: bool
 
 
-class Endpoint(BaseModel):
-    hash: Optional[str] = None
-    taskId: Optional[str] = None
-    cfgId: Optional[str] = None
+class RunSettings(BaseModel):
     callbackUrl: Optional[str] = None
+    debugMode: bool = False
+    coreManage: bool = False
+    singleRequest: bool = True
+    waitRuns: bool = True
+    profileMode: Optional[str] = None
+    scaleInfo: List[ScaleInfo] = []
+    component: TaskComponent = TaskComponent()
+    policy: TaskPolicy = TaskPolicy()
+    restrictions: Optional[Restrictions] = Restrictions()
+
+
+class Endpoint(BaseModel):
+    hash: Optional[Alias.Id] = None
+    taskId: Optional[Alias.Id] = None
+    cfgId: Optional[Alias.Id] = None
     sla: Optional[str] = None
     active: Optional[bool] = None
+    prepare: Optional[bool] = None
+    runSettings: Optional[RunSettings] = None
 
 
 class Endpoints(BaseModel):
     data: List[Endpoint]
+
+
+class UserConfig(BaseModel):
+    collections: Dict[Alias.Id, Alias.Id] = {}
+    rawCollections: Dict[Alias.Id, DocsDataCollection] = {}
+    different: Dict[Alias.Id, Alias.Id] = {}
+    schemesAliases: Dict[str, str] = {}
+    msgUrl: Optional[str] = None
+    initAppsUpdate: Dict[str, bool] = {}
+    appSettings: List[AppSettings] = []
+    email: Optional[str] = None
+
+
+class EndpointOverride(BaseModel):
+    taskId: Optional[Alias.Id] = None
+    cfgId: Optional[Alias.Id] = None
+    cfg: Optional[UserConfig] = None
+    runSettings: Optional[RunSettings] = None
+
+
+class BatchResponse(BaseModel):
+    alias: str
+    data: str
+    code: int
+
+
+class BatchResponses(BaseModel):
+    data: List[BatchResponse]

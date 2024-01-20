@@ -9,6 +9,8 @@ from malevich_coretools.abstract.abstract import Alias, AppLogs, LogsResult
 from malevich_coretools.secondary import Config
 from malevich_coretools.secondary.kafka_utils import handle_logs
 
+__all__ = ["to_json", "model_from_json", "rand_str", "bool_to_str", "show_logs", "show_logs_colored", "show_logs_func", "show_fail_app_info", "logs_streaming"]
+
 __mini__delimiter = "-" * 25
 __delimiter = "-" * 50
 __colors = [f"\x1b[{i};20m" for i in range(31, 38)]

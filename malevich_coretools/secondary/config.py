@@ -13,6 +13,7 @@ class Config:
     CORE_PASSWORD = None
     VERBOSE = False
     WITH_WARNINGS = False
+    BATCHER = None
 
     logger = logging.getLogger("base-malevich-logger")
     logger.setLevel(logging.INFO)
