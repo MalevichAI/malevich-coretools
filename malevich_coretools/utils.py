@@ -16,6 +16,7 @@ from malevich_coretools.batch import (  # noqa: F401
 )
 from malevich_coretools.funcs.helpers import (  # noqa: F401
     create_app_settings,
+    create_cfg_struct,
     create_endpoint_override,
     create_restrictions,
     create_run_settings,
@@ -715,6 +716,7 @@ def load_collection_object_presigned(
 def update_collection_object(
     path: str,
     data: bytes,
+    zip: bool = False,
     wait: bool = True,
     *,
     auth: Optional[AUTH] = None,
@@ -725,13 +727,14 @@ def update_collection_object(
     if batcher is None:
         batcher = Config.BATCHER
     if batcher is not None:
-        return batcher.add("postCollectionObject", data=data, vars={"path": path})
-    return f.post_collections_object(path, data, wait=wait, auth=auth, conn_url=conn_url)
+        return batcher.add("postCollectionObject", data=data, vars={"path": path, "zip": zip})
+    return f.post_collections_object(path, data, zip, wait=wait, auth=auth, conn_url=conn_url)
 
 
 def update_collection_object_presigned(
     signature: str,
     data: bytes,
+    zip: bool = False,
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
@@ -741,8 +744,8 @@ def update_collection_object_presigned(
     if batcher is None:
         batcher = Config.BATCHER
     if batcher is not None:
-        return batcher.add("postPresignCollectionObject", data=data, vars={"signature": signature})
-    return f.post_collections_object_presigned(signature, data, auth=auth, conn_url=conn_url)
+        return batcher.add("postPresignCollectionObject", data=data, vars={"signature": signature, "zip": zip})
+    return f.post_collections_object_presigned(signature, data, zip, auth=auth, conn_url=conn_url)
 
 
 def delete_collection_objects(
@@ -804,8 +807,23 @@ def get_endpoint(
     if batcher is None:
         batcher = Config.BATCHER
     if batcher is not None:
-        return batcher.add("GetEndpointByHash", result_model=Endpoint)
+        return batcher.add("getEndpointByHash", result_model=Endpoint)
     return f.get_endpoint_by_hash(hash, auth=auth, conn_url=conn_url)
+
+
+def get_run_endpoint(
+    hash: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> EndpointRunInfo:
+    """get info for endpoint"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getEndpointRun", vars={"hash": hash})
+    return f.get_endpoint_run(hash, auth=auth, conn_url=conn_url)
 
 
 def run_endpoint(
@@ -1400,6 +1418,8 @@ def get_users(
 
 
 def create_user(
+    login: str,
+    password: str,
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
@@ -1408,12 +1428,10 @@ def create_user(
     """create user in malevich-core, all operations will continue on his behalf"""
     if batcher is None:
         batcher = Config.BATCHER
+    data = User(login=login, password=password)
     if batcher is not None:
-        if auth is None:
-            auth = (Config.CORE_USERNAME, Config.CORE_PASSWORD)
-        data = User(login=auth[0], password=auth[1])
         return batcher.add("postRegister", data=data)
-    return f.post_register(auth=auth, conn_url=conn_url)
+    return f.post_register(data, auth=auth, conn_url=conn_url)
 
 
 def delete_user_login(
@@ -1531,7 +1549,6 @@ def create_app(
     image_auth: Optional[AUTH] = None,
     platform: str = "base",
     platform_settings: Optional[str] = None,
-    collections_from: Optional[Dict[str, str]] = None,
     extra_collections_from: Optional[Dict[str, str]] = None,
     wait: bool = True,
     *,
@@ -1564,7 +1581,6 @@ def create_app(
         image=json_image,
         platform=platform,
         platformSettings=platform_settings,
-        collectionsFrom=collections_from,
         extraCollectionsFrom=extra_collections_from,
     )
     if batcher is not None:
@@ -1583,7 +1599,6 @@ def update_app(
     image_auth: Optional[AUTH] = None,
     platform: str = "base",
     platform_settings: Optional[str] = None,
-    collections_from: Optional[Dict[str, str]] = None,
     extra_collections_from: Optional[Dict[str, str]] = None,
     wait: bool = True,
     *,
@@ -1615,7 +1630,6 @@ def update_app(
         image=json_image,
         platform=platform,
         platformSettings=platform_settings,
-        collectionsFrom=collections_from,
         extraCollectionsFrom=extra_collections_from,
     )
     if batcher is not None:

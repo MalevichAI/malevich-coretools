@@ -5,8 +5,10 @@ from uuid import uuid4
 import pandas as pd
 
 from malevich_coretools.abstract.abstract import (
+    DEFAULT_MSG_URL,
     Alias,
     AppSettings,
+    Cfg,
     DocsDataCollection,
     EndpointOverride,
     Restrictions,
@@ -19,9 +21,9 @@ from malevich_coretools.abstract.abstract import (
 from malevich_coretools.batch import Batcher
 from malevich_coretools.funcs.checks import check_profile_mode
 from malevich_coretools.funcs.funcs import post_collections_data
-from malevich_coretools.secondary import Config
+from malevich_coretools.secondary import Config, to_json
 
-__all__ = ["create_collection_from_file_df", "raw_collection_from_df", "raw_collection_from_file", "create_collection_from_df", "create_app_settings", "create_user_config", "create_task_component", "create_task_policy", "create_restrictions", "create_run_settings", "create_endpoint_override"]
+__all__ = ["create_collection_from_file_df", "raw_collection_from_df", "raw_collection_from_file", "create_collection_from_df", "create_app_settings", "create_user_config", "create_task_component", "create_task_policy", "create_restrictions", "create_run_settings", "create_endpoint_override", "create_cfg_struct"]
 
 
 def create_collection_from_file_df(
@@ -98,28 +100,37 @@ def create_app_settings(
 
 def create_user_config(
     collections: Optional[Dict[str, str]] = None,
-    raw_collections: Optional[Dict[str, DocsDataCollection]] = None,
+    raw_collections: Optional[Dict[str, List[Alias.Doc]]] = None,
+    raw_map_collections: Optional[Dict[str, List[Dict[str, Any]]]] = None,
     different: Optional[Dict[str, str]] = None,
     schemes_aliases: Optional[Dict[str, str]] = None,
     msgUrl: Optional[str] = None,
     init_apps_update: Optional[Dict[str, bool]] = None,
     app_settings: Optional[List[AppSettings]] = None,
+    app_cfg_extension: Optional[Dict[str, Union[Dict[str, Any], Alias.Json]]] = None,
     email: Optional[str] = None,
 ) -> UserConfig:
     collections = {} if collections is None else collections
     raw_collections = {} if raw_collections is None else raw_collections
+    raw_map_collections = {} if raw_map_collections is None else raw_map_collections
     different = {} if different is None else different
     schemes_aliases = {} if schemes_aliases is None else schemes_aliases
     init_apps_update = {} if init_apps_update is None else init_apps_update
     app_settings = [] if app_settings is None else app_settings
+    app_cfg_extension_fixed = {}
+    if app_cfg_extension is not None:
+        for task_id_app_id, cfg in app_cfg_extension.items():
+            app_cfg_extension_fixed[task_id_app_id] = to_json(cfg)
     return UserConfig(
         collections=collections,
         rawCollections=raw_collections,
+        rawMapCollections=raw_map_collections,
         different=different,
         schemesAliases=schemes_aliases,
         msgUrl=msgUrl,
         initAppsUpdate=init_apps_update,
         appSettings=app_settings,
+        appCfgExtension=app_cfg_extension_fixed,
         email=email,
     )
 
@@ -198,7 +209,6 @@ def create_run_settings(
 
 
 def create_endpoint_override(
-    task_id: Optional[str] = None,
     cfg_id: Optional[str] = None,
     cfg: Optional[UserConfig] = None,
     callback_url: Optional[str] = None,
@@ -213,7 +223,6 @@ def create_endpoint_override(
     restrictions: Optional[Restrictions] = None,
 ) -> EndpointOverride:
     return EndpointOverride(
-        taskId=task_id,
         cfgId=cfg_id,
         cfg=cfg,
         runSettings=create_run_settings(
@@ -228,4 +237,35 @@ def create_endpoint_override(
             policy=policy,
             restrictions=restrictions,
         )
+    )
+
+
+def create_cfg_struct(
+    collections: Optional[Dict[Alias.Id, Union[Alias.Id, Dict[str, Any]]]] = None,
+    different: Optional[Dict[Alias.Id, Alias.Id]] = None,
+    schemes_aliases: Optional[Dict[Alias.Id, Alias.Id]] = None,
+    msg_url: str = DEFAULT_MSG_URL,
+    init_apps_update: Optional[Dict[str, bool]] = None,
+    app_settings: Optional[List[AppSettings]] = None,
+    app_cfg_extension: Optional[Dict[str, Union[Dict[str, Any], Alias.Json]]] = None,   # taskId$appId -> app_cfg json
+    email: Optional[str] = None,
+) -> Cfg:
+    collections = {} if collections is None else collections
+    different = {} if different is None else different
+    schemes_aliases = {} if schemes_aliases is None else schemes_aliases
+    init_apps_update = {} if init_apps_update is None else init_apps_update
+    app_settings = [] if app_settings is None else app_settings
+    app_cfg_extension_fixed = {}
+    if app_cfg_extension is not None:
+        for task_id_app_id, cfg in app_cfg_extension.items():
+            app_cfg_extension_fixed[task_id_app_id] = to_json(cfg)
+    return Cfg(
+        collections=collections,
+        different=different,
+        schemes_aliases=schemes_aliases,
+        msg_url=msg_url,
+        init_apps_update=init_apps_update,
+        app_settings=app_settings,
+        app_cfg_extension=app_cfg_extension_fixed,
+        email=email,
     )

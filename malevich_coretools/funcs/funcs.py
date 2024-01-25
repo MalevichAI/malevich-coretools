@@ -131,7 +131,7 @@ def get_collection_objects(path: Optional[str], recursive: Optional[str], *args,
 
 
 def get_collection_object(path: str, *args, **kwargs) -> bytes:
-    return send_to_core_get(COLLECTION_OBJECTS_PATH(path, None), is_text=None, *args, **kwargs)
+    return send_to_core_get(COLLECTION_OBJECTS_PATH(path, None, None), is_text=None, *args, **kwargs)
 
 
 def post_collection_object_presigned_url(path: str, callback_url: Optional[str], expires_in: int, wait: bool, *args, **kwargs) -> str:
@@ -143,15 +143,15 @@ def get_collection_object_presigned_url(path: str, callback_url: Optional[str], 
 
 
 def get_collections_object_presigned(signature: str, *args, **kwargs) -> bytes:
-    return send_to_core_get(COLLECTION_OBJECTS_PRESIGN(signature), is_text=None, *args, **kwargs)
+    return send_to_core_get(COLLECTION_OBJECTS_PRESIGN(signature, None), is_text=None, *args, **kwargs)
 
 
-def post_collections_object(path: str, data: bytes, wait: bool, *args, **kwargs) -> Alias.Info:
-    return send_to_core_modify_raw(COLLECTION_OBJECTS_PATH(path, wait), data, *args, **kwargs)
+def post_collections_object(path: str, data: bytes, zip: bool, wait: bool, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify_raw(COLLECTION_OBJECTS_PATH(path, wait, zip), data, *args, **kwargs)
 
 
-def post_collections_object_presigned(signature: str, data: bytes, *args, **kwargs) -> Alias.Info:
-    return send_to_core_modify_raw(COLLECTION_OBJECTS_PRESIGN(signature), data, *args, **kwargs)
+def post_collections_object_presigned(signature: str, data: bytes, zip: bool, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify_raw(COLLECTION_OBJECTS_PRESIGN(signature, zip), data, *args, **kwargs)
 
 
 def delete_collection_objects(wait: bool, *args, **kwargs) -> Alias.Info:
@@ -159,7 +159,7 @@ def delete_collection_objects(wait: bool, *args, **kwargs) -> Alias.Info:
 
 
 def delete_collection_object(path: str, wait: bool, *args, **kwargs) -> Alias.Info:
-    return send_to_core_modify(COLLECTION_OBJECTS_PATH(path, wait), *args, **kwargs, is_post=False)
+    return send_to_core_modify(COLLECTION_OBJECTS_PATH(path, wait, None), *args, **kwargs, is_post=False)
 
 
 # EndpointController
@@ -171,6 +171,10 @@ def get_endpoints(*args, **kwargs) -> Endpoints:
 
 def get_endpoint_by_hash(hash: str, *args, **kwargs) -> Endpoint:
     return model_from_json(send_to_core_get(ENDPOINTS(hash, None), *args, **kwargs), Endpoint)
+
+
+def get_endpoint_run(hash: str, *args, **kwargs) -> Endpoint:
+    return model_from_json(send_to_core_get(ENDPOINTS_RUN(hash), *args, **kwargs), EndpointRunInfo)
 
 
 def run_endpoint(hash: str, data: Optional[EndpointOverride], with_show: bool, *args, **kwargs) -> Union[AppLogs, Any]:
@@ -331,11 +335,9 @@ def get_register_all(*args, **kwargs) -> ResultLogins:
     return model_from_json(send_to_core_get(REGISTER_ALL, *args, **kwargs), ResultLogins)
 
 
-def post_register(auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
-    if auth is None:
-        auth = (Config.CORE_USERNAME, Config.CORE_PASSWORD)
-    send_to_core_modify(REGISTER, User(login=auth[0], password=auth[1]), with_auth=False, with_show=False, conn_url=conn_url)
-    info = f"user {auth[0]} created"
+def post_register(data: User, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> Alias.Info:
+    send_to_core_modify(REGISTER, data, auth=auth, with_auth=True, with_show=False, conn_url=conn_url)
+    info = f"user {data.login} created"
     if Config.VERBOSE:
         Config.logger.info(info)
     return info
@@ -516,6 +518,10 @@ def get_admin_runs(*args, **kwargs) -> AdminRunsInfo:
 
 def get_admin_runs_info(data: OperationOrNone, *args, **kwargs) -> Union[Alias.Json, Alias.Info]:
     return send_to_core_modify(ADMIN_RUNS_INFO, data, *args, **kwargs)
+
+
+def post_admin_update_superuser(data: Superuser, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify(ADMIN_SUPERUSER, data, *args, **kwargs)
 
 
 def delete_admin_runs(data: AdminStopOperation, *args, **kwargs) -> Alias.Json:

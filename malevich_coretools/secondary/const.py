@@ -57,10 +57,10 @@ COLLECTIONS_METADATA = lambda id, wait: with_wait(f"{COLLECTIONS_MAIN}/{id}/meta
 COLLECTION_OBJECTS_MAIN = f"{API_VERSION}/collectionObjects"
 COLLECTION_OBJECTS_ALL_GET = lambda path, recursive: with_key_values(f"{COLLECTION_OBJECTS_MAIN}/all", {"path": path, "recursive": recursive})
 COLLECTION_OBJECTS_ALL = lambda wait: with_wait(f"{COLLECTION_OBJECTS_MAIN}/all", wait)
-COLLECTION_OBJECTS_PATH = lambda path, wait: with_key_values(f"{COLLECTION_OBJECTS_MAIN}/", {"path": path, "wait": None if wait is None else bool_to_str(wait)})
+COLLECTION_OBJECTS_PATH = lambda path, wait, zip: with_key_values(f"{COLLECTION_OBJECTS_MAIN}/", {"path": path, "wait": None if wait is None else bool_to_str(wait), "zip": None if zip is None else bool_to_str(zip)})
 COLLECTION_OBJECTS_PRESIGN_PUT = lambda path, callback_url, expires_in, wait: with_key_values(f"{COLLECTION_OBJECTS_MAIN}/presign/put", {"path": path, "callback_url": callback_url, "expiresIn": expires_in, "wait": bool_to_str(wait)})
 COLLECTION_OBJECTS_PRESIGN_GET = lambda path, callback_url, expires_in, wait: with_key_values(f"{COLLECTION_OBJECTS_MAIN}/presign/get", {"path": path, "callback_url": callback_url, "expiresIn": expires_in, "wait": bool_to_str(wait)})
-COLLECTION_OBJECTS_PRESIGN = lambda signature: with_key_values(f"{COLLECTION_OBJECTS_MAIN}/presign", {"signature": signature})
+COLLECTION_OBJECTS_PRESIGN = lambda signature, zip: with_key_values(f"{COLLECTION_OBJECTS_MAIN}/presign", {"signature": signature, "zip": None if zip is None else bool_to_str(zip)})
 
 ## EndpointController
 ENDPOINTS_MAIN = f"{API_VERSION}/endpoints"
@@ -100,7 +100,7 @@ SHARE_ALL = lambda wait: with_wait(f"{SHARE_MAIN}/all", wait)
 ## RegistrationController
 REGISTER_MAIN = f"{API_VERSION}/register"
 REGISTER = f"{REGISTER_MAIN}/"
-REGISTER_LOGIN = lambda login, wait: with_wait(f"{REGISTER_MAIN}/{login}", wait)
+REGISTER_LOGIN = lambda login, wait: with_wait(f"{REGISTER_MAIN}/login/{login}", wait)
 REGISTER_ALL = f"{REGISTER_MAIN}/all"
 
 ## UserAppsController
@@ -143,6 +143,7 @@ TEMP_RUN_OPERATIONS_IDS = lambda taskId, cfgId: f"{TEMP_RUN_MAIN}/operationsIds/
 ADMIN_MAIN = f"{API_VERSION}/admin"
 ADMIN_RUNS = f"{ADMIN_MAIN}/runs"
 ADMIN_RUNS_INFO = f"{ADMIN_MAIN}/runs/info"
+ADMIN_SUPERUSER = f"{ADMIN_MAIN}/superuser"
 
 ## ManagerController
 MANAGER_MAIN = f"{API_VERSION}/manager"

@@ -111,7 +111,6 @@ class UserApp(BaseModel):
     image: JsonImage
     platform: str
     platformSettings: Optional[str] = None
-    collectionsFrom: Optional[Dict[str, Alias.Id]] = None
     extraCollectionsFrom: Optional[Dict[str, Alias.Id]] = None
 
 
@@ -307,6 +306,7 @@ class Cfg(BaseModel):
     msg_url: str = DEFAULT_MSG_URL
     init_apps_update: Dict[str, bool] = {}
     app_settings: List[AppSettings] = []
+    app_cfg_extension: Dict[str, Alias.Json] = {}   # taskId$appId -> app_cfg json
     email: Optional[str] = None
 
 
@@ -439,6 +439,11 @@ class AdminStopOperation(BaseModel):
     withLogs: bool
 
 
+class Superuser(BaseModel):
+    login: str
+    isSuperuser: bool
+
+
 class RunSettings(BaseModel):
     callbackUrl: Optional[str] = None
     debugMode: bool = False
@@ -462,23 +467,28 @@ class Endpoint(BaseModel):
     runSettings: Optional[RunSettings] = None
 
 
+class EndpointRunInfo(BaseModel):   # TODO improve
+    active: bool
+
+
 class Endpoints(BaseModel):
     data: List[Endpoint]
 
 
 class UserConfig(BaseModel):
     collections: Dict[Alias.Id, Alias.Id] = {}
-    rawCollections: Dict[Alias.Id, DocsDataCollection] = {}
+    rawCollections: Dict[Alias.Id, List[Alias.Doc]] = {}
+    rawMapCollections: Dict[Alias.Id, List[Dict[str, Any]]] = {}
     different: Dict[Alias.Id, Alias.Id] = {}
     schemesAliases: Dict[str, str] = {}
     msgUrl: Optional[str] = None
     initAppsUpdate: Dict[str, bool] = {}
     appSettings: List[AppSettings] = []
+    appCfgExtension: Dict[str, Alias.Json] = {}
     email: Optional[str] = None
 
 
 class EndpointOverride(BaseModel):
-    taskId: Optional[Alias.Id] = None
     cfgId: Optional[Alias.Id] = None
     cfg: Optional[UserConfig] = None
     runSettings: Optional[RunSettings] = None

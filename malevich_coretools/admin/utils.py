@@ -49,6 +49,23 @@ def admin_get_runs_info(
     return f.get_admin_runs_info(data, auth=auth, conn_url=conn_url)
 
 
+def admin_update_superuser(
+    login: str,
+    is_superuser: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> Alias.Info:
+    """update user role by login"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = Superuser(login=login, isSuperuser=is_superuser)
+    if batcher is not None:
+        return batcher.add("postUpdateSuperuser", data=data)
+    return f.post_admin_update_superuser(data, auth=auth, conn_url=conn_url)
+
+
 def admin_delete_run(
     id: Alias.Id,
     withLogs: bool = False,
