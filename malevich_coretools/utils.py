@@ -1924,7 +1924,7 @@ def __fix_cfg(cfg: Union[Dict[str, Any], Alias.Json, Cfg]) -> str:
         if isinstance(cfg, Alias.Json):
             cfg = json.loads(cfg)
         assert isinstance(cfg, dict), "wrong cfg type"
-        for app_setting in cfg["app_settings"]:
+        for app_setting in cfg.get("app_settings", []):
             if isinstance(name := app_setting.get("saveCollectionsName"), str):
                 app_setting["saveCollectionsName"] = [name]
         cfg_json = json.dumps(cfg)
@@ -2339,7 +2339,7 @@ def task_full(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-) -> AppLogs:
+) -> Union[Alias.Id, AppLogs]:
     """prepare, run and stop task by `task_id`, `cfg_id` and other
 
     Args:
@@ -2428,7 +2428,7 @@ def task_prepare(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-) -> AppLogs:
+) -> Union[Alias.Id, AppLogs]:
     """prepare task by `task_id`, `cfg_id` and other, return `operation_id`
 
     Args:
@@ -2522,7 +2522,7 @@ def task_run(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-) -> Optional[AppLogs]:
+) -> Optional[Union[Alias.Id, AppLogs]]:
     """run prepared task by `operation_id` with `cfg_id` and other overridden parameters
 
     Args:
@@ -2600,7 +2600,7 @@ def task_stop(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-) -> Optional[AppLogs]:
+) -> Optional[Union[Alias.Id, AppLogs]]:
     """stop task by `operation_id`
 
     Args:

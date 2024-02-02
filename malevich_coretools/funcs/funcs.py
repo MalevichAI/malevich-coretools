@@ -578,20 +578,24 @@ def get_task_schedules(data: Operation, with_show: bool, *args, **kwargs) -> Sch
     return res
 
 
-def post_manager_task(data: MainTask, with_show: bool, long: bool, long_timeout: int, wait: bool, auth: Optional[AUTH], conn_url: Optional[str]=None, *args, **kwargs) -> AppLogs:
+def post_manager_task(data: MainTask, with_show: bool, long: bool, long_timeout: int, wait: bool, auth: Optional[AUTH], conn_url: Optional[str]=None, *args, **kwargs) -> Union[Alias.Id, AppLogs]:
     check_profile_mode(data.profileMode)
     res = send_to_core_modify(MANAGER_TASK(wait and not long), data, with_show=with_show, show_func=show_logs_func, auth=auth, conn_url=conn_url, *args, **kwargs)
     if wait and long:
         res = asyncio.run(__get_result(res, timeout=long_timeout, auth=auth))
+    if not wait:
+        return res
     return AppLogs.parse_raw(res)
 
 
-def post_manager_task_run(data: RunTask, with_show: bool, long: bool, long_timeout: int, wait: bool, auth: Optional[AUTH], conn_url: Optional[str]=None, *args, **kwargs) -> Optional[AppLogs]:
+def post_manager_task_run(data: RunTask, with_show: bool, long: bool, long_timeout: int, wait: bool, auth: Optional[AUTH], conn_url: Optional[str]=None, *args, **kwargs) -> Optional[Union[Alias.Id, AppLogs]]:
     check_profile_mode(data.profileMode)
     res = send_to_core_modify(MANAGER_TASK_RUN(wait and not long), data, with_show=with_show, show_func=show_logs_func, auth=auth, conn_url=conn_url, *args, **kwargs)
     if wait and long:
         res = asyncio.run(__get_result(res, timeout=long_timeout, auth=auth))
     if data.withLogs or data.schedule is not None:
+        if not wait:
+            return res
         return AppLogs.parse_raw(res)
 
 
@@ -599,10 +603,12 @@ def post_manager_task_unschedule(data: UnscheduleOperation, with_show: bool, wai
     return send_to_core_modify(MANAGER_TASK_UNSCHEDULE(wait), data, with_show=with_show, *args, **kwargs)
 
 
-def post_manager_task_stop(data: StopOperation, with_show: bool, wait: bool, *args, **kwargs) -> Optional[AppLogs]:
+def post_manager_task_stop(data: StopOperation, with_show: bool, wait: bool, *args, **kwargs) -> Optional[Union[Alias.Id, AppLogs]]:
     show_func = show_logs_func if data.withLogs else None
     res = send_to_core_modify(MANAGER_TASK_STOP(wait), data, with_show=with_show, show_func=show_func, *args, **kwargs)
     if data.withLogs:
+        if not wait:
+            return res
         return AppLogs.parse_raw(res)
 
 
