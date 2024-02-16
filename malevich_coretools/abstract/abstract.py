@@ -386,7 +386,7 @@ class InputFunctionInfo(FunctionInfo):
 
 
 class ProcessorFunctionInfo(FunctionInfo):
-    pass
+    contextClass: Optional[Dict[str, Any]] = None   # model_json_schema
 
 
 class OutputFunctionInfo(FunctionInfo):
