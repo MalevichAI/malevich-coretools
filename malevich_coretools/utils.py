@@ -822,7 +822,7 @@ def get_run_endpoint(
     if batcher is None:
         batcher = Config.BATCHER
     if batcher is not None:
-        return batcher.add("getEndpointRun", vars={"hash": hash})
+        return batcher.add("getEndpointRun", vars={"hash": hash}, result_model=EndpointRunInfo)
     return f.get_endpoint_run(hash, auth=auth, conn_url=conn_url)
 
 
@@ -831,16 +831,21 @@ def run_endpoint(
     endpoint_override: Optional[EndpointOverride] = None,
     with_show: bool = True,
     *,
+    with_auth: bool = True,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-) -> Union[AppLogs, Any]:
+) -> Union[AppLogsWithResults, FlattenAppLogsWithResults, Any]:
     """run by endpoint, failed if `taskId`, `cfgId` not set or it is not active"""
     if batcher is None:
         batcher = Config.BATCHER
     if batcher is not None:
-        return batcher.add("postEndpointRun", data=endpoint_override, vars={"hash": hash})
-    return f.run_endpoint(hash, endpoint_override, with_show=with_show, auth=auth, conn_url=conn_url)
+        if endpoint_override is None or endpoint_override.formatLogs:
+            model = FlattenAppLogsWithResults
+        else:
+            model = AppLogsWithResults
+        return batcher.add("postEndpointRun", data=endpoint_override, vars={"hash": hash}, result_model=model)
+    return f.run_endpoint(hash, endpoint_override, with_show=with_show, with_auth=with_auth, auth=auth, conn_url=conn_url)
 
 
 def create_endpoint(
@@ -850,6 +855,9 @@ def create_endpoint(
     active: Optional[bool] = None,
     prepare: Optional[bool] = None,
     run_settings: Optional[RunSettings] = None,
+    enable_not_auth: Optional[str] = None,
+    expected_colls_with_schemes: Optional[Dict[str, str]] = None,
+    description: Optional[str] = None,
     wait: bool = True,
     *,
     auth: Optional[AUTH] = None,
@@ -859,7 +867,8 @@ def create_endpoint(
     """create endpoint, return hash, url - api/v1/endpoints/run/{hash}. fields may not be initialized - this will only cause an error at startup"""
     if batcher is None:
         batcher = Config.BATCHER
-    data = Endpoint(taskId=task_id, cfgId=cfg_id, sla=sla, active=active, prepare=prepare, runSettings=run_settings)
+    data = Endpoint(taskId=task_id, cfgId=cfg_id, sla=sla, active=active, prepare=prepare, runSettings=run_settings,
+                    enableNotAuthorized=enable_not_auth, expectedCollectionsWithSchemes=expected_colls_with_schemes, description=description)
     if batcher is not None:
         return batcher.add("postEndpointCreate", data=data)
     return f.create_endpoint(data, wait=wait, auth=auth, conn_url=conn_url)
@@ -873,6 +882,9 @@ def update_endpoint(
     active: Optional[bool] = None,
     prepare: Optional[bool] = None,
     run_settings: Optional[RunSettings] = None,
+    enable_not_auth: Optional[str] = None,
+    expected_colls_with_schemes: Optional[Dict[str, str]] = None,
+    description: Optional[str] = None,
     wait: bool = True,
     *,
     auth: Optional[AUTH] = None,
@@ -882,7 +894,8 @@ def update_endpoint(
     """update endpoint, return hash, url - api/v1/endpoints/run/{hash}. update field if it is not None"""
     if batcher is None:
         batcher = Config.BATCHER
-    data = Endpoint(hash=hash, taskId=task_id, cfgId=cfg_id, sla=sla, active=active, prepare=prepare, runSettings=run_settings)
+    data = Endpoint(hash=hash, taskId=task_id, cfgId=cfg_id, sla=sla, active=active, prepare=prepare, runSettings=run_settings,
+                    enableNotAuthorized=enable_not_auth, expectedCollectionsWithScheme=expected_colls_with_schemes, description=description)
     if batcher is not None:
         return batcher.add("postEndpointUpdate", data=data)
     return f.update_endpoint(data, wait=wait, auth=auth, conn_url=conn_url)

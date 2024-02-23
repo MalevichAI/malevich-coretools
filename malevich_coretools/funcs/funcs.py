@@ -13,7 +13,10 @@ from malevich_coretools.abstract.abstract import *  # noqa: F403
 from malevich_coretools.funcs.checks import check_profile_mode
 from malevich_coretools.secondary import Config, model_from_json, show_logs_func
 from malevich_coretools.secondary.const import *  # noqa: F403
-from malevich_coretools.secondary.helpers import show_fail_app_info
+from malevich_coretools.secondary.helpers import (
+    show_fail_app_info,
+    show_logs_flatten_func_endpoint,
+)
 
 # DocsController
 
@@ -177,10 +180,14 @@ def get_endpoint_run(hash: str, *args, **kwargs) -> Endpoint:
     return model_from_json(send_to_core_get(ENDPOINTS_RUN(hash), *args, **kwargs), EndpointRunInfo)
 
 
-def run_endpoint(hash: str, data: Optional[EndpointOverride], with_show: bool, *args, **kwargs) -> Union[AppLogs, Any]:
-    res = send_to_core_modify(ENDPOINTS_RUN(hash), data, with_show=with_show, show_func=show_logs_func, *args, **kwargs)
+def run_endpoint(hash: str, data: Optional[EndpointOverride], with_show: bool, *args, **kwargs) -> Union[AppLogsWithResults, FlattenAppLogsWithResults, Any]:
+    show_func = show_logs_flatten_func_endpoint if data is None or data.formatLogs else show_logs_func
+    res = send_to_core_modify(ENDPOINTS_RUN(hash), data, with_show=with_show, show_func=show_func, *args, **kwargs)
     try:
-        res = AppLogs.parse_raw(res)
+        if data is None or data.formatLogs:
+            res = FlattenAppLogsWithResults.model_validate_json(res)
+        else:
+            res = AppLogsWithResults.model_validate_json(res)
     except BaseException:
         pass
     return res
@@ -585,7 +592,7 @@ def post_manager_task(data: MainTask, with_show: bool, long: bool, long_timeout:
         res = asyncio.run(__get_result(res, timeout=long_timeout, auth=auth))
     if not wait:
         return res
-    return AppLogs.parse_raw(res)
+    return AppLogs.model_validate_json(res)
 
 
 def post_manager_task_run(data: RunTask, with_show: bool, long: bool, long_timeout: int, wait: bool, auth: Optional[AUTH], conn_url: Optional[str]=None, *args, **kwargs) -> Optional[Union[Alias.Id, AppLogs]]:
@@ -596,7 +603,7 @@ def post_manager_task_run(data: RunTask, with_show: bool, long: bool, long_timeo
     if data.withLogs or data.schedule is not None:
         if not wait:
             return res
-        return AppLogs.parse_raw(res)
+        return AppLogs.model_validate_json(res)
 
 
 def post_manager_task_unschedule(data: UnscheduleOperation, with_show: bool, wait: bool, *args, **kwargs) -> Alias.Info:
@@ -609,7 +616,7 @@ def post_manager_task_stop(data: StopOperation, with_show: bool, wait: bool, *ar
     if data.withLogs:
         if not wait:
             return res
-        return AppLogs.parse_raw(res)
+        return AppLogs.model_validate_json(res)
 
 
 def post_manager_task_stop_all(data: StopOperationMany, wait: bool, *args, **kwargs) -> Alias.Json: # FIXME show
@@ -639,7 +646,7 @@ def post_manager_app_pause(data: AppManage, wait: bool, *args, **kwargs) -> Alia
 async def kafka_send(data: KafkaMsg, *args, **kwargs) -> Union[Alias.Info, KafkaMsg]:
     result = await send_to_core_post_async(KAFKA_SEND, data, *args, **kwargs)
     try:
-        return KafkaMsg.parse_raw(result)
+        return KafkaMsg.model_validate_json(result)
     except BaseException:
         return result
 

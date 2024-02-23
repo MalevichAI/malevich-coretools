@@ -15,5 +15,6 @@ class Config:
     WITH_WARNINGS = False
     BATCHER = None
 
+    logging.basicConfig()
     logger = logging.getLogger("base-malevich-logger")
     logger.setLevel(logging.INFO)

@@ -357,6 +357,17 @@ class AppLogs(BaseModel):
     error: Optional[str] = None
 
 
+class AppLogsWithResults(AppLogs):
+    results: Optional[Dict[str, List[List[Dict[str, Any]]]]] = None
+
+
+class FlattenAppLogsWithResults(BaseModel):
+    operationId: Alias.Id
+    logs: str = ""
+    error: Optional[str] = None
+    results: Optional[Dict[str, List[List[Dict[str, Any]]]]] = None
+
+
 class LogsTask(BaseModel):
     operationId: Alias.Id
     appId: Optional[Alias.Id] = None
@@ -465,10 +476,16 @@ class Endpoint(BaseModel):
     active: Optional[bool] = None
     prepare: Optional[bool] = None
     runSettings: Optional[RunSettings] = None
+    enableNotAuthorized: Optional[bool] = None                          # True by default
+    expectedCollectionsWithSchemes: Optional[Dict[str, str]] = None     # collection -> scheme
+    description: Optional[str] = None
 
 
 class EndpointRunInfo(BaseModel):   # TODO improve
     active: bool
+    description: Optional[str]
+    author: str
+    collections: Optional[Dict[str, str]] = None
 
 
 class Endpoints(BaseModel):
@@ -476,15 +493,15 @@ class Endpoints(BaseModel):
 
 
 class UserConfig(BaseModel):
-    collections: Dict[Alias.Id, Alias.Id] = {}
-    rawCollections: Dict[Alias.Id, List[Alias.Doc]] = {}
-    rawMapCollections: Dict[Alias.Id, List[Dict[str, Any]]] = {}
-    different: Dict[Alias.Id, Alias.Id] = {}
-    schemesAliases: Dict[str, str] = {}
+    collections: Optional[Dict[Alias.Id, Alias.Id]] = None
+    rawCollections: Optional[Dict[Alias.Id, List[Alias.Doc]]] = None
+    rawMapCollections: Optional[Dict[Alias.Id, List[Dict[str, Any]]]] = None
+    different: Optional[Dict[Alias.Id, Alias.Id]] = None
+    schemesAliases: Optional[Dict[str, str]] = None
     msgUrl: Optional[str] = None
-    initAppsUpdate: Dict[str, bool] = {}
-    appSettings: List[AppSettings] = []
-    appCfgExtension: Dict[str, Alias.Json] = {}
+    initAppsUpdate: Optional[Dict[str, bool]] = None
+    appSettings: Optional[List[AppSettings]] = None
+    appCfgExtension: Optional[Dict[str, Alias.Json]] = None
     email: Optional[str] = None
 
 
@@ -492,6 +509,9 @@ class EndpointOverride(BaseModel):
     cfgId: Optional[Alias.Id] = None
     cfg: Optional[UserConfig] = None
     runSettings: Optional[RunSettings] = None
+    overrideConfig: bool = False
+    formatLogs: bool = True
+    withResult: bool = True
 
 
 class BatchResponse(BaseModel):

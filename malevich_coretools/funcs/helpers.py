@@ -110,13 +110,6 @@ def create_user_config(
     app_cfg_extension: Optional[Dict[str, Union[Dict[str, Any], Alias.Json]]] = None,
     email: Optional[str] = None,
 ) -> UserConfig:
-    collections = {} if collections is None else collections
-    raw_collections = {} if raw_collections is None else raw_collections
-    raw_map_collections = {} if raw_map_collections is None else raw_map_collections
-    different = {} if different is None else different
-    schemes_aliases = {} if schemes_aliases is None else schemes_aliases
-    init_apps_update = {} if init_apps_update is None else init_apps_update
-    app_settings = [] if app_settings is None else app_settings
     app_cfg_extension_fixed = {}
     if app_cfg_extension is not None:
         for task_id_app_id, cfg in app_cfg_extension.items():
@@ -211,6 +204,10 @@ def create_run_settings(
 def create_endpoint_override(
     cfg_id: Optional[str] = None,
     cfg: Optional[UserConfig] = None,
+    override_config: bool = False,
+    format_logs: bool = True,
+    with_result: bool = True,
+    # runSettings part
     callback_url: Optional[str] = None,
     debug_mode: bool = False,
     core_manage: bool = False,
@@ -225,6 +222,9 @@ def create_endpoint_override(
     return EndpointOverride(
         cfgId=cfg_id,
         cfg=cfg,
+        overrideConfig=override_config,
+        formatLogs=format_logs,
+        withResult=with_result,
         runSettings=create_run_settings(
             callback_url=callback_url,
             debug_mode=debug_mode,

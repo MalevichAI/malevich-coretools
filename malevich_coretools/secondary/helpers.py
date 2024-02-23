@@ -5,7 +5,12 @@ from typing import Any, Callable, Dict, Optional, Tuple, Union
 
 from pydantic import BaseModel
 
-from malevich_coretools.abstract.abstract import Alias, AppLogs, LogsResult
+from malevich_coretools.abstract.abstract import (
+    Alias,
+    AppLogs,
+    FlattenAppLogsWithResults,
+    LogsResult,
+)
 from malevich_coretools.secondary import Config
 from malevich_coretools.secondary.kafka_utils import handle_logs
 
@@ -121,11 +126,25 @@ def show_logs_colored(app_logs: AppLogs, colors_dict: Optional[Dict[str, str]] =
 
 def show_logs_func(data: str, err: bool = False):  # noqa: ANN201
     try:
-        app_logs = AppLogs.parse_raw(data)
+        app_logs = AppLogs.model_validate_json(data)
         show_logs(app_logs, err=err)
     except BaseException:
         Config.logger.error("decode logs failed")
         show = Config.logger.error if err else Config.logger.info
+        show(data)
+
+
+def show_logs_flatten_func_endpoint(data: str, err: bool = False) -> None:
+    show = Config.logger.error if err else Config.logger.info
+    try:
+        app_logs_flatten = FlattenAppLogsWithResults.model_validate_json(data)
+        show(f"operation_id = {app_logs_flatten.operationId}")
+        if app_logs_flatten.error is not None:
+            show(f"error: {app_logs_flatten.error}")
+            print(__delimiter)
+        show(app_logs_flatten.logs)
+    except BaseException:
+        Config.logger.error("decode logs failed")
         show(data)
 
 
