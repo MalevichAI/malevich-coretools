@@ -481,7 +481,7 @@ class Endpoint(BaseModel):
     description: Optional[str] = None
 
 
-class EndpointRunInfo(BaseModel):   # TODO improve
+class EndpointRunInfo(BaseModel):
     active: bool
     description: Optional[str]
     author: str
