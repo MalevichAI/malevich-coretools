@@ -333,7 +333,7 @@ def parse(
 
 
 def vast_settings(
-    id: Optional[int] = None, query: Optional[Union[str, Dict[str, Any]]] = None, api_key: Optional[str] = None
+    id: Optional[int] = None, query: Optional[Union[str, Dict[str, Any]]] = None, api_key: Optional[str] = None, disk: Optional[int] = None
 ) -> str:
     """
     Platform settings for create app:\n
@@ -359,6 +359,9 @@ def vast_settings(
             assert isinstance(query, dict), "wrong query type: it should be str or dict"
             res["query"] = query
     if api_key is not None:
-        assert isinstance(id, str), "wrong api_key type"
+        assert isinstance(api_key, str), "wrong api_key type"
         res["apiKey"] = api_key
+    if disk is not None:
+        assert isinstance(disk, int), "wrong disk type"
+        res["disk"] = disk
     return json.dumps(res)
