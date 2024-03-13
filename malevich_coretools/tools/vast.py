@@ -1,7 +1,7 @@
 import json
 import re
 import sys
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 
 def numeric_version(version_str):  # noqa: ANN201
@@ -333,7 +333,7 @@ def parse(
 
 
 def vast_settings(
-    id: Optional[int] = None, query: Optional[Union[str, Dict[str, Any]]] = None, api_key: Optional[str] = None, disk: Optional[int] = None
+    id: Optional[int] = None, query: Optional[Union[str, Dict[str, Any]]] = None, api_key: Optional[str] = None, disk: Optional[int] = None, assets: Optional[List[str]] = None
 ) -> str:
     """
     Platform settings for create app:\n
@@ -364,4 +364,6 @@ def vast_settings(
     if disk is not None:
         assert isinstance(disk, int), "wrong disk type"
         res["disk"] = disk
+    if assets is not None:
+        res["assets"] = assets
     return json.dumps(res)
