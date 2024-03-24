@@ -643,6 +643,18 @@ def post_manager_app_pause(data: AppManage, wait: bool, *args, **kwargs) -> Alia
     return send_to_core_modify(MANAGER_APP_PAUSE(wait), data, *args, **kwargs)
 
 
+def get_limits(*args, **kwargs) -> UserLimits:
+    return model_from_json(send_to_core_get(LIMITS(True), *args, **kwargs), UserLimits)
+
+
+def post_limits(data: Limits, wait: bool, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify(LIMITS(wait), data, *args, **kwargs)
+
+
+def post_user_limits(data: LimitsScope, wait: bool, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify(LIMITS_USER(wait), data, *args, **kwargs)
+
+
 async def kafka_send(data: KafkaMsg, *args, **kwargs) -> Union[Alias.Info, KafkaMsg]:
     result = await send_to_core_post_async(KAFKA_SEND, data, *args, **kwargs)
     try:

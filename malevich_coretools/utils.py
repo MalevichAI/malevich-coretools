@@ -15,6 +15,7 @@ from malevich_coretools.batch import (  # noqa: F401
     DefferOperation,
 )
 from malevich_coretools.funcs.helpers import (  # noqa: F401
+    base_settings,
     create_app_settings,
     create_cfg_struct,
     create_endpoint_override,
@@ -1932,7 +1933,7 @@ def __fix_cfg(cfg: Union[Dict[str, Any], Alias.Json, Cfg]) -> str:
         for app_setting in cfg.app_settings:
             if isinstance(app_setting.saveCollectionsName, str):
                 app_setting.saveCollectionsName = [app_setting.saveCollectionsName]
-        cfg_json = cfg.json()
+        cfg_json = cfg.model_dump_json()
     else:
         if isinstance(cfg, Alias.Json):
             cfg = json.loads(cfg)
@@ -2768,6 +2769,76 @@ def app_pause(
         return batcher.add("sendAppPause", data=data)
     return f.post_manager_app_pause(
         data, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url
+    )
+
+
+# Limits
+
+
+def get_user_limits(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> UserLimits:
+    """return limits for user"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getLimits", result_model=UserLimits)
+    return f.get_limits(auth=auth, conn_url=conn_url)
+
+
+def update_user_limits(
+    memory_request: Optional[int] = None,
+    memory_limit: Optional[int] = None,
+    cpu_request: Optional[int] = None,
+    cpu_limit: Optional[int] = None,
+    storage_request: Optional[int] = None,
+    storage_limit: Optional[int] = None,
+    gpu_disk: Optional[int] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> Alias.Info:
+    """update limits for user"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = Limits(memoryRequest=memory_request, memoryLimit=memory_limit, cpuRequest=cpu_request, cpuLimit=cpu_limit, storageRequest=storage_request, storageLimit=storage_limit, gpuDisk=gpu_disk)
+    if batcher is not None:
+        return batcher.add("postLimits", data=data)
+    return f.post_limits(
+        data, wait=wait, auth=auth, conn_url=conn_url
+    )
+
+
+def update_user_limits_scope(
+    login: str,
+    app_memory_request: Optional[int] = None,
+    app_memory_limit: Optional[int] = None,
+    app_cpu_request: Optional[int] = None,
+    app_cpu_limit: Optional[int] = None,
+    app_storage_request: Optional[int] = None,
+    app_storage_limit: Optional[int] = None,
+    assets_limit: Optional[int] = None,
+    allow_common_gpu: Optional[bool] = None,
+    gpu_disk_max: Optional[int] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> Alias.Info:
+    """update limits scope for user, for superuser/admin"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = LimitsScope(login=login, appMemoryRequest=app_memory_request, appMemoryLimit=app_memory_limit, appCpuRequest=app_cpu_request, appCpuLimit=app_cpu_limit, appStorageRequest=app_storage_request, appStorageLimit=app_storage_limit, assetsLimit=assets_limit, allowCommonGpu=allow_common_gpu, gpuDiskMax=gpu_disk_max)
+    if batcher is not None:
+        return batcher.add("postUserLimits", data=data)
+    return f.post_user_limits(
+        data, wait=wait, auth=auth, conn_url=conn_url
     )
 
 

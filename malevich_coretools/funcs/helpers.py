@@ -8,6 +8,7 @@ from malevich_coretools.abstract.abstract import (
     DEFAULT_MSG_URL,
     Alias,
     AppSettings,
+    BasePlatformSettings,
     Cfg,
     DocsDataCollection,
     EndpointOverride,
@@ -163,10 +164,12 @@ def create_task_policy(
 def create_restrictions(
     honest_scale: bool = True,
     single_pod: bool = False,
+    smart_apps_reuse: bool = False,
 ) -> Restrictions:
     return Restrictions(
         honestScale=honest_scale,
         singlePod=single_pod,
+        smartAppsReuse=smart_apps_reuse,
     )
 
 
@@ -269,3 +272,21 @@ def create_cfg_struct(
         app_cfg_extension=app_cfg_extension_fixed,
         email=email,
     )
+
+
+def base_settings(
+    memory_request: Optional[int] = None,
+    memory_limit: Optional[int] = None,
+    cpu_request: Optional[int] = None,
+    cpu_limit: Optional[int] = None,
+    storage_request: Optional[int] = None,
+    storage_limit: Optional[int] = None,
+) -> str:
+    return BasePlatformSettings(
+        memoryRequest=memory_request,
+        memoryLimit=memory_limit,
+        cpuRequest=cpu_request,
+        cpuLimit=cpu_limit,
+        storageRequest=storage_request,
+        storageLimit=storage_limit,
+    ).model_dump_json()

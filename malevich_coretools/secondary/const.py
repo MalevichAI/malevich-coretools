@@ -33,9 +33,9 @@ def with_key_values(url: str, key_values: Dict[str, Optional[str]]) -> str:
     return url
 
 ## DocsController
-DOCS_MAIN = f"{API_VERSION}/docs/"
-DOCS = lambda wait: with_wait(DOCS_MAIN, wait)
-DOCS_ID = lambda id, wait: with_wait(f"{DOCS_MAIN}{id}", wait)
+DOCS_MAIN = f"{API_VERSION}/docs"
+DOCS = lambda wait: with_wait(f"{DOCS_MAIN}/", wait)
+DOCS_ID = lambda id, wait: with_wait(f"{DOCS_MAIN}/{id}", wait)
 
 ## CollectionsController
 COLLECTIONS_MAIN = f"{API_VERSION}/collections"
@@ -169,6 +169,11 @@ MANAGER_TASK_PAUSE = lambda wait: with_wait(f"{MANAGER_MAIN}/task/pause", wait)
 MANAGER_APP_STOP = lambda wait: with_wait(f"{MANAGER_MAIN}/app/stop", wait)
 MANAGER_APP_RESUME = lambda wait: with_wait(f"{MANAGER_MAIN}/app/resume", wait)
 MANAGER_APP_PAUSE = lambda wait: with_wait(f"{MANAGER_MAIN}/app/pause", wait)
+
+## LimitsController
+LIMITS_MAIN = f"{API_VERSION}/limits"
+LIMITS = lambda wait: with_wait(f"{LIMITS_MAIN}/", wait)
+LIMITS_USER = lambda wait: with_wait(f"{LIMITS_MAIN}/user", wait)
 
 ### Kafka
 KAFKA_SEND = f"{MANAGER_MAIN}/kafkaMsg"

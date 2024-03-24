@@ -170,6 +170,7 @@ class UnscheduleOperation(BaseModel):
 class Restrictions(BaseModel):
     honestScale: bool = True
     singlePod: bool = False
+    smartAppsReuse: bool = False
 
 
 class MainTask(BaseModel):
@@ -217,7 +218,7 @@ class ResultIds(BaseModel):
 
 
 class FilesDirs(BaseModel):
-    files: List[str]
+    files: Dict[str, int]
     directories: List[str]
 
 
@@ -522,3 +523,51 @@ class BatchResponse(BaseModel):
 
 class BatchResponses(BaseModel):
     data: List[BatchResponse]
+
+
+class UserLimits(BaseModel):
+    # set by superuser
+    appMemoryRequest: int       # in Mi
+    appMemoryLimit: int         # in Mi
+    appCpuRequest: int          # in m
+    appCpuLimit: int            # in m
+    appStorageRequest: int      # in Mi
+    appStorageLimit: int        # in Mi
+    assetsLimit: int            # in Mi, if < 0 - unlimited
+    allowCommonGpu: int         # ignore if exist access key
+    gpuDiskMax: int             # ignore if exist access key
+
+    # set by user
+    defaultMemoryRequest: int   # in Mi
+    defaultMemoryLimit: int     # in Mi
+    defaultCpuRequest: int      # in m
+    defaultCpuLimit: int        # in m
+    defaultStorageRequest: int  # in Mi
+    defaultStorageLimit: int    # in Mi
+    defaultGpuDisk: int
+
+
+class BasePlatformSettings(BaseModel):
+    memoryRequest: Optional[int]
+    memoryLimit: Optional[int]
+    cpuRequest: Optional[int]
+    cpuLimit: Optional[int]
+    storageRequest: Optional[int]
+    storageLimit: Optional[int]
+
+
+class Limits(BasePlatformSettings):
+    gpuDisk: Optional[int]
+
+
+class LimitsScope(BaseModel):   # for superuser/admin
+    login: str
+    appMemoryRequest: Optional[int]
+    appMemoryLimit: Optional[int]
+    appCpuRequest: Optional[int]
+    appCpuLimit: Optional[int]
+    appStorageRequest: Optional[int]
+    appStorageLimit: Optional[int]
+    assetsLimit: Optional[int]
+    allowCommonGpu: Optional[bool]
+    gpuDiskMax: Optional[int]
