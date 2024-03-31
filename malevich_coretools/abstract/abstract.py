@@ -111,7 +111,7 @@ class UserApp(BaseModel):
     image: JsonImage
     platform: str
     platformSettings: Optional[str] = None
-    extraCollectionsFrom: Optional[Dict[str, Alias.Id]] = None
+    extraCollectionsFrom: Optional[Dict[str, List[Alias.Id]]] = None
 
 
 class UserTask(BaseModel):
@@ -548,26 +548,26 @@ class UserLimits(BaseModel):
 
 
 class BasePlatformSettings(BaseModel):
-    memoryRequest: Optional[int]
-    memoryLimit: Optional[int]
-    cpuRequest: Optional[int]
-    cpuLimit: Optional[int]
-    storageRequest: Optional[int]
-    storageLimit: Optional[int]
+    memoryRequest: Optional[int] = None
+    memoryLimit: Optional[int] = None
+    cpuRequest: Optional[int] = None
+    cpuLimit: Optional[int] = None
+    storageRequest: Optional[int] = None
+    storageLimit: Optional[int] = None
 
 
 class Limits(BasePlatformSettings):
-    gpuDisk: Optional[int]
+    gpuDisk: Optional[int] = None
 
 
 class LimitsScope(BaseModel):   # for superuser/admin
     login: str
-    appMemoryRequest: Optional[int]
-    appMemoryLimit: Optional[int]
-    appCpuRequest: Optional[int]
-    appCpuLimit: Optional[int]
-    appStorageRequest: Optional[int]
-    appStorageLimit: Optional[int]
-    assetsLimit: Optional[int]
-    allowCommonGpu: Optional[bool]
-    gpuDiskMax: Optional[int]
+    appMemoryRequest: Optional[int] = None
+    appMemoryLimit: Optional[int] = None
+    appCpuRequest: Optional[int] = None
+    appCpuLimit: Optional[int] = None
+    appStorageRequest: Optional[int] = None
+    appStorageLimit: Optional[int] = None
+    assetsLimit: Optional[int] = None
+    allowCommonGpu: Optional[bool] = None
+    gpuDiskMax: Optional[int] = None
