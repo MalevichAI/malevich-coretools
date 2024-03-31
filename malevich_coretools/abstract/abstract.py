@@ -111,7 +111,7 @@ class UserApp(BaseModel):
     image: JsonImage
     platform: str
     platformSettings: Optional[str] = None
-    extraCollectionsFrom: Optional[Dict[str, Alias.Id]] = None
+    extraCollectionsFrom: Optional[Dict[str, List[Alias.Id]]] = None
 
 
 class UserTask(BaseModel):

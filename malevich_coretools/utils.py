@@ -1563,7 +1563,7 @@ def create_app(
     image_auth: Optional[AUTH] = None,
     platform: str = "base",
     platform_settings: Optional[str] = None,
-    extra_collections_from: Optional[Dict[str, str]] = None,
+    extra_collections_from: Optional[Dict[str, Union[List[str], str]]] = None,
     wait: bool = True,
     *,
     use_system_auth: bool = True,
@@ -1586,6 +1586,10 @@ def create_app(
     if Config.WITH_WARNINGS and (image_user is None or image_token is None):
         Config.logger.warning("image_auth not set")
     json_image = JsonImage(ref=image_ref, user=image_user, token=image_token)
+    if extra_collections_from is not None:
+        for k, v in extra_collections_from.items():
+            if isinstance(v, str):
+                extra_collections_from[k] = [v]
     data = UserApp(
         appId=app_id,
         inputId=input_id,
@@ -1613,7 +1617,7 @@ def update_app(
     image_auth: Optional[AUTH] = None,
     platform: str = "base",
     platform_settings: Optional[str] = None,
-    extra_collections_from: Optional[Dict[str, str]] = None,
+    extra_collections_from: Optional[Dict[str, Union[List[str], str]]] = None,
     wait: bool = True,
     *,
     use_system_auth: bool = True,
@@ -1635,6 +1639,10 @@ def update_app(
     if Config.WITH_WARNINGS and (image_user is None or image_token is None):
         Config.logger.warning("image_auth not set")
     json_image = JsonImage(ref=image_ref, user=image_user, token=image_token)
+    if extra_collections_from is not None:
+        for k, v in extra_collections_from.items():
+            if isinstance(v, str):
+                extra_collections_from[k] = [v]
     data = UserApp(
         appId=app_id,
         inputId=input_id,
