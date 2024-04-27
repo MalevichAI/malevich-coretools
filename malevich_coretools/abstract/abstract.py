@@ -40,7 +40,7 @@ class StopOperationMany(BaseModel):
 
 class DocWithName(BaseModel):
     data: Alias.Json
-    name: Optional[str]
+    name: Optional[str] = None
 
 
 class DocsCollection(BaseModel):
@@ -82,9 +82,9 @@ class SchemesIds(BaseModel):
 
 class Shared(BaseModel):
     userLogins: List[Alias.Login]
-    collectionsIds: Optional[List[Alias.Id]]
-    schemesIds: Optional[List[Alias.Id]]
-    userAppsIds: Optional[List[Alias.Id]]
+    collectionsIds: Optional[List[Alias.Id]] = None
+    schemesIds: Optional[List[Alias.Id]] = None
+    userAppsIds: Optional[List[Alias.Id]] = None
 
 
 class SharedWithUsers(BaseModel):
@@ -132,7 +132,7 @@ class KeysValues(Operation):
 
 
 class ScaleInfo(BaseModel):
-    taskId: Optional[Alias.Id]
+    taskId: Optional[Alias.Id] = None
     appId: Alias.Id
     scale: int
 
@@ -175,7 +175,7 @@ class Restrictions(BaseModel):
 
 class MainTask(BaseModel):
     taskId: Alias.Id
-    cfgId: Optional[Alias.Id]
+    cfgId: Optional[Alias.Id] = None
     infoUrl: Optional[str] = None
     debugMode: bool = False
     run: bool = True
@@ -207,7 +207,7 @@ class RunTask(Operation):
 
 
 class AppManage(Operation):
-    taskId: Optional[Alias.Id]
+    taskId: Optional[Alias.Id] = None
     appId: Alias.Id
     runId: Alias.Id
 
@@ -322,12 +322,12 @@ class MainTaskCfg(BaseModel):
     tasks: Dict[Alias.Id, UserTask]
     cfg: str
     schemesNames: List[str]
-    infoUrl: Optional[str]
+    infoUrl: Optional[str] = None
     debugMode: bool
-    login: Optional[Alias.Login]
+    login: Optional[Alias.Login] = None
     coreManage: bool
     kafkaMode: bool
-    tlWithoutData: Optional[int]
+    tlWithoutData: Optional[int] = None
 
 
 class KafkaMsg(BaseModel):
@@ -386,14 +386,14 @@ class FunctionInfo(BaseModel):
     id: Alias.Id
     name: str
     arguments: List[Tuple[str, Optional[str]]]
-    finishMsg: Optional[str]
-    doc: Optional[str]
+    finishMsg: Optional[str] = None
+    doc: Optional[str] = None
 
 
 class InputFunctionInfo(FunctionInfo):
-    collectionsNames: Optional[List[str]]
-    extraCollectionsNames: Optional[List[str]]
-    query: Optional[str]
+    collectionsNames: Optional[List[str]] = None
+    extraCollectionsNames: Optional[List[str]] = None
+    query: Optional[str] = None
     mode: str
 
 
@@ -402,16 +402,16 @@ class ProcessorFunctionInfo(FunctionInfo):
 
 
 class OutputFunctionInfo(FunctionInfo):
-    collectionOutNames: Optional[List[str]]
+    collectionOutNames: Optional[List[str]] = None
 
 
 class InitInfo(BaseModel):
     id: Alias.Id
     enable: bool
-    tl: Optional[int]
+    tl: Optional[int] = None
     prepare: bool
-    argname: Optional[str]
-    doc: Optional[str]
+    argname: Optional[str] = None
+    doc: Optional[str] = None
 
 
 class AppFunctionsInfo(BaseModel):
@@ -484,7 +484,7 @@ class Endpoint(BaseModel):
 
 class EndpointRunInfo(BaseModel):
     active: bool
-    description: Optional[str]
+    description: Optional[str] = None
     author: str
     collections: Optional[Dict[str, str]] = None
 
