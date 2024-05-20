@@ -1,10 +1,15 @@
 from enum import IntEnum
-from typing import Optional, List, Dict
-from malevich_coretools.abstract import JsonImage
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel
 
-from malevich_coretools.abstract.abstract import Restrictions, ScaleInfo, TaskComponent, TaskPolicy
+from malevich_coretools.abstract import JsonImage
+from malevich_coretools.abstract.abstract import (  # noqa: F401
+    Restrictions,
+    ScaleInfo,
+    TaskComponent,
+    TaskPolicy,
+)
 
 
 class PullCollectionPolicy(IntEnum):
@@ -22,14 +27,14 @@ class BaseArgument(BaseModel):
     # or
     collectionId: Optional[str] = None                  # hardcode collection with id (or obj path)
 
-    def validation(self):
+    def validation(self) -> None:
         assert (self.id is not None) + (self.collectionName is not None) + (self.collectionId is not None) == 1, "one way of constructing the argument must be chosen"
 
 
 class Argument(BaseArgument):
     group: Optional[List[BaseArgument]] = None                    # for constructed dfs, sink
 
-    def validation(self):
+    def validation(self) -> None:
         if self.group is not None:
             assert self.id is None and self.collectionName is None and self.collectionId is None, "one way of constructing the argument must be chosen"
             for subarg in self.group:
