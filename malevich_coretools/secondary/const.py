@@ -122,6 +122,14 @@ USER_TASKS_MAP_IDS = f"{USER_TASKS_MAIN}/mapIds"
 USER_TASKS_ID = lambda id, wait: with_wait(f"{USER_TASKS_MAIN}/{urllib.parse.quote(id, safe='')}", wait)
 USER_TASKS_REAL_ID = lambda id: f"{USER_TASKS_MAIN}/realIds/{urllib.parse.quote(id, safe='')}"
 
+## UserPipelinesController
+USER_PIPELINES_MAIN = f"{API_VERSION}/userPipelines"
+USER_PIPELINES = lambda wait: with_wait(f"{USER_PIPELINES_MAIN}/", wait)
+USER_PIPELINES_REAL_IDS = f"{USER_PIPELINES_MAIN}/realIds"
+USER_PIPELINES_MAP_IDS = f"{USER_PIPELINES_MAIN}/mapIds"
+USER_PIPELINES_ID = lambda id, wait: with_wait(f"{USER_PIPELINES_MAIN}/{urllib.parse.quote(id, safe='')}", wait)
+USER_PIPELINES_REAL_ID = lambda id: f"{USER_PIPELINES_MAIN}/realIds/{urllib.parse.quote(id, safe='')}"
+
 ## UserCfgsController
 USER_CFGS_MAIN = f"{API_VERSION}/userCfgs"
 USER_CFGS = lambda wait: with_wait(f"{USER_CFGS_MAIN}/", wait)
@@ -166,6 +174,7 @@ MANAGER_TASK_STOP = lambda wait: with_wait(f"{MANAGER_MAIN}/task/stop", wait)
 MANAGER_TASK_STOP_ALL = lambda wait: with_wait(f"{MANAGER_MAIN}/task/stopAll", wait)
 MANAGER_TASK_RESUME = lambda wait: with_wait(f"{MANAGER_MAIN}/task/resume", wait)
 MANAGER_TASK_PAUSE = lambda wait: with_wait(f"{MANAGER_MAIN}/task/pause", wait)
+MANAGER_PIPELINE = lambda wait: with_wait(f"{MANAGER_MAIN}/pipeline", wait)
 MANAGER_APP_STOP = lambda wait: with_wait(f"{MANAGER_MAIN}/app/stop", wait)
 MANAGER_APP_RESUME = lambda wait: with_wait(f"{MANAGER_MAIN}/app/resume", wait)
 MANAGER_APP_PAUSE = lambda wait: with_wait(f"{MANAGER_MAIN}/app/pause", wait)

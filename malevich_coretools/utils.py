@@ -1861,6 +1861,179 @@ def delete_task(
     return f.delete_userTasks_id(id, wait=wait, auth=auth, conn_url=conn_url)
 
 
+# UserPipelines
+
+
+def get_pipelines(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> ResultIds:
+    """return pipelines ids for current user"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getPipelines", result_model=ResultIds)
+    return f.get_userPipelines(auth=auth, conn_url=conn_url)
+
+
+def get_pipelines_real(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> ResultIds:
+    """return pipelines real ids for current user"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getPipelinesReal", result_model=ResultIds)
+    return f.get_userPipelines_realIds(auth=auth, conn_url=conn_url)
+
+
+def get_pipelines_map(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> ResultIdsMap:
+    """return pipelines ids with real ids for current user"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getPipelinesMapIds", result_model=ResultIdsMap)
+    return f.get_userPipelines_mapIds(auth=auth, conn_url=conn_url)
+
+
+def get_pipeline(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> Pipeline:
+    """return pipeline by `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getPipelineById", vars={"id": id}, result_model=Pipeline)
+    return f.get_userTasks_id(id, auth=auth, conn_url=conn_url)
+
+
+def get_pipeline_real(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> Pipeline:
+    """return pipeline by real `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getPipelineByRealId", vars={"id": id}, result_model=Pipeline)
+    return f.get_userPipelines_realId(id, auth=auth, conn_url=conn_url)
+
+
+def create_pipeline(
+    pipeline_id: str,
+    processors: Dict[str, Processor] = None,
+    conditions: Dict[str, Condition] = None,
+    results: Dict[str, List[Result]] = None,
+    pull_collection_policy: PullCollectionPolicy = PullCollectionPolicy.IF_NOT_EXIST,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> Alias.Id:
+    """create pipeline"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if processors is None:
+        processors = {}
+    if conditions is None:
+        conditions = {}
+    if results is None:
+        results = {}
+    data = Pipeline(
+        pipelineId=pipeline_id,
+        processors=processors,
+        conditions=conditions,
+        results=results,
+        pullCollectionPolicy=pull_collection_policy,
+    )
+    if batcher is not None:
+        return batcher.add("postPipeline", data=data)
+    return f.post_userPipelines(data, wait=wait, auth=auth, conn_url=conn_url)
+
+
+def update_pipeline(
+    id: str,
+    pipeline_id: str,
+    processors: Dict[str, Processor] = None,
+    conditions: Dict[str, Condition] = None,
+    results: Dict[str, List[Result]] = None,
+    pull_collection_policy: PullCollectionPolicy = PullCollectionPolicy.IF_NOT_EXIST,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> Alias.Info:
+    """update pipeline by `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if processors is None:
+        processors = {}
+    if conditions is None:
+        conditions = {}
+    if results is None:
+        results = {}
+    data = Pipeline(
+        pipelineId=pipeline_id,
+        processors=processors,
+        conditions=conditions,
+        results=results,
+        pullCollectionPolicy=pull_collection_policy,
+    )
+    if batcher is not None:
+        return batcher.add("postPipelineById", data=data, vars={"id": id})
+    return f.post_userPipelines_id(id, data, wait=wait, auth=auth, conn_url=conn_url)
+
+
+def delete_pipelines(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> Alias.Info:
+    """delete all user pipelines"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deletePipelines")
+    return f.delete_userPipelines(wait=wait, auth=auth, conn_url=conn_url)
+
+
+def delete_pipeline(
+    id: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> Alias.Info:
+    """delete user pipeline by `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deletePipelineById", vars={"id": id})
+    return f.delete_userPipelines_id(id, wait=wait, auth=auth, conn_url=conn_url)
+
+
 # UserCfgs
 
 
@@ -2582,6 +2755,140 @@ def task_run(
     if batcher is not None:
         return batcher.add("sendTaskRun", data=data, result_model=AppLogs if with_logs or schedule is not None else None)
     return f.post_manager_task_run(
+        data,
+        with_show=with_show,
+        long=long,
+        long_timeout=long_timeout,
+        wait=wait,
+        auth=auth,
+        conn_url=conn_url,
+    )
+
+
+def pipeline_full(
+    pipeline_id: str,
+    cfg_id: str,
+    info_url: Optional[str] = None,
+    debug_mode: bool = False,
+    core_manage: bool = False,
+    single_request: bool = False,
+    profile_mode: Optional[str] = None,
+    component: TaskComponent = None,
+    policy: TaskPolicy = None,
+    restrictions: Optional[Restrictions] = None,
+    scaleInfo: List[ScaleInfo] = None,
+    with_show: bool = True,
+    long: bool = False,
+    long_timeout: Optional[int] = WAIT_RESULT_TIMEOUT,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> Union[Alias.Id, AppLogs]:
+    if batcher is None:
+        batcher = Config.BATCHER
+    if scaleInfo is None:
+        scaleInfo = []
+    if component is None:
+        component = TaskComponent()
+    if policy is None:
+        policy = TaskPolicy()
+    if restrictions is None:
+        restrictions = Restrictions()
+    data = MainPipeline(
+        pipelineId=pipeline_id,
+        cfgId=cfg_id,
+        infoUrl=info_url,
+        debugMode=debug_mode,
+        coreManage=core_manage,
+        kafkaMode=False,
+        singleRequest=single_request,
+        tlWithoutData=None,
+        waitRuns=True,
+        profileMode=profile_mode,
+        withLogs=True,
+        component=component,
+        policy=policy,
+        restrictions=restrictions,
+        scaleInfo=scaleInfo,
+        withListener=False,
+        kafkaModeUrl=None,
+        run=True,
+    )
+    if batcher is not None:
+        return batcher.add("sendPipeline", data=data, result_model=AppLogs)
+    return f.post_manager_pipeline(
+        data,
+        with_show=with_show,
+        long=long,
+        long_timeout=long_timeout,
+        wait=wait,
+        auth=auth,
+        conn_url=conn_url,
+    )
+
+
+def pipeline_prepare(
+    pipeline_id: str,
+    cfg_id: str,
+    info_url: Optional[str] = None,
+    debug_mode: bool = False,
+    core_manage: bool = False,
+    kafka_mode: bool = False,
+    single_request: bool = False,
+    tl_without_data: Optional[int] = None,
+    wait_runs: bool = True,
+    profile_mode: Optional[str] = None,
+    with_logs: bool = False,
+    component: TaskComponent = None,
+    policy: TaskPolicy = None,
+    restrictions: Optional[Restrictions] = None,
+    scaleInfo: List[ScaleInfo] = None,
+    with_listener: bool = False,
+    kafka_mode_url_response: Optional[str] = None,
+    with_show: bool = True,
+    long: bool = False,
+    long_timeout: Optional[int] = WAIT_RESULT_TIMEOUT,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> Union[Alias.Id, AppLogs]:
+    if batcher is None:
+        batcher = Config.BATCHER
+    if scaleInfo is None:
+        scaleInfo = []
+    if component is None:
+        component = TaskComponent()
+    if policy is None:
+        policy = TaskPolicy()
+    if restrictions is None:
+        restrictions = Restrictions()
+    data = MainPipeline(
+        pipelineId=pipeline_id,
+        cfgId=cfg_id,
+        infoUrl=info_url,
+        debugMode=debug_mode,
+        coreManage=core_manage,
+        kafkaMode=kafka_mode,
+        singleRequest=single_request,
+        tlWithoutData=tl_without_data,
+        waitRuns=wait_runs,
+        profileMode=profile_mode,
+        withLogs=with_logs,
+        component=component,
+        policy=policy,
+        restrictions=restrictions,
+        scaleInfo=scaleInfo,
+        withListener=with_listener,
+        kafkaModeUrl=kafka_mode_url_response,
+        run=False,
+    )
+    if batcher is not None:
+        return batcher.add("sendPipeline", data=data, result_model=AppLogs)
+    return f.post_manager_pipeline(
         data,
         with_show=with_show,
         long=long,

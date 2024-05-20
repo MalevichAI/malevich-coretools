@@ -195,6 +195,27 @@ class MainTask(BaseModel):
     restrictions: Optional[Restrictions] = Restrictions()
 
 
+class MainPipeline(BaseModel):
+    pipelineId: str
+    cfgId: str
+    infoUrl: Optional[str] = None
+    debugMode: bool = False
+    coreManage: bool = False
+    kafkaMode: bool = False
+    singleRequest: bool = True
+    tlWithoutData: Optional[int] = None
+    waitRuns: bool = True
+    profileMode: Optional[str] = None
+    withLogs: bool = False
+    component: TaskComponent = TaskComponent()
+    policy: TaskPolicy = TaskPolicy()
+    restrictions: Optional[Restrictions] = Restrictions()
+    scaleInfo: List[ScaleInfo] = []
+    withListener: bool = False
+    kafkaModeUrl: Optional[str] = None
+    run: bool = True
+
+
 class RunTask(Operation):
     cfgId: Optional[Alias.Id] = None
     infoUrl: Optional[str] = None

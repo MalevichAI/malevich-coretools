@@ -442,6 +442,44 @@ def delete_userTasks(wait: bool, *args, **kwargs) -> Alias.Info:
 def delete_userTasks_id(id: str, wait: bool, *args, **kwargs) -> Alias.Info:
     return send_to_core_modify(USER_TASKS_ID(id, wait), *args, **kwargs, is_post=False)
 
+# UserPipelinesController
+
+
+def get_userPipelines(*args, **kwargs) -> ResultIds:
+    return model_from_json(send_to_core_get(USER_PIPELINES(None), *args, **kwargs), ResultIds)
+
+
+def get_userPipelines_realIds(*args, **kwargs) -> ResultIds:
+    return model_from_json(send_to_core_get(USER_PIPELINES_REAL_IDS, *args, **kwargs), ResultIds)
+
+
+def get_userPipelines_mapIds(*args, **kwargs) -> ResultIdsMap:
+    return model_from_json(send_to_core_get(USER_PIPELINES_MAP_IDS, *args, **kwargs), ResultIdsMap)
+
+
+def get_userPipelines_id(id: str, *args, **kwargs) -> UserTask:
+    return model_from_json(send_to_core_get(USER_PIPELINES_ID(id, None), *args, **kwargs), UserTask)
+
+
+def get_userPipelines_realId(id: str, *args, **kwargs) -> UserTask:
+    return model_from_json(send_to_core_get(USER_PIPELINES_REAL_ID(id), *args, **kwargs), UserTask)
+
+
+def post_userPipelines(data: UserTask, wait: bool, *args, **kwargs) -> Alias.Id:
+    return send_to_core_modify(USER_PIPELINES(wait), data, *args, **kwargs)
+
+
+def post_userPipelines_id(id: str, data: UserTask, wait: bool, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify(USER_PIPELINES_ID(id, wait), data, *args, **kwargs)
+
+
+def delete_userPipelines(wait: bool, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify(USER_PIPELINES(wait), *args, **kwargs, is_post=False)
+
+
+def delete_userPipelines_id(id: str, wait: bool, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify(USER_PIPELINES_ID(id, wait), *args, **kwargs, is_post=False)
+
 # UserCfgsController
 
 
@@ -604,6 +642,16 @@ def post_manager_task_run(data: RunTask, with_show: bool, long: bool, long_timeo
         if not wait:
             return res
         return AppLogs.model_validate_json(res)
+
+
+def post_manager_pipeline(data: MainPipeline, with_show: bool, long: bool, long_timeout: int, wait: bool, auth: Optional[AUTH], conn_url: Optional[str]=None, *args, **kwargs) -> Union[Alias.Id, AppLogs]:
+    check_profile_mode(data.profileMode)
+    res = send_to_core_modify(MANAGER_PIPELINE(wait and not long), data, with_show=with_show, show_func=show_logs_func, auth=auth, conn_url=conn_url, *args, **kwargs)
+    if wait and long:
+        res = asyncio.run(__get_result(res, timeout=long_timeout, auth=auth))
+    if not wait:
+        return res
+    return AppLogs.model_validate_json(res)
 
 
 def post_manager_task_unschedule(data: UnscheduleOperation, with_show: bool, wait: bool, *args, **kwargs) -> Alias.Info:
