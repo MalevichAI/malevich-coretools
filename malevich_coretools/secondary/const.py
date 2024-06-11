@@ -3,8 +3,8 @@ from typing import Dict, Optional
 
 import aiohttp
 
-from malevich_coretools.secondary.helpers import bool_to_str
 from malevich_coretools.batch import DefferOperation
+from malevich_coretools.secondary.helpers import bool_to_str
 
 # const
 API_VERSION = "api/v1"
