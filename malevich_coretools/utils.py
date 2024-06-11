@@ -864,7 +864,7 @@ def create_endpoint(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-) -> str:
+) -> Alias.Id:
     """create endpoint, return hash, url - api/v1/endpoints/run/{hash}. fields may not be initialized - this will only cause an error at startup"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -891,12 +891,12 @@ def update_endpoint(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-) -> str:
+) -> Alias.Id:
     """update endpoint, return hash, url - api/v1/endpoints/run/{hash}. update field if it is not None"""
     if batcher is None:
         batcher = Config.BATCHER
     data = Endpoint(hash=hash, taskId=task_id, cfgId=cfg_id, sla=sla, active=active, prepare=prepare, runSettings=run_settings,
-                    enableNotAuthorized=enable_not_auth, expectedCollectionsWithScheme=expected_colls_with_schemes, description=description)
+                    enableNotAuthorized=enable_not_auth, expectedCollectionsWithSchemes=expected_colls_with_schemes, description=description)
     if batcher is not None:
         return batcher.add("postEndpointUpdate", data=data)
     return f.update_endpoint(data, wait=wait, auth=auth, conn_url=conn_url)
