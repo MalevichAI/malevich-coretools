@@ -3,7 +3,7 @@ from typing import Dict, Optional
 
 import aiohttp
 
-from malevich_coretools.batch import DefferOperation
+from malevich_coretools.batch import DefferOperationInternal
 from malevich_coretools.secondary.helpers import bool_to_str
 
 # const
@@ -26,7 +26,7 @@ def with_key_values(url: str, key_values: Dict[str, Optional[str]]) -> str:
     sep = "?"
     for key, value in key_values.items():
         if value is not None:
-            if isinstance(value, DefferOperation):
+            if isinstance(value, DefferOperationInternal):
                 value = urllib.parse.quote(str(value), safe='')
             elif isinstance(value, str):
                 value = urllib.parse.quote(value, safe='')
