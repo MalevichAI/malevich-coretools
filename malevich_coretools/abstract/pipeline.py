@@ -32,7 +32,8 @@ class BaseArgument(BaseModel):
 
 
 class Argument(BaseArgument):
-    group: Optional[List[BaseArgument]] = None                    # for constructed dfs, sink
+    group: Optional[List[BaseArgument]] = None          # for constructed dfs, sink
+    conditions: Optional[Dict[str, bool]] = None        # valid only for alternative, bindConditionId -> value, must be specified explicitly, then it will be derived from the pipeline structure
 
     def validation(self) -> None:
         if self.group is not None:
@@ -43,12 +44,16 @@ class Argument(BaseArgument):
             assert (self.id is not None) + (self.collectionName is not None) + (self.collectionId is not None) == 1, "one way of constructing the argument must be chosen"
 
 
+class AlternativeArgument(Argument):
+    alternative: Optional[List[Argument]] = None        # if set - should be only one valid argument with conditions
+
+
 class AppEntity(BaseModel):
     cfg: Optional[str] = None                           # local cfg for processor/condition
-    arguments: Dict[str, Argument] = {}                 # TODO or List[Argument]?
+    arguments: Dict[str, AlternativeArgument] = {}      # TODO or List[Argument]?
     conditions: Optional[Dict[str, bool]] = None        # condition bindId to it result
 
-    loopArguments: Optional[Dict[str, Argument]] = None # other calls, TODO or List[Argument]?, problems
+    loopArguments: Optional[Dict[str, AlternativeArgument]] = None  # other calls, TODO or List[Argument]?, problems
     loopConditions: Optional[Dict[str, bool]] = None    # condition bindId to it result for loop
 
     image: JsonImage
