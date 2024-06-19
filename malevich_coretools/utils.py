@@ -1918,7 +1918,7 @@ def get_pipeline(
         batcher = Config.BATCHER
     if batcher is not None:
         return batcher.add("getPipelineById", vars={"id": id}, result_model=Pipeline)
-    return f.get_userTasks_id(id, auth=auth, conn_url=conn_url)
+    return f.get_userPipelines_id(id, auth=auth, conn_url=conn_url)
 
 
 def get_pipeline_real(
