@@ -10,6 +10,7 @@ import requests
 from requests.models import Response
 
 from malevich_coretools.abstract.abstract import *  # noqa: F403
+from malevich_coretools.abstract.pipeline import Pipeline
 from malevich_coretools.funcs.checks import check_profile_mode
 from malevich_coretools.secondary import Config, model_from_json, show_logs_func
 from malevich_coretools.secondary.const import *  # noqa: F403
@@ -457,12 +458,12 @@ def get_userPipelines_mapIds(*args, **kwargs) -> ResultIdsMap:
     return model_from_json(send_to_core_get(USER_PIPELINES_MAP_IDS, *args, **kwargs), ResultIdsMap)
 
 
-def get_userPipelines_id(id: str, *args, **kwargs) -> UserTask:
-    return model_from_json(send_to_core_get(USER_PIPELINES_ID(id, None), *args, **kwargs), UserTask)
+def get_userPipelines_id(id: str, *args, **kwargs) -> Pipeline:
+    return model_from_json(send_to_core_get(USER_PIPELINES_ID(id, None), *args, **kwargs), Pipeline)
 
 
-def get_userPipelines_realId(id: str, *args, **kwargs) -> UserTask:
-    return model_from_json(send_to_core_get(USER_PIPELINES_REAL_ID(id), *args, **kwargs), UserTask)
+def get_userPipelines_realId(id: str, *args, **kwargs) -> Pipeline:
+    return model_from_json(send_to_core_get(USER_PIPELINES_REAL_ID(id), *args, **kwargs), Pipeline)
 
 
 def post_userPipelines(data: UserTask, wait: bool, *args, **kwargs) -> Alias.Id:
