@@ -33,7 +33,7 @@ class BaseArgument(BaseModel):
 
 class Argument(BaseArgument):
     group: Optional[List[BaseArgument]] = None          # for constructed dfs, sink
-    conditions: Optional[Dict[str, bool]] = None        # valid only for alternative, bindConditionId -> value, must be specified explicitly, then it will be derived from the pipeline structure
+    # conditions: Optional[Dict[str, bool]] = None        # valid only for alternative, bindConditionId -> value, must be specified explicitly, then it will be derived from the pipeline structure
 
     def validation(self) -> None:
         if self.group is not None:
@@ -45,7 +45,8 @@ class Argument(BaseArgument):
 
 
 class AlternativeArgument(Argument):
-    alternative: Optional[List[Argument]] = None        # if set - should be only one valid argument with conditions
+    # alternative: Optional[List[Argument]] = None        # if set - should be only one valid argument with conditions
+    pass
 
 
 class AppEntity(BaseModel):
