@@ -2,7 +2,7 @@ import json
 import os
 import re
 import subprocess
-from typing import Union
+from typing import Type, Union
 
 import pandas as pd
 
@@ -149,7 +149,7 @@ def get_doc(
 
 
 def create_doc(
-    data: Alias.Json,
+    data: Union[Alias.Json, Dict, Type[BaseModel]],
     name: Optional[str],
     wait: bool = True,
     *,
@@ -160,6 +160,10 @@ def create_doc(
     """save doc with `data` and `name`, return `id` """
     if batcher is None:
         batcher = Config.BATCHER
+    if isinstance(data, Dict):
+        data = json.dumps(data)
+    elif issubclass(data.__class__, BaseModel):
+        data = data.model_dump_json()
     data = DocWithName(data=data, name=name)
     if batcher is not None:
         return batcher.add("postDoc", data=data)
@@ -3265,6 +3269,23 @@ def get_collection_by_name_to_df(
     )
     records = list(map(lambda x: json.loads(x.data), collection.docs))
     return pd.DataFrame.from_records(records)
+
+
+def create_doc_from_file(
+    filename: str,
+    name: Optional[str] = None,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> Alias.Id:
+    """create doc\n
+    return doc id"""
+    with open(filename) as f:
+        data = json.load(f)
+    return create_doc(
+        data, name, auth=auth, conn_url=conn_url, batcher=batcher
+    )
 
 
 def create_schemes_by_path(
