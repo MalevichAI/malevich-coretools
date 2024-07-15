@@ -34,7 +34,10 @@ def create_collection_from_file_df(
     *args,
     **kwargs
 ) -> Alias.Id:
-    data = pd.read_csv(file)
+    try:
+        data = pd.read_csv(file)
+    except pd.errors.EmptyDataError:
+        data = pd.DataFrame()
     if name is None:
         name = file
     return create_collection_from_df(data, name=file, metadata=metadata, *args, **kwargs)
@@ -63,7 +66,10 @@ def raw_collection_from_file(
     name: Optional[str] = None,
     metadata: Optional[Union[Dict[str, Any], str]] = None,
 ) -> DocsDataCollection:
-    data = pd.read_csv(file)
+    try:
+        data = pd.read_csv(file)
+    except pd.errors.EmptyDataError:
+        data = pd.DataFrame()
     return raw_collection_from_df(data, name, metadata)
 
 
