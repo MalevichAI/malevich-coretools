@@ -148,6 +148,21 @@ def get_doc(
     return f.get_docs_id(id, auth=auth, conn_url=conn_url)
 
 
+def get_doc_by_name(
+    name: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> ResultDoc:
+    """return doc by `name` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getDocByName", vars={"name": name}, result_model=ResultDoc)
+    return f.get_docs_name(name, auth=auth, conn_url=conn_url)
+
+
 def create_doc(
     data: Union[Alias.Json, Dict, Type[BaseModel]],
     name: Optional[str],

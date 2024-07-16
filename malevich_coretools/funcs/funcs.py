@@ -30,6 +30,10 @@ def get_docs_id(id: str, *args, **kwargs) -> ResultDoc:
     return model_from_json(send_to_core_get(DOCS_ID(id, None), *args, **kwargs), ResultDoc)
 
 
+def get_docs_name(name: str, *args, **kwargs) -> ResultDoc:
+    return model_from_json(send_to_core_get(DOCS_NAME(name, None), *args, **kwargs), ResultDoc)
+
+
 def post_docs(data: DocWithName, wait: bool, *args, **kwargs) -> Alias.Id:
     return send_to_core_modify(DOCS(wait), data, *args, **kwargs)
 

@@ -39,6 +39,7 @@ def with_key_values(url: str, key_values: Dict[str, Optional[str]]) -> str:
 DOCS_MAIN = f"{API_VERSION}/docs"
 DOCS = lambda wait: with_wait(f"{DOCS_MAIN}/", wait)
 DOCS_ID = lambda id, wait: with_wait(f"{DOCS_MAIN}/{id}", wait)
+DOCS_NAME = lambda name, wait: with_wait(f"{DOCS_MAIN}/name/{name}", wait)
 
 ## CollectionsController
 COLLECTIONS_MAIN = f"{API_VERSION}/collections"
