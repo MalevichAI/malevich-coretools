@@ -423,8 +423,7 @@ class ProcessorFunctionInfo(FunctionInfo):
 
 
 class ConditionFunctionInfo(FunctionInfo):
-    # contextClass: Optional[Dict[str, Any]] = None   # model_json_schema
-    ...
+    contextClass: Optional[Dict[str, Any]] = None   # model_json_schema
 
 
 class OutputFunctionInfo(FunctionInfo):
