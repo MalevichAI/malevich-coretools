@@ -422,6 +422,11 @@ class ProcessorFunctionInfo(FunctionInfo):
     contextClass: Optional[Dict[str, Any]] = None   # model_json_schema
 
 
+class ConditionFunctionInfo(FunctionInfo):
+    # contextClass: Optional[Dict[str, Any]] = None   # model_json_schema
+    ...
+
+
 class OutputFunctionInfo(FunctionInfo):
     collectionOutNames: Optional[List[str]] = None
 
@@ -438,6 +443,7 @@ class InitInfo(BaseModel):
 class AppFunctionsInfo(BaseModel):
     inputs: Dict[Alias.Id, InputFunctionInfo] = dict()
     processors: Dict[Alias.Id, ProcessorFunctionInfo] = dict()
+    conditions: Dict[Alias.Id, ConditionFunctionInfo] = dict()
     outputs: Dict[Alias.Id, OutputFunctionInfo] = dict()
     schemes: Dict[Alias.Id, str] = dict()
     inits: Dict[Alias.Id, InitInfo] = dict()
