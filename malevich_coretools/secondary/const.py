@@ -188,6 +188,10 @@ LIMITS_MAIN = f"{API_VERSION}/limits"
 LIMITS = lambda wait: with_wait(f"{LIMITS_MAIN}/", wait)
 LIMITS_USER = lambda wait: with_wait(f"{LIMITS_MAIN}/user", wait)
 
+## HandlerUrlController
+HANDLER_URL_MAIN = f"{API_VERSION}/handlerUrls"
+HANDLER_URL = lambda url, wait: with_key_values(f"{HANDLER_URL_MAIN}/", {"url": url, "wait": bool_to_str(wait)})
+
 ### Kafka
 KAFKA_SEND = f"{MANAGER_MAIN}/kafkaMsg"
 

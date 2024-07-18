@@ -3176,6 +3176,41 @@ def update_user_limits_scope(
     )
 
 
+# HandlerUrls
+
+
+def get_user_handler_url(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> str:
+    """return handler url for user"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getHandlerUrls")
+    return f.get_handler_url(auth=auth, conn_url=conn_url)
+
+
+def update_user_handler_url(
+    url: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> Alias.Info:
+    """update handler url for user"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("postHandlerUrls", vars={"url": url})
+    return f.post_handler_url(
+        url, wait=wait, auth=auth, conn_url=conn_url
+    )
+
+
 # kafka
 
 

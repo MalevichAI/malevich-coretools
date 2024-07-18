@@ -708,6 +708,14 @@ def post_user_limits(data: LimitsScope, wait: bool, *args, **kwargs) -> Alias.In
     return send_to_core_modify(LIMITS_USER(wait), data, *args, **kwargs)
 
 
+def get_handler_url(*args, **kwargs) -> str:
+    return send_to_core_get(HANDLER_URL(None, True), is_text=True, *args, **kwargs)
+
+
+def post_handler_url(url: Optional[str], wait: bool, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify(HANDLER_URL(url, wait), *args, **kwargs)
+
+
 async def kafka_send(data: KafkaMsg, *args, **kwargs) -> Union[Alias.Info, KafkaMsg]:
     result = await send_to_core_post_async(KAFKA_SEND, data, *args, **kwargs)
     try:
