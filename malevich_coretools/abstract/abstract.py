@@ -281,6 +281,7 @@ class ResultCollection(BaseModel):
     length: int
     scheme: Optional[Scheme] = None
     metadata: Optional[Alias.Json] = None
+    fromDocs: bool = False
 
 
 class ResultCollections(BaseModel):
