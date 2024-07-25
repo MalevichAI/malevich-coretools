@@ -59,7 +59,7 @@ class AppEntity(BaseModel):
 
     image: JsonImage
     platform: str = "base"
-    platformSettings: str = ""
+    platformSettings: Optional[str] = None
 
 
 class Processor(AppEntity):
