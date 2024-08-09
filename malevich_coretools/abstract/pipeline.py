@@ -33,7 +33,7 @@ class BaseArgument(BaseModel):
 
 class Argument(BaseArgument):
     group: Optional[List[BaseArgument]] = None          # for constructed dfs, sink
-    # conditions: Optional[Dict[str, bool]] = None        # valid only for alternative, bindConditionId -> value, must be specified explicitly, then it will be derived from the pipeline structure
+    conditions: Optional[Dict[str, bool]] = None        # valid only for alternative, bindConditionId -> value, must be specified explicitly, then it will be derived from the pipeline structure
 
     def validation(self) -> None:
         if self.group is not None:
@@ -44,9 +44,25 @@ class Argument(BaseArgument):
             assert (self.id is not None) + (self.collectionName is not None) + (self.collectionId is not None) == 1, "one way of constructing the argument must be chosen"
 
 
-class AlternativeArgument(Argument):
-    # alternative: Optional[List[Argument]] = None        # if set - should be only one valid argument with conditions
-    pass
+class AlternativeArgument(BaseArgument):
+    group: Optional[List[BaseArgument]] = None          # for constructed dfs, sink
+    alternative: Optional[List[Argument]] = None        # if set - should be only one valid argument with conditions
+
+    def validation(self) -> None:
+        if self.group is not None:
+            assert self.id is None and self.collectionName is None and self.collectionId is None, "one way of constructing the argument must be chosen"
+            for subarg in self.group:
+                subarg.validation()
+        elif self.alternative is not None:
+            for alt_arg in self.alternative:
+                if alt_arg.group is not None:
+                    assert alt_arg.id is None and alt_arg.collectionName is None and alt_arg.collectionId is None, "one way of constructing the argument must be chosen"
+                    for subarg in alt_arg.group:
+                        subarg.validation()
+                else:
+                    assert (self.id is not None) + (self.collectionName is not None) + (self.collectionId is not None) == 1, "one way of constructing the argument must be chosen"
+        else:
+            assert (self.id is not None) + (self.collectionName is not None) + (self.collectionId is not None) == 1, "one way of constructing the argument must be chosen"
 
 
 class AppEntity(BaseModel):
