@@ -373,11 +373,17 @@ class AppLog(BaseModel):
     data: List[LogsResult]
 
 
+class PipelineInfo(BaseModel):
+    conditions: Dict[str, Dict[int, bool]]  # condition bindId -> iteration -> value
+    fails: Dict[str, List[int]]             # bindId -> fail iterations (1 in common situation)
+
+
 class AppLogs(BaseModel):
     operationId: Alias.Id
     dagLogs: str = ""
     data: Dict[str, AppLog] = {}
     error: Optional[str] = None
+    pipeline: Optional[PipelineInfo] = None # only for pipeline
 
 
 class AppLogsWithResults(AppLogs):
