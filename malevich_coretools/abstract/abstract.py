@@ -604,3 +604,14 @@ class LimitsScope(BaseModel):   # for superuser/admin
     assetsLimit: Optional[int] = None
     allowCommonGpu: Optional[bool] = None
     gpuDiskMax: Optional[int] = None
+
+
+class UserAnalytics(BaseModel):
+    name: str
+    data: Dict[str, Any]
+    timestamp: Optional[str] = None
+    id: Optional[str] = None
+
+
+class UserAnalyticsBatch(BaseModel):
+    data: List[UserAnalytics]

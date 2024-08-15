@@ -456,6 +456,32 @@ def create_collection_by_docs(
     )
 
 
+def update_collection_by_docs(
+    id: str,
+    docs: List[Alias.Json],
+    name: Optional[str] = None,
+    metadata: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> Alias.Id:
+    """update collection by `id` with `docs`, return `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = DocsDataCollection(data=docs, name=name, metadata=metadata)
+    if batcher is not None:
+        return batcher.add("postCollectionByDocsAndId", data=data, vars={"id": id})
+    return f.post_collections_data_id(
+        id,
+        data,
+        wait=wait,
+        auth=auth,
+        conn_url=conn_url,
+    )
+
+
 def add_to_collection(
     id: str,
     ids: List[str],
@@ -1542,6 +1568,21 @@ def get_apps_map(
     return f.get_userApps_mapIds(auth=auth, conn_url=conn_url)
 
 
+def get_app_map(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> Alias.Id:
+    """return real id by app id for current user"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getAppsMapIdsById", vars={"id": id})
+    return f.get_userApps_mapId(id, auth=auth, conn_url=conn_url)
+
+
 def get_app(
     id: str,
     *,
@@ -1754,6 +1795,21 @@ def get_tasks_map(
     return f.get_userTasks_mapIds(auth=auth, conn_url=conn_url)
 
 
+def get_task_map(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> Alias.Id:
+    """return real id by task id for current user"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getTasksMapIdsById", vars={"id": id})
+    return f.get_userTasks_mapId(id, auth=auth, conn_url=conn_url)
+
+
 def get_task(
     id: str,
     *,
@@ -1923,6 +1979,21 @@ def get_pipelines_map(
     if batcher is not None:
         return batcher.add("getPipelinesMapIds", result_model=ResultIdsMap)
     return f.get_userPipelines_mapIds(auth=auth, conn_url=conn_url)
+
+
+def get_pipeline_map(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> Alias.Id:
+    """return real id by pipeline id for current user"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getPipelinesMapIdsById", vars={"id": id})
+    return f.get_userPipelines_mapId(id, auth=auth, conn_url=conn_url)
 
 
 def get_pipeline(
@@ -2096,6 +2167,22 @@ def get_cfgs_map(
     if batcher is not None:
         return batcher.add("getCfgsMapIds", result_model=ResultIdsMap)
     return f.get_userCfgs_mapIds(auth=auth, conn_url=conn_url)
+
+
+
+def get_cfg_map(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> Alias.Id:
+    """return real id by cfg id for current user"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getCfgsMapIdsById", vars={"id": id})
+    return f.get_userCfgs_mapId(id, auth=auth, conn_url=conn_url)
 
 
 def get_cfg(
@@ -3211,6 +3298,115 @@ def update_user_handler_url(
     )
 
 
+# Analytics
+
+
+def get_analytics(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> UserAnalyticsBatch:
+    """return all analytics for current user """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getAnalytics", result_model=UserAnalyticsBatch)
+    return f.get_analytics(auth=auth, conn_url=conn_url)
+
+
+def get_analytics_by_id(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> UserAnalytics:
+    """return analytics by `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getAnalyticsById", vars={"id": id}, result_model=UserAnalytics)
+    return f.get_analytics_by_id(id, auth=auth, conn_url=conn_url)
+
+
+def get_analytics_by_name(
+    name: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> UserAnalyticsBatch:
+    """return analytics by `name` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getAnalyticsByName", vars={"name": name}, result_model=UserAnalyticsBatch)
+    return f.get_analytics_by_name(name, auth=auth, conn_url=conn_url)
+
+
+def create_analytics(
+    data: Dict[str, Any],
+    name: str,
+    timestamp: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> Alias.Id:
+    """save analytics with `data`, `name` and `timestamp`, return `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = UserAnalytics(name=name, data=data, timestamp=timestamp)
+    if batcher is not None:
+        return batcher.add("postAnalytics", data=data)
+    return f.post_analytics(
+        data, wait=wait, auth=auth, conn_url=conn_url
+    )
+
+
+def update_analytics(
+    id: str,
+    data: Dict[str, Any],
+    name: str,
+    timestamp: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> Alias.Id:
+    """update analytics by `id` with `data`, `name` and `timestamp`, return `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = UserAnalytics(name=name, data=data, timestamp=timestamp, id=id)
+    if batcher is not None:
+        return batcher.add("postAnalytics", data=data)
+    return f.post_analytics(
+        data, wait=wait, auth=auth, conn_url=conn_url
+    )
+
+
+def update_analytics_many(
+    data: List[UserAnalytics],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> ResultIds:
+    """update analytics by list of UserAnalytics, return ResultIds """
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = UserAnalyticsBatch(data=data)
+    if batcher is not None:
+        return batcher.add("postAnalyticsMany", data=data, result_model=ResultIds)
+    return f.post_analytics_many(
+        data, wait=wait, auth=auth, conn_url=conn_url
+    )
+
+
 # kafka
 
 
@@ -3271,6 +3467,23 @@ def create_collection_from_file(
     )
 
 
+def update_collection_from_file(
+    id: str,
+    filename: str,
+    name: Optional[str] = None,
+    metadata: Optional[Union[Dict[str, Any], str]] = None,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> Alias.Id:
+    """create collection\n
+    return collection id"""
+    return fh.update_collection_from_file_df(
+        id, filename, name, metadata, auth=auth, conn_url=conn_url, batcher=batcher
+    )
+
+
 def create_collection_from_df(
     data: pd.DataFrame,
     name: Optional[str] = None,
@@ -3284,6 +3497,23 @@ def create_collection_from_df(
     return collection id"""
     return fh.create_collection_from_df(
         data, name, metadata, auth=auth, conn_url=conn_url, batcher=batcher
+    )
+
+
+def update_collection_from_df(
+    id: str,
+    data: pd.DataFrame,
+    name: Optional[str] = None,
+    metadata: Optional[Union[Dict[str, Any], str]] = None,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> Alias.Id:
+    """update collection by id\n
+    return collection id"""
+    return fh.update_collection_from_df(
+        id, data, name, metadata, auth=auth, conn_url=conn_url, batcher=batcher
     )
 
 

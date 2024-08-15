@@ -21,10 +21,13 @@ from malevich_coretools.abstract.abstract import (
 )
 from malevich_coretools.batch import Batcher
 from malevich_coretools.funcs.checks import check_profile_mode
-from malevich_coretools.funcs.funcs import post_collections_data
+from malevich_coretools.funcs.funcs import (
+    post_collections_data,
+    post_collections_data_id,
+)
 from malevich_coretools.secondary import Config, to_json
 
-__all__ = ["create_collection_from_file_df", "raw_collection_from_df", "raw_collection_from_file", "create_collection_from_df", "create_app_settings", "create_user_config", "create_task_component", "create_task_policy", "create_restrictions", "create_run_settings", "create_endpoint_override", "create_cfg_struct"]
+__all__ = ["create_collection_from_file_df", "update_collection_from_file_df", "raw_collection_from_df", "raw_collection_from_file", "create_collection_from_df", "update_collection_from_df", "create_app_settings", "create_user_config", "create_task_component", "create_task_policy", "create_restrictions", "create_run_settings", "create_endpoint_override", "create_cfg_struct"]
 
 
 def create_collection_from_file_df(
@@ -41,6 +44,23 @@ def create_collection_from_file_df(
     if name is None:
         name = file
     return create_collection_from_df(data, name=file, metadata=metadata, *args, **kwargs)
+
+
+def update_collection_from_file_df(
+    id: str,
+    file: str,
+    name: Optional[str],
+    metadata: Optional[Union[Dict[str, Any], str]],
+    *args,
+    **kwargs
+) -> Alias.Id:
+    try:
+        data = pd.read_csv(file)
+    except pd.errors.EmptyDataError:
+        data = pd.DataFrame()
+    if name is None:
+        name = file
+    return update_collection_from_df(id, data, name=file, metadata=metadata, *args, **kwargs)
 
 
 def raw_collection_from_df(
@@ -87,6 +107,23 @@ def create_collection_from_df(
     if batcher is not None:
         return batcher.add("postCollectionByDocs", data=data)
     return post_collections_data(data, *args, **kwargs)
+
+
+def update_collection_from_df(
+    id: str,
+    data: pd.DataFrame,
+    name: Optional[str],
+    metadata: Optional[Union[Dict[str, Any], str]],
+    batcher: Optional[Batcher] = None,
+    *args,
+    **kwargs
+) -> Alias.Id:
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = raw_collection_from_df(data, name, metadata)
+    if batcher is not None:
+        return batcher.add("postCollectionByDocsAndId", data=data, vars={"id": id})
+    return post_collections_data_id(id, data, *args, **kwargs)
 
 
 def create_app_settings(

@@ -55,6 +55,7 @@ COLLECTIONS_ID_ADD = lambda id, wait: with_wait(f"{COLLECTIONS_MAIN}/{urllib.par
 COLLECTIONS_ID_COPY = lambda id, full_copy, wait: with_key_values(f"{COLLECTIONS_MAIN}/{urllib.parse.quote(str(id), safe='')}/copy", {"wait": None if wait is None else bool_to_str(wait), "fullCopy": None if full_copy is None else bool_to_str(full_copy)})
 COLLECTIONS_ID_DEL = lambda id, wait: with_wait(f"{COLLECTIONS_MAIN}/{urllib.parse.quote(str(id), safe='')}/del", wait)
 COLLECTIONS_DATA = lambda wait: with_wait(f"{COLLECTIONS_MAIN}/data", wait)
+COLLECTIONS_DATA_ID = lambda id, wait: with_wait(f"{COLLECTIONS_MAIN}/data/{urllib.parse.quote(str(id), safe='')}", wait)
 COLLECTIONS_APPLY_SCHEME = lambda id, wait: with_wait(f"{COLLECTIONS_MAIN}/{urllib.parse.quote(str(id), safe='')}/applyScheme", wait)
 COLLECTIONS_FIX_SCHEME = lambda id, wait: with_wait(f"{COLLECTIONS_MAIN}/{urllib.parse.quote(str(id), safe='')}/fixScheme", wait)
 COLLECTIONS_UNFIX_SCHEME = lambda id, wait: with_wait(f"{COLLECTIONS_MAIN}/{urllib.parse.quote(str(id), safe='')}/unfixScheme", wait)
@@ -115,6 +116,7 @@ USER_APPS_MAIN = f"{API_VERSION}/userApps"
 USER_APPS = lambda wait: with_wait(f"{USER_APPS_MAIN}/", wait)
 USER_APPS_REAL_IDS = f"{USER_APPS_MAIN}/realIds"
 USER_APPS_MAP_IDS = f"{USER_APPS_MAIN}/mapIds"
+USER_APPS_MAP_ID = lambda id: f"{USER_APPS_MAIN}/mapIds/{urllib.parse.quote(str(id), safe='')}"
 USER_APPS_ID = lambda id, wait: with_wait(f"{USER_APPS_MAIN}/{urllib.parse.quote(str(id), safe='')}", wait)
 USER_APPS_REAL_ID = lambda id: f"{USER_APPS_MAIN}/realIds/{urllib.parse.quote(str(id), safe='')}"
 
@@ -123,6 +125,7 @@ USER_TASKS_MAIN = f"{API_VERSION}/userTasks"
 USER_TASKS = lambda wait: with_wait(f"{USER_TASKS_MAIN}/", wait)
 USER_TASKS_REAL_IDS = f"{USER_TASKS_MAIN}/realIds"
 USER_TASKS_MAP_IDS = f"{USER_TASKS_MAIN}/mapIds"
+USER_TASKS_MAP_ID = lambda id: f"{USER_TASKS_MAIN}/mapIds/{urllib.parse.quote(str(id), safe='')}"
 USER_TASKS_ID = lambda id, wait: with_wait(f"{USER_TASKS_MAIN}/{urllib.parse.quote(str(id), safe='')}", wait)
 USER_TASKS_REAL_ID = lambda id: f"{USER_TASKS_MAIN}/realIds/{urllib.parse.quote(str(id), safe='')}"
 
@@ -131,6 +134,7 @@ USER_PIPELINES_MAIN = f"{API_VERSION}/userPipelines"
 USER_PIPELINES = lambda wait: with_wait(f"{USER_PIPELINES_MAIN}/", wait)
 USER_PIPELINES_REAL_IDS = f"{USER_PIPELINES_MAIN}/realIds"
 USER_PIPELINES_MAP_IDS = f"{USER_PIPELINES_MAIN}/mapIds"
+USER_PIPELINES_MAP_ID = lambda id: f"{USER_PIPELINES_MAIN}/mapIds/{urllib.parse.quote(str(id), safe='')}"
 USER_PIPELINES_ID = lambda id, wait: with_wait(f"{USER_PIPELINES_MAIN}/{urllib.parse.quote(str(id), safe='')}", wait)
 USER_PIPELINES_REAL_ID = lambda id: f"{USER_PIPELINES_MAIN}/realIds/{urllib.parse.quote(str(id), safe='')}"
 
@@ -139,6 +143,7 @@ USER_CFGS_MAIN = f"{API_VERSION}/userCfgs"
 USER_CFGS = lambda wait: with_wait(f"{USER_CFGS_MAIN}/", wait)
 USER_CFGS_REAL_IDS = f"{USER_CFGS_MAIN}/realIds"
 USER_CFGS_MAP_IDS = f"{USER_CFGS_MAIN}/mapIds"
+USER_CFGS_MAP_ID = lambda id: f"{USER_CFGS_MAIN}/mapIds/{urllib.parse.quote(str(id), safe='')}"
 USER_CFGS_ID = lambda id, wait: with_wait(f"{USER_CFGS_MAIN}/{urllib.parse.quote(str(id), safe='')}", wait)
 USER_CFGS_REAL_ID = lambda id: f"{USER_CFGS_MAIN}/realIds/{urllib.parse.quote(str(id), safe='')}"
 
@@ -191,6 +196,13 @@ LIMITS_USER = lambda wait: with_wait(f"{LIMITS_MAIN}/user", wait)
 ## HandlerUrlController
 HANDLER_URL_MAIN = f"{API_VERSION}/handlerUrls"
 HANDLER_URL = lambda url, wait: with_key_values(f"{HANDLER_URL_MAIN}/", {"url": url, "wait": bool_to_str(wait)})
+
+## AnalyticsController
+ANALYTICS_MAIN = f"{API_VERSION}/analytics"
+ANALYTICS = lambda wait: with_wait(f"{ANALYTICS_MAIN}/", wait)
+ANALYTICS_MANY = lambda wait: with_wait(f"{ANALYTICS_MAIN}/many", wait)
+ANALYTICS_ID = lambda id, wait: with_wait(f"{ANALYTICS_MAIN}/{id}", wait)
+ANALYTICS_NAME = lambda name, wait: with_wait(f"{ANALYTICS_MAIN}/name/{name}", wait)
 
 ### Kafka
 KAFKA_SEND = f"{MANAGER_MAIN}/kafkaMsg"

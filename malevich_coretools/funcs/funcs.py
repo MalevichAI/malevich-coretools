@@ -92,6 +92,10 @@ def post_collections_data(data: DocsDataCollection, wait: bool=True, *args, **kw
     return send_to_core_modify(COLLECTIONS_DATA(wait), data, *args, **kwargs)
 
 
+def post_collections_data_id(id: str, data: DocsDataCollection, wait: bool=True, *args, **kwargs) -> Alias.Id:
+    return send_to_core_modify(COLLECTIONS_DATA_ID(id, wait), data, *args, **kwargs)
+
+
 def post_collections_id_add(id: str, data: DocsCollectionChange, wait: bool, *args, **kwargs) -> Alias.Info:
     return send_to_core_modify(COLLECTIONS_ID_ADD(id, wait), data, *args, **kwargs)
 
@@ -386,6 +390,10 @@ def get_userApps_mapIds(*args, **kwargs) -> ResultOwnAndSharedIdsMap:
     return model_from_json(send_to_core_get(USER_APPS_MAP_IDS, *args, **kwargs), ResultOwnAndSharedIdsMap)
 
 
+def get_userApps_mapId(id, *args, **kwargs) -> Alias.Id:
+    return send_to_core_get(USER_APPS_MAP_ID(id), is_text=True, *args, **kwargs)
+
+
 def get_userApps_id(id: str, *args, **kwargs) -> UserApp:
     return model_from_json(send_to_core_get(USER_APPS_ID(id, None), *args, **kwargs), UserApp)
 
@@ -422,6 +430,10 @@ def get_userTasks_realIds(*args, **kwargs) -> ResultIds:
 
 def get_userTasks_mapIds(*args, **kwargs) -> ResultIdsMap:
     return model_from_json(send_to_core_get(USER_TASKS_MAP_IDS, *args, **kwargs), ResultIdsMap)
+
+
+def get_userTasks_mapId(id: str, *args, **kwargs) -> Alias.Id:
+    return send_to_core_get(USER_TASKS_MAP_ID(id), is_text=True, *args, **kwargs)
 
 
 def get_userTasks_id(id: str, *args, **kwargs) -> UserTask:
@@ -462,6 +474,10 @@ def get_userPipelines_mapIds(*args, **kwargs) -> ResultIdsMap:
     return model_from_json(send_to_core_get(USER_PIPELINES_MAP_IDS, *args, **kwargs), ResultIdsMap)
 
 
+def get_userPipelines_mapId(id: str, *args, **kwargs) -> Alias.Id:
+    return send_to_core_get(USER_PIPELINES_MAP_ID(id), is_text=True, *args, **kwargs)
+
+
 def get_userPipelines_id(id: str, *args, **kwargs) -> Pipeline:
     return model_from_json(send_to_core_get(USER_PIPELINES_ID(id, None), *args, **kwargs), Pipeline)
 
@@ -498,6 +514,10 @@ def get_userCfgs_realIds(*args, **kwargs) -> ResultIds:
 
 def get_userCfgs_mapIds(*args, **kwargs) -> ResultIdsMap:
     return model_from_json(send_to_core_get(USER_CFGS_MAP_IDS, *args, **kwargs), ResultIdsMap)
+
+
+def get_userCfgs_mapId(id: str, *args, **kwargs) -> Alias.Id:
+    return send_to_core_get(USER_CFGS_MAP_ID(id), is_text=True, *args, **kwargs)
 
 
 def get_userCfgs_id(id: str, *args, **kwargs) -> ResultUserCfg:
@@ -714,6 +734,26 @@ def get_handler_url(*args, **kwargs) -> str:
 
 def post_handler_url(url: Optional[str], wait: bool, *args, **kwargs) -> Alias.Info:
     return send_to_core_modify(HANDLER_URL(url, wait), *args, **kwargs)
+
+
+def get_analytics(*args, **kwargs) -> UserAnalyticsBatch:
+    return model_from_json(send_to_core_get(ANALYTICS(None), *args, **kwargs), UserAnalyticsBatch)
+
+
+def get_analytics_by_id(id: str, *args, **kwargs) -> UserAnalytics:
+    return model_from_json(send_to_core_get(ANALYTICS_ID(id, None), *args, **kwargs), UserAnalytics)
+
+
+def get_analytics_by_name(name: str, *args, **kwargs) -> UserAnalyticsBatch:
+    return model_from_json(send_to_core_get(ANALYTICS_NAME(name, None), *args, **kwargs), UserAnalyticsBatch)
+
+
+def post_analytics(data: UserAnalytics, wait: bool, *args, **kwargs) -> Alias.Id:
+    return send_to_core_modify(ANALYTICS(wait), data, *args, **kwargs)
+
+
+def post_analytics_many(data: UserAnalyticsBatch, wait: bool, *args, **kwargs) -> ResultIds:
+    return model_from_json(send_to_core_modify(ANALYTICS_MANY(wait), data, *args, **kwargs), ResultIds)
 
 
 async def kafka_send(data: KafkaMsg, *args, **kwargs) -> Union[Alias.Info, KafkaMsg]:
