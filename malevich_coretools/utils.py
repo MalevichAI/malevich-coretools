@@ -896,6 +896,7 @@ def run_endpoint(
 
 def create_endpoint(
     task_id: Optional[str] = None,
+    pipeline_id: Optional[str] = None,
     cfg_id: Optional[str] = None,
     sla: Optional[str] = None,
     active: Optional[bool] = None,
@@ -911,9 +912,10 @@ def create_endpoint(
     batcher: Optional[Batcher] = None,
 ) -> Alias.Id:
     """create endpoint, return hash, url - api/v1/endpoints/run/{hash}. fields may not be initialized - this will only cause an error at startup"""
+    assert task_id is None or pipeline_id is None, "endpoint should be defined in one way"
     if batcher is None:
         batcher = Config.BATCHER
-    data = Endpoint(taskId=task_id, cfgId=cfg_id, sla=sla, active=active, prepare=prepare, runSettings=run_settings,
+    data = Endpoint(taskId=task_id, pipelineId=pipeline_id, cfgId=cfg_id, sla=sla, active=active, prepare=prepare, runSettings=run_settings,
                     enableNotAuthorized=enable_not_auth, expectedCollectionsWithSchemes=expected_colls_with_schemes, description=description)
     if batcher is not None:
         return batcher.add("postEndpointCreate", data=data)
@@ -923,6 +925,7 @@ def create_endpoint(
 def update_endpoint(
     hash: str,
     task_id: Optional[str] = None,
+    pipeline_id: Optional[str] = None,
     cfg_id: Optional[str] = None,
     sla: Optional[str] = None,
     active: Optional[bool] = None,
@@ -938,9 +941,10 @@ def update_endpoint(
     batcher: Optional[Batcher] = None,
 ) -> Alias.Id:
     """update endpoint, return hash, url - api/v1/endpoints/run/{hash}. update field if it is not None"""
+    assert task_id is None or pipeline_id is None, "endpoint should be defined in one way"
     if batcher is None:
         batcher = Config.BATCHER
-    data = Endpoint(hash=hash, taskId=task_id, cfgId=cfg_id, sla=sla, active=active, prepare=prepare, runSettings=run_settings,
+    data = Endpoint(hash=hash, taskId=task_id, pipelineId=pipeline_id, cfgId=cfg_id, sla=sla, active=active, prepare=prepare, runSettings=run_settings,
                     enableNotAuthorized=enable_not_auth, expectedCollectionsWithSchemes=expected_colls_with_schemes, description=description)
     if batcher is not None:
         return batcher.add("postEndpointUpdate", data=data)

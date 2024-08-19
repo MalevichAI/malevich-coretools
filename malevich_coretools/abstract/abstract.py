@@ -505,6 +505,7 @@ class RunSettings(BaseModel):
 class Endpoint(BaseModel):
     hash: Optional[Alias.Id] = None
     taskId: Optional[Alias.Id] = None
+    pipelineId: Optional[Alias.Id] = None   # should set taskId or pipelineId
     cfgId: Optional[Alias.Id] = None
     sla: Optional[str] = None
     active: Optional[bool] = None
