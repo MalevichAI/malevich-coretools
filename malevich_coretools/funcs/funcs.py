@@ -10,7 +10,11 @@ import requests
 from requests.models import Response
 
 from malevich_coretools.abstract.abstract import *  # noqa: F403
-from malevich_coretools.abstract.pipeline import Pipeline
+from malevich_coretools.abstract.pipeline import (
+    AdminRunsInfo,
+    MainPipelineCfg,
+    Pipeline,
+)
 from malevich_coretools.funcs.checks import check_profile_mode
 from malevich_coretools.secondary import Config, model_from_json, show_logs_func
 from malevich_coretools.secondary.const import *  # noqa: F403
@@ -576,6 +580,10 @@ def get_run_mainTaskCfg(id: str, *args, **kwargs) -> MainTaskCfg:
     return model_from_json(send_to_core_get(TEMP_RUN_MAIN_TASK_CFG(id), *args, **kwargs), MainTaskCfg)
 
 
+def get_run_mainPipelineCfg(id: str, *args, **kwargs) -> MainPipelineCfg:
+    return model_from_json(send_to_core_get(TEMP_RUN_MAIN_PIPELINE_CFG(id), *args, **kwargs), MainPipelineCfg)
+
+
 def get_run_operationsIds(task_id: str, cfg_id: Optional[str]=None, *args, **kwargs) -> ResultIds:
     return model_from_json(send_to_core_get(TEMP_RUN_OPERATIONS_IDS(task_id, cfg_id), *args, **kwargs), ResultIds)
 
@@ -586,7 +594,7 @@ def get_admin_runs(*args, **kwargs) -> AdminRunsInfo:
     return model_from_json(send_to_core_get(ADMIN_RUNS, *args, **kwargs), AdminRunsInfo)
 
 
-def get_admin_runs_info(data: OperationOrNone, *args, **kwargs) -> Union[Alias.Json, Alias.Info]:
+def get_admin_runs_info(data: OperationOrNone, *args, **kwargs) -> Alias.Json:
     return send_to_core_modify(ADMIN_RUNS_INFO, data, *args, **kwargs)
 
 

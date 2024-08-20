@@ -2417,6 +2417,21 @@ def get_run_main_task_cfg(
     return f.get_run_mainTaskCfg(id, auth=auth, conn_url=conn_url)
 
 
+def get_run_main_pipeline_cfg(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> MainPipelineCfg:
+    """return mainPipelineCfg by operation `id` for running pipeline"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getMainPipelineCfg", vars={"operationId": id}, result_model=MainPipelineCfg)
+    return f.get_run_mainPipelineCfg(id, auth=auth, conn_url=conn_url)
+
+
 def get_task_runs(
     task_id: str,
     cfg_id: Optional[str] = None,
@@ -2885,6 +2900,7 @@ def pipeline_full(
     profile_mode: Optional[str] = None,
     component: TaskComponent = None,
     policy: TaskPolicy = None,
+    schedule: Optional[Schedule] = None,
     restrictions: Optional[Restrictions] = None,
     scaleInfo: List[ScaleInfo] = None,
     with_show: bool = True,
@@ -2920,6 +2936,7 @@ def pipeline_full(
         withLogs=True,
         component=component,
         policy=policy,
+        schedule=schedule,
         restrictions=restrictions,
         scaleInfo=scaleInfo,
         withListener=False,
@@ -2957,6 +2974,7 @@ def pipeline_prepare(
     scaleInfo: List[ScaleInfo] = None,
     with_listener: bool = False,
     kafka_mode_url_response: Optional[str] = None,
+    synthetic: bool = False,
     with_show: bool = True,
     long: bool = False,
     long_timeout: Optional[int] = WAIT_RESULT_TIMEOUT,
@@ -2995,6 +3013,7 @@ def pipeline_prepare(
         withListener=with_listener,
         kafkaModeUrl=kafka_mode_url_response,
         run=False,
+        synthetic=synthetic,
     )
     if batcher is not None:
         return batcher.add("sendPipeline", data=data, result_model=AppLogs)

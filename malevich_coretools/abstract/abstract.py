@@ -209,11 +209,13 @@ class MainPipeline(BaseModel):
     withLogs: bool = False
     component: TaskComponent = TaskComponent()
     policy: TaskPolicy = TaskPolicy()
+    schedule: Optional[Schedule] = None
     restrictions: Optional[Restrictions] = Restrictions()
     scaleInfo: List[ScaleInfo] = []
     withListener: bool = False
     kafkaModeUrl: Optional[str] = None
     run: bool = True
+    synthetic: bool = False
 
 
 class RunTask(Operation):
@@ -373,7 +375,7 @@ class AppLog(BaseModel):
     data: List[LogsResult]
 
 
-class PipelineInfo(BaseModel):
+class PipelineRunInfo(BaseModel):
     conditions: Dict[str, Dict[int, bool]]  # condition bindId -> iteration -> value
     fails: Dict[str, List[int]]             # bindId -> fail iterations (1 in common situation)
 
@@ -383,7 +385,7 @@ class AppLogs(BaseModel):
     dagLogs: str = ""
     data: Dict[str, AppLog] = {}
     error: Optional[str] = None
-    pipeline: Optional[PipelineInfo] = None # only for pipeline
+    pipeline: Optional[PipelineRunInfo] = None # only for pipeline
 
 
 class AppLogsWithResults(AppLogs):
@@ -469,10 +471,6 @@ class AdminRunInfo(BaseModel):
     operationId: Alias.Id
     taskInfo: TaskInfo
     cfgId: Alias.Id
-
-
-class AdminRunsInfo(BaseModel):
-    data: List[AdminRunInfo]
 
 
 class OperationOrNone(BaseModel):

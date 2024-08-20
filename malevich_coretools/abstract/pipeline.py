@@ -3,10 +3,13 @@ from typing import Dict, List, Optional
 
 from pydantic import BaseModel
 
-from malevich_coretools.abstract import JsonImage
 from malevich_coretools.abstract.abstract import (  # noqa: F401
+    AdminRunInfo,
+    Alias,
+    JsonImage,
     Restrictions,
     ScaleInfo,
+    Schedule,
     TaskComponent,
     TaskPolicy,
 )
@@ -98,3 +101,53 @@ class Pipeline(BaseModel):
     conditions: Dict[str, Condition] = {}               # bindConditionId to Condition
     results: Dict[str, List[Result]] = {}               # bindProcessorId to results
     pullCollectionPolicy: PullCollectionPolicy = PullCollectionPolicy.IF_NOT_EXIST
+
+
+class MainPipelineCfg(BaseModel):
+    operationId: Alias.Id
+    pipelineId: Alias.Id
+    processors: Dict[str, Processor]
+    conditions: Dict[str, Condition]
+    results: Dict[str, List[Result]]
+    pullCollectionPolicy: PullCollectionPolicy
+    cfg: str
+    infoUrl: Optional[str] = None
+    debugMode: bool
+    coreManage: bool
+    kafkaMode: bool
+    singleRequest: bool
+    tlWithoutData: Optional[int] = None
+    waitRuns: bool
+    profileMode: Optional[str] = None
+    withLogs: bool
+    component: TaskComponent
+    policy: TaskPolicy
+    schedule: Optional[Schedule] = None
+    restrictions: Optional[Restrictions] = None
+    scaleInfo: List[ScaleInfo]
+    schemesNames: List[str]
+    login: Optional[Alias.Login] = None
+    withListener: bool
+    kafkaModeUrl: Optional[str] = None
+    run: bool
+    synthetic: bool = False
+
+
+class PipelineInfo(BaseModel):
+    pipelineId: Alias.Id
+    processors: Dict[str, Processor]
+    conditions: Dict[str, Condition]
+    results: Dict[str, List[Result]]
+    cfg: Alias.Json
+    login: Alias.Login
+
+
+class AdminRunPipelineInfo(BaseModel):
+    operationId: Alias.Id
+    pipelineInfo: PipelineInfo
+    cfgId: Alias.Id
+
+
+class AdminRunsInfo(BaseModel):
+    tasks: List[AdminRunInfo]
+    pipelines: List[AdminRunPipelineInfo]

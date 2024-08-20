@@ -157,6 +157,7 @@ TEMP_RUN_MAIN = f"{API_VERSION}/run"
 TEMP_RUN_CONDITION = lambda operationId: f"{TEMP_RUN_MAIN}/condition/{urllib.parse.quote(str(operationId), safe='')}"
 TEMP_RUN_ACTIVE_RUNS = f"{TEMP_RUN_MAIN}/activeRuns"
 TEMP_RUN_MAIN_TASK_CFG = lambda operationId: f"{TEMP_RUN_MAIN}/mainTaskCfg/{urllib.parse.quote(str(operationId), safe='')}"
+TEMP_RUN_MAIN_PIPELINE_CFG = lambda operationId: f"{TEMP_RUN_MAIN}/mainPipelineCfg/{urllib.parse.quote(str(operationId), safe='')}"
 TEMP_RUN_OPERATIONS_IDS = lambda taskId, cfgId: f"{TEMP_RUN_MAIN}/operationsIds/{urllib.parse.quote(str(taskId), safe='')}" if cfgId is None else f"{TEMP_RUN_MAIN}/operationsIds/{urllib.parse.quote(str(taskId), safe='')}/{urllib.parse.quote(str(cfgId), safe='')}"
 
 ## AdminController

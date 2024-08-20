@@ -24,7 +24,7 @@ def admin_get_run_info(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-) -> Alias.Info:
+) -> Alias.Json:
     """return run info by operation `id`"""
     if batcher is None:
         batcher = Config.BATCHER
