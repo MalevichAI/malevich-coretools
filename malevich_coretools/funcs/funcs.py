@@ -483,11 +483,11 @@ def get_userPipelines_mapId(id: str, *args, **kwargs) -> Alias.Id:
 
 
 def get_userPipelines_id(id: str, *args, **kwargs) -> Pipeline:
-    return model_from_json(send_to_core_get(USER_PIPELINES_ID(id, None), *args, **kwargs), Pipeline)
+    return model_from_json(send_to_core_get(USER_PIPELINES_ID(id, None), *args, **kwargs), Pipeline).simplify()
 
 
 def get_userPipelines_realId(id: str, *args, **kwargs) -> Pipeline:
-    return model_from_json(send_to_core_get(USER_PIPELINES_REAL_ID(id), *args, **kwargs), Pipeline)
+    return model_from_json(send_to_core_get(USER_PIPELINES_REAL_ID(id), *args, **kwargs), Pipeline).simplify()
 
 
 def post_userPipelines(data: UserTask, wait: bool, *args, **kwargs) -> Alias.Id:

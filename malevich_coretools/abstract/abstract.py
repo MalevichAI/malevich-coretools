@@ -456,6 +456,7 @@ class AppFunctionsInfo(BaseModel):
     schemes: Dict[Alias.Id, str] = dict()
     inits: Dict[Alias.Id, InitInfo] = dict()
     logs: Optional[str] = None
+    version: Optional[str] = None
     instanceInfo: Optional[str] = None  # json with info about instance
 
 

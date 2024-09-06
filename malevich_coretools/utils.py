@@ -2057,7 +2057,7 @@ def create_pipeline(
         conditions=conditions,
         results=results,
         pullCollectionPolicy=pull_collection_policy,
-    )
+    ).internal()
     if batcher is not None:
         return batcher.add("postPipeline", data=data)
     return f.post_userPipelines(data, wait=wait, auth=auth, conn_url=conn_url)
@@ -2091,7 +2091,7 @@ def update_pipeline(
         conditions=conditions,
         results=results,
         pullCollectionPolicy=pull_collection_policy,
-    )
+    ).internal()
     if batcher is not None:
         return batcher.add("postPipelineById", data=data, vars={"id": id})
     return f.post_userPipelines_id(id, data, wait=wait, auth=auth, conn_url=conn_url)
