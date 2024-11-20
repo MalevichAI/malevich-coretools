@@ -677,9 +677,11 @@ def post_manager_task_run(data: RunTask, with_show: bool, long: bool, long_timeo
         return AppLogs.model_validate_json(res)
 
 
-def post_manager_pipeline(data: MainPipeline, with_show: bool, long: bool, long_timeout: int, wait: bool, auth: Optional[AUTH], conn_url: Optional[str]=None, *args, **kwargs) -> Union[Alias.Id, AppLogs]:
+def post_manager_pipeline(data: MainPipeline, with_show: bool, long: bool, long_timeout: int, return_response: bool, wait: bool, auth: Optional[AUTH], conn_url: Optional[str]=None, *args, **kwargs) -> Union[Alias.Id, AppLogs]:
     check_profile_mode(data.profileMode)
-    res = send_to_core_modify(MANAGER_PIPELINE(wait and not long), data, with_show=with_show, show_func=show_logs_func, auth=auth, conn_url=conn_url, *args, **kwargs)
+    res = send_to_core_modify(MANAGER_PIPELINE(wait and not long), data, with_show=with_show, show_func=show_logs_func, return_response=return_response, auth=auth, conn_url=conn_url, *args, **kwargs)
+    if return_response:
+        return res
     if wait and long:
         res = asyncio.run(__get_result(res, timeout=long_timeout, auth=auth))
     if not wait:
