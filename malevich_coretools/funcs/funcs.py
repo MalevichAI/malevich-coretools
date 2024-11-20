@@ -847,7 +847,7 @@ def send_to_core_get(path: str, with_auth=True, show_func: Optional[Callable]=No
         return response.content
 
 
-def send_to_core_modify(path: str, operation: Optional[Any] = None, with_auth: bool=True, with_show: Optional[bool]=None, show_func: Optional[Callable]=None, is_post: bool=True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> str:  # noqa: ANN401
+def send_to_core_modify(path: str, operation: Optional[Any] = None, with_auth: bool=True, with_show: Optional[bool]=None, show_func: Optional[Callable]=None, return_response: bool = False, is_post: bool=True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> str:  # noqa: ANN401
     """modify: post by default, else - delete"""
     host = Config.HOST_PORT if conn_url is None else conn_url
     assert host is not None, "host port not set"
@@ -859,6 +859,8 @@ def send_to_core_modify(path: str, operation: Optional[Any] = None, with_auth: b
         response = requests.post(f"{host}{path}", data=operation, headers=HEADERS, auth=auth if with_auth else None)
     else:   # delete
         response = requests.delete(f"{host}{path}", data=operation, headers=HEADERS, auth=auth if with_auth else None)
+    if return_response:
+        return response
     __check_response(f"{host}{path}", response, show_func=show_func)
     if response.status_code == HTTPStatus.NO_CONTENT:
         return ""
