@@ -1015,7 +1015,7 @@ async def send_to_core_modify_raw_async(path: str, data: bytes, with_auth: bool=
     assert host is not None, "host port not set"
     if auth is None:
         auth = (Config.CORE_USERNAME, Config.CORE_PASSWORD)
-    
+
     async with async_session or aiohttp.ClientSession(auth=auth if with_auth else None, connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
         if is_post:
             response_cm = session.post(f"{host}{path}", data=data, headers=HEADERS_RAW)
@@ -1025,7 +1025,7 @@ async def send_to_core_modify_raw_async(path: str, data: bytes, with_auth: bool=
             await __async_check_response(response, show_func, f"{host}{path}")
             if response.status == HTTPStatus.NO_CONTENT:
                 return ""
-            result = await response.text()    
+            result = await response.text()
     if with_show is None:
         with_show = Config.VERBOSE
     if with_show:
