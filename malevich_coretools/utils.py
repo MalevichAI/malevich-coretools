@@ -1222,13 +1222,17 @@ def check_auth(
 def ping(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
+    is_async: bool = False,
 ) -> Alias.Info:
     """return `pong` """
     if batcher is None:
         batcher = Config.BATCHER
     if batcher is not None:
         return batcher.add("ping")
-    return f.get_ping(with_auth=False, conn_url=conn_url)
+    if is_async:
+        return f.get_ping_async(with_auth=False, conn_url=conn_url)
+    else:
+        return f.get_ping(with_auth=False, conn_url=conn_url)
 
 # UserShare
 
@@ -2659,6 +2663,7 @@ def task_full(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
+    is_async: bool = False,
 ) -> Union[Alias.Id, AppLogs]:
     """prepare, run and stop task by `task_id`, `cfg_id` and other
 
@@ -2711,15 +2716,26 @@ def task_full(
     )
     if batcher is not None:
         return batcher.add("sendTask", data=data, result_model=AppLogs)
-    return f.post_manager_task(
-        data,
-        with_show=with_show,
-        long=long,
-        long_timeout=long_timeout,
-        wait=wait,
-        auth=auth,
-        conn_url=conn_url,
-    )
+    if is_async:
+        return f.post_manager_task_async(
+            data,
+            with_show=with_show,
+            long=long,
+            long_timeout=long_timeout,
+            wait=wait,
+            auth=auth,
+            conn_url=conn_url,
+        )
+    else:
+        return f.post_manager_task(
+            data,
+            with_show=with_show,
+            long=long,
+            long_timeout=long_timeout,
+            wait=wait,
+            auth=auth,
+            conn_url=conn_url,
+        )
 
 
 def task_prepare(
@@ -2748,6 +2764,7 @@ def task_prepare(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
+    is_async: bool = False,
 ) -> Union[Alias.Id, AppLogs]:
     """prepare task by `task_id`, `cfg_id` and other, return `operation_id`
 
@@ -2813,15 +2830,26 @@ def task_prepare(
     )
     if batcher is not None:
         return batcher.add("sendTask", data=data, result_model=AppLogs)
-    return f.post_manager_task(
-        data,
-        with_show=with_show,
-        long=long,
-        long_timeout=long_timeout,
-        wait=wait,
-        auth=auth,
-        conn_url=conn_url,
-    )
+    if is_async:
+        return f.post_manager_task_async(
+            data,
+            with_show=with_show,
+            long=long,
+            long_timeout=long_timeout,
+            wait=wait,
+            auth=auth,
+            conn_url=conn_url,
+        )
+    else:
+        return f.post_manager_task(
+            data,
+            with_show=with_show,
+            long=long,
+            long_timeout=long_timeout,
+            wait=wait,
+            auth=auth,
+            conn_url=conn_url,
+        )
 
 
 def task_run(
@@ -2842,6 +2870,7 @@ def task_run(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
+    is_async: bool = False,
 ) -> Optional[Union[Alias.Id, AppLogs]]:
     """run prepared task by `operation_id` with `cfg_id` and other overridden parameters
 
@@ -2879,15 +2908,26 @@ def task_run(
     )
     if batcher is not None:
         return batcher.add("sendTaskRun", data=data, result_model=AppLogs if with_logs or schedule is not None else None)
-    return f.post_manager_task_run(
-        data,
-        with_show=with_show,
-        long=long,
-        long_timeout=long_timeout,
-        wait=wait,
-        auth=auth,
-        conn_url=conn_url,
-    )
+    if is_async:
+        return f.post_manager_task_run_async(
+            data,
+            with_show=with_show,
+            long=long,
+            long_timeout=long_timeout,
+            wait=wait,
+            auth=auth,
+            conn_url=conn_url,
+        )
+    else:
+        return f.post_manager_task_run(
+            data,
+            with_show=with_show,
+            long=long,
+            long_timeout=long_timeout,
+            wait=wait,
+            auth=auth,
+            conn_url=conn_url,
+        )
 
 
 def pipeline_full(
@@ -2912,6 +2952,7 @@ def pipeline_full(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
+    is_async: bool = False,
 ) -> Union[Alias.Id, AppLogs]:
     if batcher is None:
         batcher = Config.BATCHER
@@ -2946,16 +2987,28 @@ def pipeline_full(
     )
     if batcher is not None:
         return batcher.add("sendPipeline", data=data, result_model=AppLogs)
-    return f.post_manager_pipeline(
-        data,
-        with_show=with_show,
-        long=long,
-        long_timeout=long_timeout,
-        return_response=return_response,
-        wait=wait,
-        auth=auth,
-        conn_url=conn_url,
-    )
+    if is_async:
+        return f.post_manager_pipeline_async(
+            data,
+            with_show=with_show,
+            long=long,
+            long_timeout=long_timeout,
+            return_response=return_response,
+            wait=wait,
+            auth=auth,
+            conn_url=conn_url,
+        )
+    else:
+        return f.post_manager_pipeline(
+            data,
+            with_show=with_show,
+            long=long,
+            long_timeout=long_timeout,
+            return_response=return_response,
+            wait=wait,
+            auth=auth,
+            conn_url=conn_url,
+        )
 
 
 def pipeline_prepare(
@@ -2985,6 +3038,7 @@ def pipeline_prepare(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
+    is_async: bool = False,
 ) -> Union[Alias.Id, AppLogs]:
     if batcher is None:
         batcher = Config.BATCHER
@@ -3019,15 +3073,26 @@ def pipeline_prepare(
     )
     if batcher is not None:
         return batcher.add("sendPipeline", data=data, result_model=AppLogs)
-    return f.post_manager_pipeline(
-        data,
-        with_show=with_show,
-        long=long,
-        long_timeout=long_timeout,
-        wait=wait,
-        auth=auth,
-        conn_url=conn_url,
-    )
+    if is_async:
+        return f.post_manager_pipeline_async(
+            data,
+            with_show=with_show,
+            long=long,
+            long_timeout=long_timeout,
+            wait=wait,
+            auth=auth,
+            conn_url=conn_url,
+        )
+    else:
+        return f.post_manager_pipeline(
+            data,
+            with_show=with_show,
+            long=long,
+            long_timeout=long_timeout,
+            wait=wait,
+            auth=auth,
+            conn_url=conn_url,
+        )
 
 
 def task_unschedule(
@@ -3060,6 +3125,7 @@ def task_stop(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
+    is_async: bool = False,
 ) -> Optional[Union[Alias.Id, AppLogs]]:
     """stop task by `operation_id`
 
@@ -3077,9 +3143,14 @@ def task_stop(
     data = StopOperation(operationId=operation_id, withLogs=with_logs, infoUrl=info_url)
     if batcher is not None:
         return batcher.add("sendTaskStop", data=data, result_model=AppLogs if with_logs else None)
-    return f.post_manager_task_stop(
-        data, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url
-    )
+    if is_async:
+        return f.post_manager_task_stop_async(
+            data, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url
+        )
+    else:
+        return f.post_manager_task_stop(
+            data, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url
+        )
 
 
 def task_stop_all(
@@ -3091,6 +3162,7 @@ def task_stop_all(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
+    is_async: bool = False,
 ) -> Alias.Json:
     """stop all tasks"""
     if batcher is None:
@@ -3098,9 +3170,14 @@ def task_stop_all(
     data = StopOperationMany(withLogs=with_logs, infoUrl=info_url)
     if batcher is not None:
         return batcher.add("sendTaskStopAll", data=data, result_model=AppLogs if with_logs else None)
-    return f.post_manager_task_stop_all(
-        data, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url
-    )
+    if is_async:
+        return f.post_manager_task_stop_all_async(
+            data, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url
+        )
+    else:
+        return f.post_manager_task_stop_all(
+            data, with_show=with_show, wait=wait, auth=auth, conn_url=conn_url
+        )
 
 
 def task_resume(

@@ -283,6 +283,10 @@ def get_ping(*args, **kwargs) -> Alias.Info:
     return send_to_core_get(PING, *args, **kwargs, is_text=True)
 
 
+async def get_ping_async(*args, **kwargs) -> Alias.Info:
+    return await send_to_core_get_async(PING, *args, **kwargs, is_text=True)
+
+
 # def get_mapping(wait: bool, *args, **kwargs) -> ResultDocMappingsFull:
 #     return model_from_json(send_to_core_get(MAPPING, *args, **kwargs), ResultDocMappingsFull)
 
@@ -666,11 +670,32 @@ def post_manager_task(data: MainTask, with_show: bool, long: bool, long_timeout:
     return AppLogs.model_validate_json(res)
 
 
+async def post_manager_task_async(data: MainTask, with_show: bool, long: bool, long_timeout: int, wait: bool, auth: Optional[AUTH], conn_url: Optional[str]=None, *args, **kwargs) -> Union[Alias.Id, AppLogs]:
+    check_profile_mode(data.profileMode)
+    res = await send_to_core_modify_async(MANAGER_TASK(wait and not long), data, with_show=with_show, show_func=show_logs_func, auth=auth, conn_url=conn_url, *args, **kwargs)
+    if wait and long:
+        res = await __get_result(res, timeout=long_timeout, auth=auth)
+    if not wait:
+        return res
+    return AppLogs.model_validate_json(res)
+
+
 def post_manager_task_run(data: RunTask, with_show: bool, long: bool, long_timeout: int, wait: bool, auth: Optional[AUTH], conn_url: Optional[str]=None, *args, **kwargs) -> Optional[Union[Alias.Id, AppLogs]]:
     check_profile_mode(data.profileMode)
     res = send_to_core_modify(MANAGER_TASK_RUN(wait and not long), data, with_show=with_show, show_func=show_logs_func, auth=auth, conn_url=conn_url, *args, **kwargs)
     if wait and long:
         res = asyncio.run(__get_result(res, timeout=long_timeout, auth=auth))
+    if data.withLogs or data.schedule is not None:
+        if not wait:
+            return res
+        return AppLogs.model_validate_json(res)
+
+
+async def post_manager_task_run_async(data: RunTask, with_show: bool, long: bool, long_timeout: int, wait: bool, auth: Optional[AUTH], conn_url: Optional[str]=None, *args, **kwargs) -> Optional[Union[Alias.Id, AppLogs]]:
+    check_profile_mode(data.profileMode)
+    res = await send_to_core_modify_async(MANAGER_TASK_RUN(wait and not long), data, with_show=with_show, show_func=show_logs_func, auth=auth, conn_url=conn_url, *args, **kwargs)
+    if wait and long:
+        res = await __get_result(res, timeout=long_timeout, auth=auth)
     if data.withLogs or data.schedule is not None:
         if not wait:
             return res
@@ -689,6 +714,18 @@ def post_manager_pipeline(data: MainPipeline, with_show: bool, long: bool, long_
     return AppLogs.model_validate_json(res)
 
 
+async def post_manager_pipeline_async(data: MainPipeline, with_show: bool, long: bool, long_timeout: int, return_response: bool, wait: bool, auth: Optional[AUTH], conn_url: Optional[str]=None, *args, **kwargs) -> Union[Alias.Id, AppLogs]:
+    check_profile_mode(data.profileMode)
+    res = await send_to_core_modify_async(MANAGER_PIPELINE(wait and not long), data, with_show=with_show, show_func=show_logs_func, return_response=return_response, auth=auth, conn_url=conn_url, *args, **kwargs)
+    if return_response:
+        return res
+    if wait and long:
+        res = await __get_result(res, timeout=long_timeout, auth=auth)
+    if not wait:
+        return res
+    return AppLogs.model_validate_json(res)
+
+
 def post_manager_task_unschedule(data: UnscheduleOperation, with_show: bool, wait: bool, *args, **kwargs) -> Alias.Info:
     return send_to_core_modify(MANAGER_TASK_UNSCHEDULE(wait), data, with_show=with_show, *args, **kwargs)
 
@@ -702,8 +739,21 @@ def post_manager_task_stop(data: StopOperation, with_show: bool, wait: bool, *ar
         return AppLogs.model_validate_json(res)
 
 
+async def post_manager_task_stop_async(data: StopOperation, with_show: bool, wait: bool, *args, **kwargs) -> Optional[Union[Alias.Id, AppLogs]]:
+    show_func = show_logs_func if data.withLogs else None
+    res = await send_to_core_modify_async(MANAGER_TASK_STOP(wait), data, with_show=with_show, show_func=show_func, *args, **kwargs)
+    if data.withLogs:
+        if not wait:
+            return res
+        return AppLogs.model_validate_json(res)
+
+
 def post_manager_task_stop_all(data: StopOperationMany, wait: bool, *args, **kwargs) -> Alias.Json: # FIXME show
     return send_to_core_modify(MANAGER_TASK_STOP_ALL(wait), data, *args, **kwargs)
+
+
+async def post_manager_task_stop_all_async(data: StopOperationMany, wait: bool, *args, **kwargs) -> Alias.Json: # FIXME show
+    return await send_to_core_modify_async(MANAGER_TASK_STOP_ALL(wait), data, *args, **kwargs)
 
 
 def post_manager_task_resume(data: Operation, wait: bool, *args, **kwargs) -> Alias.Empty:
@@ -811,11 +861,18 @@ async def __get_result(id: str, is_text: bool = True, check_time: float = LONG_S
             pass    # recreate ClientSession
 
 
-async def __async_check_response(response: aiohttp.ClientResponse, show_func: Optional[Callable]=None):  # noqa: ANN202
+async def __async_check_response(response: aiohttp.ClientResponse, show_func: Optional[Callable]=None, path: Optional[str] = None):  # noqa: ANN202
     if not response.ok:
         if show_func is None:
-            Config.logger.error(await response.text())
+            if path is not None:
+                text = await response.text()
+                msg = f"failed: {text}" if len(text) > 0 else "failed"
+                Config.logger.error(f"{path} {msg}")
+            else:
+                Config.logger.error(await response.text())
         else:
+            if path is not None:
+                Config.logger.error(f"{path} failed")
             show_func(await response.text(), err=True)
     response.raise_for_status()
 
@@ -849,6 +906,26 @@ def send_to_core_get(path: str, with_auth=True, show_func: Optional[Callable]=No
         return response.content
 
 
+# FIXME copypaste
+async def send_to_core_get_async(path: str, with_auth=True, show_func: Optional[Callable]=None, is_text=False, auth: Optional[AUTH]=None, conn_url: Optional[str]=None, async_session = None) -> Optional[Union[str, bytes]]:
+    host = Config.HOST_PORT if conn_url is None else conn_url
+    assert host is not None, "host port not set"
+    if auth is None or not with_auth:
+        auth = (Config.CORE_USERNAME, Config.CORE_PASSWORD) if with_auth else None
+
+    async with async_session or aiohttp.ClientSession(auth=auth, connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
+        async with session.get(f"{host}{path}", headers=HEADERS) as response:
+            await __async_check_response(response, show_func, f"{host}{path}")
+            if response.status == HTTPStatus.NO_CONTENT:
+                return None
+            if is_text is True:
+                return await response.text()
+            elif is_text is False:
+                return await response.json()
+            else:
+                return await response.read()
+
+
 def send_to_core_modify(path: str, operation: Optional[Any] = None, with_auth: bool=True, with_show: Optional[bool]=None, show_func: Optional[Callable]=None, return_response: bool = False, is_post: bool=True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> str:  # noqa: ANN401
     """modify: post by default, else - delete"""
     host = Config.HOST_PORT if conn_url is None else conn_url
@@ -877,6 +954,37 @@ def send_to_core_modify(path: str, operation: Optional[Any] = None, with_auth: b
     return result
 
 
+async def send_to_core_modify_async(path: str, operation: Optional[Any] = None, with_auth: bool=True, with_show: Optional[bool]=None, show_func: Optional[Callable]=None, return_response: bool = False, is_post: bool=True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None, async_session=None) -> str:  # noqa: ANN401
+    """modify: post by default, else - delete"""
+    host = Config.HOST_PORT if conn_url is None else conn_url
+    assert host is not None, "host port not set"
+    if auth is None:
+        auth = (Config.CORE_USERNAME, Config.CORE_PASSWORD)
+    if operation is not None:
+        operation = json.dumps(operation.model_dump())
+
+    async with async_session or aiohttp.ClientSession(auth=auth if with_auth else None, connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
+        if is_post:
+            response_cm = session.post(f"{host}{path}", data=operation, headers=HEADERS)
+        else:
+            response_cm = session.delete(f"{host}{path}", data=operation, headers=HEADERS)
+        async with response_cm as response:
+            if return_response:
+                return response
+            await __async_check_response(response, show_func, f"{host}{path}")
+            if response.status == HTTPStatus.NO_CONTENT:
+                return ""
+            result = await response.text()
+    if with_show is None:
+        with_show = Config.VERBOSE
+    if with_show:
+        if show_func is None:
+            Config.logger.info(result)
+        else:
+            show_func(result)
+    return result
+
+
 def send_to_core_modify_raw(path: str, data: bytes, with_auth: bool=True, with_show: Optional[bool]=None, show_func: Optional[Callable]=None, is_post: bool=True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None) -> str:  # noqa: ANN401
     """modify: post by default, else - delete"""
     host = Config.HOST_PORT if conn_url is None else conn_url
@@ -891,6 +999,33 @@ def send_to_core_modify_raw(path: str, data: bytes, with_auth: bool=True, with_s
     if response.status_code == HTTPStatus.NO_CONTENT:
         return ""
     result = response.text
+    if with_show is None:
+        with_show = Config.VERBOSE
+    if with_show:
+        if show_func is None:
+            Config.logger.info(result)
+        else:
+            show_func(result)
+    return result
+
+
+async def send_to_core_modify_raw_async(path: str, data: bytes, with_auth: bool=True, with_show: Optional[bool]=None, show_func: Optional[Callable]=None, is_post: bool=True, auth: Optional[AUTH]=None, conn_url: Optional[str]=None, async_session=None) -> str:  # noqa: ANN401
+    """modify: post by default, else - delete"""
+    host = Config.HOST_PORT if conn_url is None else conn_url
+    assert host is not None, "host port not set"
+    if auth is None:
+        auth = (Config.CORE_USERNAME, Config.CORE_PASSWORD)
+    
+    async with async_session or aiohttp.ClientSession(auth=auth if with_auth else None, connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
+        if is_post:
+            response_cm = session.post(f"{host}{path}", data=data, headers=HEADERS_RAW)
+        else:
+            response_cm = session.delete(f"{host}{path}", data=data, headers=HEADERS_RAW)
+        async with response_cm as response:
+            await __async_check_response(response, show_func, f"{host}{path}")
+            if response.status == HTTPStatus.NO_CONTENT:
+                return ""
+            result = await response.text()    
     if with_show is None:
         with_show = Config.VERBOSE
     if with_show:
