@@ -837,7 +837,8 @@ async def __get_result(id: str, is_text: bool = True, check_time: float = LONG_S
     host = Config.HOST_PORT if conn_url is None else conn_url
     assert host is not None, "host port not set"
     if auth is None:
-        auth = aiohttp.BasicAuth(login=Config.CORE_USERNAME, password=Config.CORE_PASSWORD, encoding='utf-8')
+        auth = (Config.CORE_USERNAME, Config.CORE_PASSWORD)
+    auth = aiohttp.BasicAuth(login=auth[0], password=auth[1], encoding='utf-8')
 
     timeout_deadline = None if timeout is None else datetime.datetime.now() + datetime.timedelta(0, timeout)
     while True:
@@ -912,7 +913,8 @@ async def send_to_core_get_async(path: str, with_auth=True, show_func: Optional[
     assert host is not None, "host port not set"
     if auth is None or not with_auth:
         auth = (Config.CORE_USERNAME, Config.CORE_PASSWORD) if with_auth else None
-
+    if auth is not None:
+        auth = aiohttp.BasicAuth(login=auth[0], password=auth[1], encoding='utf-8')
     async with async_session or aiohttp.ClientSession(auth=auth, connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
         async with session.get(f"{host}{path}", headers=HEADERS) as response:
             await __async_check_response(response, show_func, f"{host}{path}")
@@ -960,6 +962,7 @@ async def send_to_core_modify_async(path: str, operation: Optional[Any] = None, 
     assert host is not None, "host port not set"
     if auth is None:
         auth = (Config.CORE_USERNAME, Config.CORE_PASSWORD)
+    auth = aiohttp.BasicAuth(login=auth[0], password=auth[1], encoding='utf-8')
     if operation is not None:
         operation = json.dumps(operation.model_dump())
 
@@ -1015,6 +1018,7 @@ async def send_to_core_modify_raw_async(path: str, data: bytes, with_auth: bool=
     assert host is not None, "host port not set"
     if auth is None:
         auth = (Config.CORE_USERNAME, Config.CORE_PASSWORD)
+    auth = aiohttp.BasicAuth(login=auth[0], password=auth[1], encoding='utf-8')
 
     async with async_session or aiohttp.ClientSession(auth=auth if with_auth else None, connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
         if is_post:
@@ -1040,7 +1044,9 @@ async def send_to_core_post_async(path: str, operation: Optional[str] = None, wi
     host = Config.HOST_PORT if conn_url is None else conn_url
     assert host is not None, "host port not set"
     if auth is None or not with_auth:
-        auth = aiohttp.BasicAuth(login=Config.CORE_USERNAME, password=Config.CORE_PASSWORD, encoding='utf-8') if with_auth else None
+        auth = (Config.CORE_USERNAME, Config.CORE_PASSWORD) if with_auth else None
+    if auth is not None:
+        auth = aiohttp.BasicAuth(login=auth[0], password=auth[1], encoding='utf-8') 
     if operation is not None:
         operation = json.dumps(operation.model_dump())
 

@@ -165,7 +165,7 @@ def get_doc_by_name(
 
 def create_doc(
     data: Union[Alias.Json, Dict, Type[BaseModel]],
-    name: Optional[str],
+    name: Optional[str] = None,
     wait: bool = True,
     *,
     auth: Optional[AUTH] = None,
@@ -3033,6 +3033,7 @@ def pipeline_prepare(
     with_show: bool = True,
     long: bool = False,
     long_timeout: Optional[int] = WAIT_RESULT_TIMEOUT,
+    return_response: bool = False,
     wait: bool = True,
     *,
     auth: Optional[AUTH] = None,
@@ -3079,6 +3080,7 @@ def pipeline_prepare(
             with_show=with_show,
             long=long,
             long_timeout=long_timeout,
+            return_response=return_response,
             wait=wait,
             auth=auth,
             conn_url=conn_url,
@@ -3089,6 +3091,7 @@ def pipeline_prepare(
             with_show=with_show,
             long=long,
             long_timeout=long_timeout,
+            return_response=return_response,
             wait=wait,
             auth=auth,
             conn_url=conn_url,
