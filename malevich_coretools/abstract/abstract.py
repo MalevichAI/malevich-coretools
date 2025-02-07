@@ -188,6 +188,7 @@ class MainTask(BaseModel):
     waitRuns: bool = True
     profileMode: Optional[str] = None
     withLogs: bool = False  # use only in prepare
+    saveFails: bool = True
     scaleInfo: List[ScaleInfo]
     component: TaskComponent
     policy: TaskPolicy
@@ -216,6 +217,7 @@ class MainPipeline(BaseModel):
     kafkaModeUrl: Optional[str] = None
     run: bool = True
     synthetic: bool = False
+    saveFails: bool = True
 
 
 class RunTask(Operation):

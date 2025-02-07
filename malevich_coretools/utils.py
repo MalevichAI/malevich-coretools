@@ -677,7 +677,7 @@ def delete_from_collection(
 
 def get_collection_objects(
     path: Optional[str] = None,
-    recursive: Optional[str] = None,
+    recursive: Optional[bool] = None,
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
@@ -2650,6 +2650,7 @@ def task_full(
     core_manage: bool = False,
     single_request: bool = False,
     profile_mode: Optional[str] = None,
+    save_fails: bool = True,
     with_show: bool = True,
     long: bool = False,
     long_timeout: Optional[int] = WAIT_RESULT_TIMEOUT,
@@ -2708,6 +2709,7 @@ def task_full(
         waitRuns=True,
         profileMode=profile_mode,
         withLogs=True,
+        saveFails=save_fails,
         scaleInfo=scaleInfo,
         component=component,
         policy=policy,
@@ -2752,6 +2754,7 @@ def task_prepare(
     wait_runs: bool = True,
     with_logs: bool = False,
     profile_mode: Optional[str] = None,
+    save_fails: bool = True,
     with_show: bool = None,
     long: bool = False,
     long_timeout: int = WAIT_RESULT_TIMEOUT,
@@ -2822,6 +2825,7 @@ def task_prepare(
         run=False,
         waitRuns=wait_runs,
         withLogs=with_logs,
+        saveFails=save_fails,
         profileMode=profile_mode,
         scaleInfo=scaleInfo,
         component=component,
@@ -2943,6 +2947,7 @@ def pipeline_full(
     schedule: Optional[Schedule] = None,
     restrictions: Optional[Restrictions] = None,
     scaleInfo: List[ScaleInfo] = None,
+    save_fails: bool = True,
     with_show: bool = True,
     long: bool = False,
     long_timeout: Optional[int] = WAIT_RESULT_TIMEOUT,
@@ -2984,6 +2989,7 @@ def pipeline_full(
         withListener=False,
         kafkaModeUrl=None,
         run=True,
+        saveFails=save_fails,
     )
     if batcher is not None:
         return batcher.add("sendPipeline", data=data, result_model=AppLogs)
@@ -3030,6 +3036,7 @@ def pipeline_prepare(
     with_listener: bool = False,
     kafka_mode_url_response: Optional[str] = None,
     synthetic: bool = False,
+    save_fails: bool = True,
     with_show: bool = True,
     long: bool = False,
     long_timeout: Optional[int] = WAIT_RESULT_TIMEOUT,
@@ -3071,6 +3078,7 @@ def pipeline_prepare(
         kafkaModeUrl=kafka_mode_url_response,
         run=False,
         synthetic=synthetic,
+        saveFails=save_fails,
     )
     if batcher is not None:
         return batcher.add("sendPipeline", data=data, result_model=AppLogs)
@@ -3510,6 +3518,39 @@ def update_analytics_many(
     return f.post_analytics_many(
         data, wait=wait, auth=auth, conn_url=conn_url
     )
+
+
+# RunsInfo
+
+
+def get_last_runs(
+    count: int = 10,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None
+) -> ResultIds:
+    """return last operationIds (prepared task/pipeline)"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getLastOperationsIds", vars={"count": count}, result_model=ResultIds)
+    return f.get_runsInfo_last_operation_ids(count, auth=auth, conn_url=conn_url)
+
+
+def get_last_failed_runs(
+    count: int = 5,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None
+) -> ResultIds:
+    """return last operationIds (failed prepare/run of task/pipeline)"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getLastFailedOperationsIds", vars={"count": count}, result_model=ResultIds)
+    return f.get_runsInfo_last_failed_operation_ids(count, auth=auth, conn_url=conn_url)
 
 
 # kafka

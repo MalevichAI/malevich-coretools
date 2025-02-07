@@ -205,6 +205,11 @@ ANALYTICS_MANY = lambda wait: with_wait(f"{ANALYTICS_MAIN}/many", wait)
 ANALYTICS_ID = lambda id, wait: with_wait(f"{ANALYTICS_MAIN}/{id}", wait)
 ANALYTICS_NAME = lambda name, wait: with_wait(f"{ANALYTICS_MAIN}/name/{name}", wait)
 
+## RunsInfoController
+RUNS_INFO_MAIN = f"{API_VERSION}/runsInfo"
+RUNS_INFO_LAST = lambda count: with_key_values(f"{RUNS_INFO_MAIN}/lastOperationsIds", {"count": count})
+RUNS_INFO_LAST_FAILED = lambda count: with_key_values(f"{RUNS_INFO_MAIN}/lastFailedOperationsIds", {"count": count})
+
 ### Kafka
 KAFKA_SEND = f"{MANAGER_MAIN}/kafkaMsg"
 

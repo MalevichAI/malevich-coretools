@@ -142,7 +142,7 @@ def delete_collections_id_del(id: str, data: DocsCollectionChange, wait: bool, *
 # CollectionObjectsController
 
 
-def get_collection_objects(path: Optional[str], recursive: Optional[str], *args, **kwargs) -> FilesDirs:
+def get_collection_objects(path: Optional[str], recursive: Optional[bool], *args, **kwargs) -> FilesDirs:
     return model_from_json(send_to_core_get(COLLECTION_OBJECTS_ALL_GET(path, recursive), *args, **kwargs), FilesDirs)
 
 
@@ -816,6 +816,14 @@ def post_analytics_many(data: UserAnalyticsBatch, wait: bool, *args, **kwargs) -
     return model_from_json(send_to_core_modify(ANALYTICS_MANY(wait), data, *args, **kwargs), ResultIds)
 
 
+def get_runsInfo_last_operation_ids(count: int, *args, **kwargs) -> ResultIds:
+    return model_from_json(send_to_core_get(RUNS_INFO_LAST(count), *args, **kwargs), ResultIds)
+
+
+def get_runsInfo_last_failed_operation_ids(count: int, *args, **kwargs) -> ResultIds:
+    return model_from_json(send_to_core_get(RUNS_INFO_LAST_FAILED(count), *args, **kwargs), ResultIds)
+
+
 async def kafka_send(data: KafkaMsg, *args, **kwargs) -> Union[Alias.Info, KafkaMsg]:
     result = await send_to_core_post_async(KAFKA_SEND, data, *args, **kwargs)
     try:
@@ -1046,7 +1054,7 @@ async def send_to_core_post_async(path: str, operation: Optional[str] = None, wi
     if auth is None or not with_auth:
         auth = (Config.CORE_USERNAME, Config.CORE_PASSWORD) if with_auth else None
     if auth is not None:
-        auth = aiohttp.BasicAuth(login=auth[0], password=auth[1], encoding='utf-8') 
+        auth = aiohttp.BasicAuth(login=auth[0], password=auth[1], encoding='utf-8')
     if operation is not None:
         operation = json.dumps(operation.model_dump())
 
