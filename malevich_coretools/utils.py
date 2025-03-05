@@ -3553,6 +3553,87 @@ def get_last_failed_runs(
     return f.get_runsInfo_last_failed_operation_ids(count, auth=auth, conn_url=conn_url)
 
 
+# WSApp
+
+
+def get_ws_apps(
+    only_active: bool = False,
+    full: bool = False,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> Union[ResultIds, WSApps]:
+    """return list ids or list ws apps structure"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getWSApps", vars={"onlyActive": only_active, "full": full}, result_model=WSApps if full else ResultIds)
+    return f.get_ws_apps(only_active, full, auth=auth, conn_url=conn_url)
+
+
+def get_ws_app(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> WSApp:
+    """return ws app struct by `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getWSAppById", vars={"id": id}, result_model=WSApp)
+    return f.get_ws_apps_id(id, auth=auth, conn_url=conn_url)
+
+
+def create_ws_app(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> WSApp:
+    """save ws app, return ws app struct"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("postWSApp")
+    return f.post_ws_apps(wait=wait, auth=auth, conn_url=conn_url)
+
+
+def delete_ws_app(
+    id: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> Alias.Info:
+    """delete ws app by `id` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteWSAppById", vars={"id": id})
+    return f.delete_ws_apps_id(id, wait=wait, auth=auth, conn_url=conn_url)
+
+
+def delete_ws_apps(
+    only_not_active: bool = False,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+) -> Alias.Info:
+    """delete all ws apps (only not active if `only_not_active`)"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteWSApps", vars={"onlyNotActive": only_not_active})
+    return f.delete_ws_apps(only_not_active, wait=wait, auth=auth, conn_url=conn_url)
+
+
 # kafka
 
 

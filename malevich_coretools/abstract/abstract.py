@@ -617,3 +617,14 @@ class UserAnalytics(BaseModel):
 
 class UserAnalyticsBatch(BaseModel):
     data: List[UserAnalytics]
+
+
+class WSApp(BaseModel):
+    id: Alias.Id
+    secret: str
+    active: bool
+    dm: str
+
+
+class WSApps(BaseModel):
+    data: List[WSApp]

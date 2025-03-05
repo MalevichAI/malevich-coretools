@@ -210,6 +210,12 @@ RUNS_INFO_MAIN = f"{API_VERSION}/runsInfo"
 RUNS_INFO_LAST = lambda count: with_key_values(f"{RUNS_INFO_MAIN}/lastOperationsIds", {"count": count})
 RUNS_INFO_LAST_FAILED = lambda count: with_key_values(f"{RUNS_INFO_MAIN}/lastFailedOperationsIds", {"count": count})
 
+## WSAppsController
+WS_APPS_MAIN = f"{API_VERSION}/ws/apps"
+WS_APPS = lambda only_active, full: with_key_values(f"{WS_APPS_MAIN}/", {"onlyActive": only_active, "full": full})
+WS_APPS_ = lambda only_not_active, wait: with_key_values(f"{WS_APPS_MAIN}/", {"onlyNotActive": only_not_active, "wait": wait})
+WS_APPS_ID = lambda id, wait: with_wait(f"{WS_APPS_MAIN}/{id}", wait)
+
 ### Kafka
 KAFKA_SEND = f"{MANAGER_MAIN}/kafkaMsg"
 

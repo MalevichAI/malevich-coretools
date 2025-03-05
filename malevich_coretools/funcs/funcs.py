@@ -824,6 +824,26 @@ def get_runsInfo_last_failed_operation_ids(count: int, *args, **kwargs) -> Resul
     return model_from_json(send_to_core_get(RUNS_INFO_LAST_FAILED(count), *args, **kwargs), ResultIds)
 
 
+def get_ws_apps(only_active: bool = False, full: bool = False, *args, **kwargs) -> Union[ResultIds, WSApps]:
+    return model_from_json(send_to_core_get(WS_APPS(only_active, full), *args, **kwargs), WSApps if full else ResultIds)
+
+
+def get_ws_apps_id(id: str, *args, **kwargs) -> WSApp:
+    return model_from_json(send_to_core_get(WS_APPS_ID(id, None), *args, **kwargs), WSApp)
+
+
+def post_ws_apps(wait: bool, *args, **kwargs) -> WSApp:
+    return model_from_json(send_to_core_modify(WS_APPS_(None, wait), *args, **kwargs), WSApp)
+
+
+def delete_ws_apps_id(id: str, wait: bool, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify(WS_APPS_ID(id, wait), *args, **kwargs)
+
+
+def delete_ws_apps(only_not_active: bool, wait: bool, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify(WS_APPS_(only_not_active, wait), *args, **kwargs)
+
+
 async def kafka_send(data: KafkaMsg, *args, **kwargs) -> Union[Alias.Info, KafkaMsg]:
     result = await send_to_core_post_async(KAFKA_SEND, data, *args, **kwargs)
     try:
