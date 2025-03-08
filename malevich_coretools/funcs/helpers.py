@@ -23,7 +23,9 @@ from malevich_coretools.batch import Batcher
 from malevich_coretools.funcs.checks import check_profile_mode
 from malevich_coretools.funcs.funcs import (
     post_collections_data,
+    post_collections_data_async,
     post_collections_data_id,
+    post_collections_data_id_async,
 )
 from malevich_coretools.secondary import Config, to_json
 
@@ -98,6 +100,7 @@ def create_collection_from_df(
     name: Optional[str],
     metadata: Optional[Union[Dict[str, Any], str]],
     batcher: Optional[Batcher] = None,
+    is_async: bool = False,
     *args,
     **kwargs
 ) -> Alias.Id:
@@ -106,6 +109,8 @@ def create_collection_from_df(
     data = raw_collection_from_df(data, name, metadata)
     if batcher is not None:
         return batcher.add("postCollectionByDocs", data=data)
+    if is_async:
+        return post_collections_data_async(data, *args, **kwargs)
     return post_collections_data(data, *args, **kwargs)
 
 
@@ -115,6 +120,7 @@ def update_collection_from_df(
     name: Optional[str],
     metadata: Optional[Union[Dict[str, Any], str]],
     batcher: Optional[Batcher] = None,
+    is_async: bool = False,
     *args,
     **kwargs
 ) -> Alias.Id:
@@ -123,6 +129,8 @@ def update_collection_from_df(
     data = raw_collection_from_df(data, name, metadata)
     if batcher is not None:
         return batcher.add("postCollectionByDocsAndId", data=data, vars={"id": id})
+    if is_async:
+        return post_collections_data_id_async(id, data, *args, **kwargs)
     return post_collections_data_id(id, data, *args, **kwargs)
 
 
