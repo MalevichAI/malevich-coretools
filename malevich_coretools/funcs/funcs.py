@@ -1107,11 +1107,11 @@ async def post_admin_update_superuser_async(data: Superuser, *args, **kwargs) ->
 
 
 def delete_admin_runs(data: AdminStopOperation, *args, **kwargs) -> Alias.Json:
-    return send_to_core_modify(ADMIN_RUNS, data, is_post=False, *args, **kwargs)
+    return send_to_core_modify(ADMIN_RUNS, data, *args, **kwargs, is_post=False)
 
 
 async def delete_admin_runs_async(data: AdminStopOperation, *args, **kwargs) -> Alias.Json:
-    return await send_to_core_modify_async(ADMIN_RUNS, data, is_post=False, *args, **kwargs)
+    return await send_to_core_modify_async(ADMIN_RUNS, data, *args, **kwargs, is_post=False)
 
 # ManagerController
 
@@ -1473,19 +1473,85 @@ async def post_ws_apps_async(wait: bool, *args, **kwargs) -> WSApp:
 
 
 def delete_ws_apps_id(id: str, wait: bool, *args, **kwargs) -> Alias.Info:
-    return send_to_core_modify(WS_APPS_ID(id, wait), *args, **kwargs)
+    return send_to_core_modify(WS_APPS_ID(id, wait), *args, **kwargs, is_post=False)
 
 
 async def delete_ws_apps_id_async(id: str, wait: bool, *args, **kwargs) -> Alias.Info:
-    return await send_to_core_modify_async(WS_APPS_ID(id, wait), *args, **kwargs)
+    return await send_to_core_modify_async(WS_APPS_ID(id, wait), *args, **kwargs, is_post=False)
 
 
 def delete_ws_apps(only_not_active: bool, wait: bool, *args, **kwargs) -> Alias.Info:
-    return send_to_core_modify(WS_APPS_(only_not_active, wait), *args, **kwargs)
+    return send_to_core_modify(WS_APPS_(only_not_active, wait), *args, **kwargs, is_post=False)
 
 
 async def delete_ws_apps_async(only_not_active: bool, wait: bool, *args, **kwargs) -> Alias.Info:
-    return await send_to_core_modify_async(WS_APPS_(only_not_active, wait), *args, **kwargs)
+    return await send_to_core_modify_async(WS_APPS_(only_not_active, wait), *args, **kwargs, is_post=False)
+
+
+def get_mcp_tools(*args, **kwargs) -> List[MCPTool]:
+    return model_from_json(send_to_core_get(MCP_TOOLS_ALL(None), *args, **kwargs), MCPTool, is_list=True)
+
+
+async def get_mcp_tools_async(*args, **kwargs) -> List[MCPTool]:
+    return model_from_json(await send_to_core_get_async(MCP_TOOLS_ALL(None), *args, **kwargs), MCPTool, is_list=True)
+
+
+def get_mcp_tools_list(*args, **kwargs) -> List[MCPToolSimple]:
+    return model_from_json(send_to_core_get(MCP_TOOLS_LIST, *args, **kwargs), MCPToolSimple, is_list=True)
+
+
+async def get_mcp_tools_list_async(*args, **kwargs) -> List[MCPToolSimple]:
+    return model_from_json(await send_to_core_get_async(MCP_TOOLS_LIST, *args, **kwargs), MCPToolSimple, is_list=True)
+
+
+def get_mcp_tool_id_name(id: Optional[str], name: Optional[str], *args, **kwargs) -> MCPTool:
+    return model_from_json(send_to_core_get(MCP_TOOLS(id, name, None), *args, **kwargs), MCPTool)
+
+
+async def get_mcp_tool_id_name_async(id: Optional[str], name: Optional[str], *args, **kwargs) -> MCPTool:
+    return model_from_json(await send_to_core_get_async(MCP_TOOLS(id, name, None), *args, **kwargs), MCPTool)
+
+
+def post_mcp_tool(data, wait: bool, *args, **kwargs) -> Alias.Id:
+    return send_to_core_modify(MCP_TOOLS(None, None, wait), data, *args, **kwargs)
+
+
+async def post_mcp_tool_async(data, wait: bool, *args, **kwargs) -> Alias.Id:
+    return await send_to_core_modify_async(MCP_TOOLS(None, None, wait), data, *args, **kwargs)
+
+
+def call_mcp_tool(data: MCPToolCall, with_show: bool, *args, **kwargs) -> Union[AppLogsWithResults, Any]:
+    res = send_to_core_modify(MCP_TOOLS_CALL, data, with_show=with_show, show_func=show_logs_func, *args, **kwargs)
+    try:
+        res = AppLogsWithResults.model_validate_json(res)
+    except BaseException:
+        pass
+    return res
+
+
+async def call_mcp_tool_async(data: MCPToolCall, with_show: bool, *args, **kwargs) -> Union[AppLogsWithResults, Any]:
+    res = await send_to_core_modify_async(MCP_TOOLS_CALL, data, with_show=with_show, show_func=show_logs_func, *args, **kwargs)
+    try:
+        res = AppLogsWithResults.model_validate_json(res)
+    except BaseException:
+        pass
+    return res
+
+
+def delete_mcp_tool_id_name(id: str, name: str, wait: bool, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify(MCP_TOOLS(id, name, wait), *args, **kwargs, is_post=False)
+
+
+async def delete_mcp_tool_id_name_async(id: str, name: str, wait: bool, *args, **kwargs) -> Alias.Info:
+    return await send_to_core_modify_async(MCP_TOOLS(id, name, wait), *args, **kwargs, is_post=False)
+
+
+def delete_mcp_tools(wait: bool, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify(MCP_TOOLS_ALL(wait), *args, **kwargs, is_post=False)
+
+
+async def delete_mcp_tools_async(wait: bool, *args, **kwargs) -> Alias.Info:
+    return await send_to_core_modify_async(MCP_TOOLS_ALL(wait), *args, **kwargs, is_post=False)
 
 
 async def kafka_send(data: KafkaMsg, *args, **kwargs) -> Union[Alias.Info, KafkaMsg]:

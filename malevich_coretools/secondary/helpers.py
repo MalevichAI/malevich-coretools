@@ -35,11 +35,17 @@ def to_json(data: Union[Dict[str, Any], Alias.Json], condition_and_msg: Tuple[Ca
     return res
 
 
-def model_from_json(data: Union[Dict[str, Any], Alias.Json], model: BaseModel):  # noqa: ANN201
+def model_from_json(data: Union[Dict[str, Any], Alias.Json], model: BaseModel, is_list: Optional[bool] = False):  # noqa: ANN201
     if isinstance(data, Alias.Json):
         data = json.loads(data)
-    assert isinstance(data, dict), data
-    return model.parse_obj(data)
+    if is_list is None:
+        is_list = isinstance(data, list)
+    if is_list:
+        assert isinstance(data, list), data
+        return [model.model_validate(item) for item in data]
+    else:
+        assert isinstance(data, dict), data
+        return model.model_validate(data)
 
 
 def rand_str(size: int = 10, chars=string.ascii_letters) -> str:

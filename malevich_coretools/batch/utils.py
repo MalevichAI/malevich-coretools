@@ -80,7 +80,7 @@ class DefferOperationInternal(str):
         if self.__result_model is not None and self.__code < 400:   # ok
             try:
                 from malevich_coretools.secondary import model_from_json
-                self.__data = model_from_json(res, self.__result_model)
+                self.__data = model_from_json(res, self.__result_model, is_list=None)
             except BaseException:
                 Config.logger.error(f"parse {self.__alias} failed, model={self.__result_model.__name__}")
                 self.__data = res

@@ -4225,6 +4225,156 @@ def delete_ws_apps(
     return f.delete_ws_apps(only_not_active, wait=wait, auth=auth, conn_url=conn_url)
 
 
+# MCP Tools
+
+
+def get_mcp_tools(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: bool = False,
+) -> List[MCPTool]:
+    """return list of mcp tools"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getMcpTools", result_model=MCPTool) # list of it
+    if is_async:
+        return f.get_mcp_tools_async(auth=auth, conn_url=conn_url)
+    return f.get_mcp_tools(auth=auth, conn_url=conn_url)
+
+
+def get_mcp_tools_list(
+    *,
+    with_auth: bool = True,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: bool = False,
+) -> List[MCPToolSimple]:
+    """return list of mcp tools (simple)"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getMcpToolsSimple", result_model=MCPToolSimple) # list of it
+    if is_async:
+        return f.get_mcp_tools_list_async(with_auth=with_auth, auth=auth, conn_url=conn_url)
+    return f.get_mcp_tools_list(with_auth=with_auth, auth=auth, conn_url=conn_url)
+
+
+def get_mcp_tool(
+    id: Optional[str] = None,
+    name: Optional[str] = None,
+    *,
+    with_auth: bool = True,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: bool = False,
+) -> Union[MCPToolSimple, MCPTool]:
+    """return mcp tool struct by `id` or `name` """
+    assert id is not None or name is not None, "id or name should be set"
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getMcpToolByIdOrName", vars={"id": id, "name": name}, result_model=MCPTool)
+    if is_async:
+        return f.get_mcp_tool_id_name_async(id, name, with_auth=with_auth, auth=auth, conn_url=conn_url)
+    return f.get_mcp_tool_id_name(id, name, with_auth=with_auth, auth=auth, conn_url=conn_url)
+
+
+def post_mcp_tool(
+    name: str,
+    description: Optional[str] = None,
+    input_schema: Optional[Dict[str, Any]] = None,
+    task_id: Optional[str] = None,
+    pipeline_id: Optional[str] = None,
+    cfg_id: Optional[str] = None,
+    run_settings: Optional[RunSettings] = None,
+    enable_not_auth: Optional[str] = None,
+    id: Optional[str] = None,   # set it on update
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: bool = False,
+) -> Alias.Id:
+    """create mcp tool, return id"""
+    assert task_id is None or pipeline_id is None, "mcp tool should be defined in one way"
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = MCPTool(name=name, description=description, inputSchema=input_schema, id=id, taskId=task_id,
+                   pipelineId=pipeline_id, cfgId=cfg_id, runSettings=run_settings, enableNotAuthorized=enable_not_auth)
+    if batcher is not None:
+        return batcher.add("postMcpTool", data=data)
+    if is_async:
+        return f.post_mcp_tool_async(data, wait=wait, auth=auth, conn_url=conn_url)
+    return f.post_mcp_tool(data, wait=wait, auth=auth, conn_url=conn_url)
+
+
+def call_mcp_tool(
+    name: str,
+    arguments: Dict[str, Any],
+    with_show: bool = True,
+    *,
+    with_auth: bool = True,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: bool = False,
+) -> Union[AppLogsWithResults, Any]:
+    """run by mcp tool"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = MCPToolCall(name=name, arguments=arguments)
+    if batcher is not None:
+        return batcher.add("postMcpToolCall", data=data, result_model=AppLogsWithResults)
+    if is_async:
+        return f.call_mcp_tool_async(data, with_show=with_show, with_auth=with_auth, auth=auth, conn_url=conn_url)
+    return f.call_mcp_tool(data, with_show=with_show, with_auth=with_auth, auth=auth, conn_url=conn_url)
+
+
+def delete_mcp_tool(
+    id: Optional[str] = None,
+    name: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: bool = False,
+) -> Alias.Info:
+    """delete mcp tool by `id` or `name` """
+    assert id is not None or name is not None, "id or name should be set"
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteMcpTool", vars={"id": id, "name": name})
+    if is_async:
+        return f.delete_mcp_tool_id_name_async(id, name, wait=wait, auth=auth, conn_url=conn_url)
+    return f.delete_mcp_tool_id_name(id, name, wait=wait, auth=auth, conn_url=conn_url)
+
+
+def delete_mcp_tools(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: bool = False,
+) -> Alias.Info:
+    """delete all mcp tools"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteMcpTools")
+    if is_async:
+        return f.delete_mcp_tools_async(wait=wait, auth=auth, conn_url=conn_url)
+    return f.delete_mcp_tools(wait=wait, auth=auth, conn_url=conn_url)
+
+
 # kafka
 
 

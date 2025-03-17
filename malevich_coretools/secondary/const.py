@@ -30,6 +30,8 @@ def with_key_values(url: str, key_values: Dict[str, Optional[str]]) -> str:
                 value = urllib.parse.quote(str(value), safe='')
             elif isinstance(value, str):
                 value = urllib.parse.quote(value, safe='')
+            elif isinstance(value, bool):
+                value = bool_to_str(value)
             url = f"{url}{sep}{key}={value}"
             if sep == "?":
                 sep = "&"
@@ -215,6 +217,13 @@ WS_APPS_MAIN = f"{API_VERSION}/ws/apps"
 WS_APPS = lambda only_active, full: with_key_values(f"{WS_APPS_MAIN}/", {"onlyActive": only_active, "full": full})
 WS_APPS_ = lambda only_not_active, wait: with_key_values(f"{WS_APPS_MAIN}/", {"onlyNotActive": only_not_active, "wait": wait})
 WS_APPS_ID = lambda id, wait: with_wait(f"{WS_APPS_MAIN}/{id}", wait)
+
+## McpToolController
+MCP_TOOLS_MAIN = f"{API_VERSION}/tools"
+MCP_TOOLS = lambda id, name, wait: with_key_values(f"{MCP_TOOLS_MAIN}/", {"id": id, "name": name, "wait": wait})
+MCP_TOOLS_ALL = lambda wait: with_wait(f"{MCP_TOOLS_MAIN}/all", wait)
+MCP_TOOLS_LIST = f"{MCP_TOOLS_MAIN}/list"
+MCP_TOOLS_CALL = f"{MCP_TOOLS_MAIN}/call"
 
 ### Kafka
 KAFKA_SEND = f"{MANAGER_MAIN}/kafkaMsg"

@@ -628,3 +628,23 @@ class WSApp(BaseModel):
 
 class WSApps(BaseModel):
     data: List[WSApp]
+
+
+class MCPToolSimple(BaseModel):
+    name: Optional[str]     # can be None on updates
+    description: Optional[str] = None
+    inputSchema: Optional[Dict[str, Any]] = None
+
+
+class MCPTool(MCPToolSimple):
+    id: Optional[str] = None    # None if create, id otherwise
+    taskId: Optional[str] = None
+    pipelineId: Optional[str] = None
+    cfgId: Optional[str] = None
+    runSettings: Optional[RunSettings] = None
+    enableNotAuthorized: Optional[bool] = False
+
+
+class MCPToolCall(BaseModel):
+    name: str
+    arguments: Dict[str, Any]
