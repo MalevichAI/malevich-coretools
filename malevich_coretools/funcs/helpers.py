@@ -332,6 +332,7 @@ def base_settings(
     cpu_limit: Optional[int] = None,
     storage_request: Optional[int] = None,
     storage_limit: Optional[int] = None,
+    kubeconfig: Optional[str] = None,
 ) -> str:
     return BasePlatformSettings(
         memoryRequest=memory_request,
@@ -340,4 +341,5 @@ def base_settings(
         cpuLimit=cpu_limit,
         storageRequest=storage_request,
         storageLimit=storage_limit,
+        kubeconfig=kubeconfig,
     ).model_dump_json()

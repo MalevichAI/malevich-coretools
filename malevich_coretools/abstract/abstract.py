@@ -589,6 +589,7 @@ class BasePlatformSettings(BaseModel):
     cpuLimit: Optional[int] = None
     storageRequest: Optional[int] = None
     storageLimit: Optional[int] = None
+    kubeconfig: Optional[str] = None
 
 
 class Limits(BasePlatformSettings):
