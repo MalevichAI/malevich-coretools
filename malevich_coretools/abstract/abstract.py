@@ -154,9 +154,16 @@ class TaskPolicy(BaseModel):
 
 
 class Schedule(BaseModel):
-    delay: int                      # seconds
-    startAfter: int = 0             # seconds
-    count: Optional[int] = None     # iters
+    delay: Optional[int] = None         # seconds
+    startAfter: Optional[int] = None    # seconds
+    count: Optional[int] = None         # iters
+    cron: Optional[str] = None
+
+    def validate(self) -> None:
+        if self.cron is None:
+            assert self.delay is not None, "cron or delay should set"
+        else:
+            assert self.delay is None and self.startAfter is None and self.count is None, "should set cron or other"
 
 
 class Schedules(BaseModel):

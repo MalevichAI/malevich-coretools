@@ -3188,6 +3188,8 @@ def task_full(
         restrictions: (Optional[Restrictions]): permissions to handle deployment
         wait (bool): is it worth waiting for the result or immediately return `operation_id`
         auth (Optional[AUTH]): redefined auth if not None"""
+    if schedule is not None:
+        schedule.validate()
     if batcher is None:
         batcher = Config.BATCHER
     if scaleInfo is None:
@@ -3393,6 +3395,8 @@ def task_run(
         schedule: (Optional[Schedule]): schedule task runs settings - return scheduleId instead of operationId
         wait (bool): is it worth waiting for the result or immediately return `operation_id`
         auth (Optional[AUTH]): redefined auth if not None"""
+    if schedule is not None:
+        schedule.validate()
     if batcher is None:
         batcher = Config.BATCHER
     if run_id is None:
@@ -3458,6 +3462,8 @@ def pipeline_full(
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
 ) -> Union[Alias.Id, AppLogs]:
+    if schedule is not None:
+        schedule.validate()
     if batcher is None:
         batcher = Config.BATCHER
     if scaleInfo is None:
