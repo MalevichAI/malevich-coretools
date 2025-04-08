@@ -196,11 +196,13 @@ class MainTask(BaseModel):
     profileMode: Optional[str] = None
     withLogs: bool = False  # use only in prepare
     saveFails: bool = True
+    scaleCount: int = 1
     scaleInfo: List[ScaleInfo]
     component: TaskComponent
     policy: TaskPolicy
     schedule: Optional[Schedule] = None
     restrictions: Optional[Restrictions] = Restrictions()
+    tags: Optional[Dict[str, str]] = None
 
 
 class MainPipeline(BaseModel):
@@ -225,6 +227,8 @@ class MainPipeline(BaseModel):
     run: bool = True
     synthetic: bool = False
     saveFails: bool = True
+    scaleCount: int = 1
+    tags: Optional[Dict[str, str]] = None
 
 
 class RunTask(Operation):
@@ -324,6 +328,10 @@ class ResultUserCfg(BaseModel):
     data: Alias.Json
     cfgId: Alias.Id
     id: Alias.Id
+
+
+class ResultTags(BaseModel):
+    idToTags: Dict[str, Optional[Dict[str, str]]]
 
 
 # TODO add smth from Cfg
@@ -427,6 +435,7 @@ class FunctionInfo(BaseModel):
     arguments: List[Tuple[str, Optional[str]]]
     finishMsg: Optional[str] = None
     doc: Optional[str] = None
+    tags: Optional[Dict[str, str]] = None
 
 
 class InputFunctionInfo(FunctionInfo):
@@ -455,6 +464,7 @@ class InitInfo(BaseModel):
     prepare: bool
     argname: Optional[str] = None
     doc: Optional[str] = None
+    tags: Optional[Dict[str, str]] = None
 
 
 class AppFunctionsInfo(BaseModel):
@@ -656,3 +666,8 @@ class MCPTool(MCPToolSimple):
 class MCPToolCall(BaseModel):
     name: str
     arguments: Dict[str, Any]
+
+
+class RunsFilter(BaseModel):
+    data: Optional[Dict[str, str]] = None
+    withTags: bool = False

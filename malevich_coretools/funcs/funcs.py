@@ -1056,6 +1056,14 @@ async def get_run_activeRuns_async(*args, **kwargs) -> ResultIds:
     return model_from_json(await send_to_core_get_async(TEMP_RUN_ACTIVE_RUNS, *args, **kwargs), ResultIds)
 
 
+def post_run_activeRuns(data: RunsFilter, *args, **kwargs) -> Union[ResultIds, ResultTags]:
+    return model_from_json(send_to_core_modify(TEMP_RUN_ACTIVE_RUNS, data, *args, **kwargs), ResultTags if data.withTags else ResultIds)
+
+
+async def post_run_activeRuns_async(data: RunsFilter, *args, **kwargs) -> Union[ResultIds, ResultTags]:
+    return model_from_json(await send_to_core_modify_async(TEMP_RUN_ACTIVE_RUNS, data, *args, **kwargs), ResultTags if data.withTags else ResultIds)
+
+
 def get_run_mainTaskCfg(id: str, *args, **kwargs) -> MainTaskCfg:
     return model_from_json(send_to_core_get(TEMP_RUN_MAIN_TASK_CFG(id), *args, **kwargs), MainTaskCfg)
 

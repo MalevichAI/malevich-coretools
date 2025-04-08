@@ -2846,20 +2846,30 @@ def get_run_condition(
 
 
 def get_run_active_runs(
+    tags: Optional[Dict[str, str]] = None,
+    with_tags: bool = False,
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultIds:
-    """return list running operationIds"""
+) -> Union[ResultIds, ResultTags]:
+    """return list running operationIds, filter by tags if set, return id -> tags if with_tags"""
     if batcher is None:
         batcher = Config.BATCHER
-    if batcher is not None:
-        return batcher.add("getActiveRuns", result_model=ResultIds)
-    if is_async:
-        return f.get_run_activeRuns_async(auth=auth, conn_url=conn_url)
-    return f.get_run_activeRuns(auth=auth, conn_url=conn_url)
+    if tags is not None or with_tags:
+        data = RunsFilter(data=tags, withTags=with_tags)
+        if batcher is not None:
+            return batcher.add("postActiveRuns", data=data, result_model=ResultTags if with_tags else ResultIds)
+        if is_async:
+            return f.post_run_activeRuns_async(data, auth=auth, conn_url=conn_url)
+        return f.post_run_activeRuns(data, auth=auth, conn_url=conn_url)
+    else:
+        if batcher is not None:
+            return batcher.add("getActiveRuns", result_model=ResultIds)
+        if is_async:
+            return f.get_run_activeRuns_async(auth=auth, conn_url=conn_url)
+        return f.get_run_activeRuns(auth=auth, conn_url=conn_url)
 
 
 def get_run_main_task_cfg(
@@ -3161,6 +3171,7 @@ def task_full(
     policy: TaskPolicy = None,
     schedule: Optional[Schedule] = None,
     restrictions: Optional[Restrictions] = None,
+    tags: Optional[Dict[str, str]] = None,
     wait: bool = True,
     *,
     auth: Optional[AUTH] = None,
@@ -3219,6 +3230,7 @@ def task_full(
         policy=policy,
         schedule=schedule,
         restrictions=restrictions,
+        tags=tags,
     )
     if batcher is not None:
         return batcher.add("sendTask", data=data, result_model=AppLogs)
@@ -3265,6 +3277,7 @@ def task_prepare(
     component: TaskComponent = None,
     policy: TaskPolicy = None,
     restrictions: Optional[Restrictions] = None,
+    tags: Optional[Dict[str, str]] = None,
     wait: bool = True,
     *,
     auth: Optional[AUTH] = None,
@@ -3334,6 +3347,7 @@ def task_prepare(
         component=component,
         policy=policy,
         restrictions=restrictions,
+        tags=tags,
     )
     if batcher is not None:
         return batcher.add("sendTask", data=data, result_model=AppLogs)
@@ -3451,6 +3465,7 @@ def pipeline_full(
     restrictions: Optional[Restrictions] = None,
     scaleInfo: List[ScaleInfo] = None,
     save_fails: bool = True,
+    tags: Optional[Dict[str, str]] = None,
     with_show: bool = True,
     long: bool = False,
     long_timeout: Optional[int] = WAIT_RESULT_TIMEOUT,
@@ -3495,6 +3510,8 @@ def pipeline_full(
         kafkaModeUrl=None,
         run=True,
         saveFails=save_fails,
+        scaleCount=1,
+        tags=tags,
     )
     if batcher is not None:
         return batcher.add("sendPipeline", data=data, result_model=AppLogs)
@@ -3541,6 +3558,8 @@ def pipeline_prepare(
     kafka_mode_url_response: Optional[str] = None,
     synthetic: bool = False,
     save_fails: bool = True,
+    scale_count: int = 1,
+    tags: Optional[Dict[str, str]] = None,
     with_show: bool = True,
     long: bool = False,
     long_timeout: Optional[int] = WAIT_RESULT_TIMEOUT,
@@ -3583,6 +3602,8 @@ def pipeline_prepare(
         run=False,
         synthetic=synthetic,
         saveFails=save_fails,
+        scaleCount=scale_count,
+        tags=tags,
     )
     if batcher is not None:
         return batcher.add("sendPipeline", data=data, result_model=AppLogs)
