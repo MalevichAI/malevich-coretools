@@ -435,6 +435,7 @@ class FunctionInfo(BaseModel):
     arguments: List[Tuple[str, Optional[str]]]
     finishMsg: Optional[str] = None
     doc: Optional[str] = None
+    cpuBound: bool
     tags: Optional[Dict[str, str]] = None
 
 
@@ -446,6 +447,7 @@ class InputFunctionInfo(FunctionInfo):
 
 
 class ProcessorFunctionInfo(FunctionInfo):
+    isStream: bool
     contextClass: Optional[Dict[str, Any]] = None   # model_json_schema
 
 
@@ -464,6 +466,7 @@ class InitInfo(BaseModel):
     prepare: bool
     argname: Optional[str] = None
     doc: Optional[str] = None
+    cpuBound: bool
     tags: Optional[Dict[str, str]] = None
 
 
