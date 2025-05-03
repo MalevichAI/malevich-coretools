@@ -98,6 +98,7 @@ class User(BaseModel):
 
 class JsonImage(BaseModel):
     ref: str
+    tag: str = ""
     user: Optional[str] = None
     token: Optional[str] = None
 
