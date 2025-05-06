@@ -2432,6 +2432,42 @@ def get_pipeline_real(
     return f.get_userPipelines_realId(id, auth=auth, conn_url=conn_url)
 
 
+def search_pipeline_by_image_tag(
+    tag: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: bool = False,
+) -> ResultIds:
+    """return pipelines ids by `tag`"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getPipelinesByTag", vars={"tag": tag}, result_model=ResultIds)
+    if is_async:
+        return f.get_userPipelines_tagSearch_async(tag, auth=auth, conn_url=conn_url)
+    return f.get_userPipelines_tagSearch(tag, auth=auth, conn_url=conn_url)
+
+
+def search_pipeline_by_image_tag_real(
+    tag: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: bool = False,
+) -> ResultIds:
+    """return real pipelines ids by `tag`"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getPipelinesByTagReal", vars={"tag": tag}, result_model=ResultIds)
+    if is_async:
+        return f.get_userPipelines_realIds_tagSearch_async(tag, auth=auth, conn_url=conn_url)
+    return f.get_userPipelines_realIds_tagSearch(tag, auth=auth, conn_url=conn_url)
+
+
 def create_pipeline(
     pipeline_id: str,
     processors: Dict[str, Processor] = None,

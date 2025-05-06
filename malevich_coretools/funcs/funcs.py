@@ -890,6 +890,22 @@ async def get_userPipelines_realId_async(id: str, *args, **kwargs) -> Pipeline:
     return model_from_json(await send_to_core_get_async(USER_PIPELINES_REAL_ID(id), *args, **kwargs), Pipeline).simplify()
 
 
+def get_userPipelines_tagSearch(tag: str, *args, **kwargs) -> ResultIds:
+    return model_from_json(send_to_core_get(USER_PIPELINES_TAG(tag), *args, **kwargs), ResultIds)
+
+
+async def get_userPipelines_tagSearch_async(tag: str, *args, **kwargs) -> ResultIds:
+    return model_from_json(await send_to_core_get_async(USER_PIPELINES_TAG(tag), *args, **kwargs), ResultIds)
+
+
+def get_userPipelines_realIds_tagSearch(tag: str, *args, **kwargs) -> ResultIds:
+    return model_from_json(send_to_core_get(USER_PIPELINES_TAG_REAL_IDS(tag), *args, **kwargs), ResultIds)
+
+
+async def get_userPipelines_realIds_tagSearch_async(tag: str, *args, **kwargs) -> ResultIds:
+    return model_from_json(await send_to_core_get_async(USER_PIPELINES_TAG_REAL_IDS(tag), *args, **kwargs), ResultIds)
+
+
 def post_userPipelines(data: UserTask, wait: bool, *args, **kwargs) -> Alias.Id:
     return send_to_core_modify(USER_PIPELINES(wait), data, *args, **kwargs)
 

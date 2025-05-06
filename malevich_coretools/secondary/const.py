@@ -139,6 +139,8 @@ USER_PIPELINES_MAP_IDS = f"{USER_PIPELINES_MAIN}/mapIds"
 USER_PIPELINES_MAP_ID = lambda id: f"{USER_PIPELINES_MAIN}/mapIds/{urllib.parse.quote(str(id), safe='')}"
 USER_PIPELINES_ID = lambda id, wait: with_wait(f"{USER_PIPELINES_MAIN}/{urllib.parse.quote(str(id), safe='')}", wait)
 USER_PIPELINES_REAL_ID = lambda id: f"{USER_PIPELINES_MAIN}/realIds/{urllib.parse.quote(str(id), safe='')}"
+USER_PIPELINES_TAG = lambda tag: f"{USER_PIPELINES_MAIN}/tagSearch/{urllib.parse.quote(str(tag), safe='')}"
+USER_PIPELINES_TAG_REAL_IDS = lambda tag: f"{USER_PIPELINES_MAIN}/realIds/tagSearch/{urllib.parse.quote(str(tag), safe='')}"
 
 ## UserCfgsController
 USER_CFGS_MAIN = f"{API_VERSION}/userCfgs"
