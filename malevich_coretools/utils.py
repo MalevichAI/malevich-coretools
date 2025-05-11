@@ -2,7 +2,7 @@ import json
 import os
 import re
 import subprocess
-from typing import Type, Union
+from typing import Coroutine, Literal, Type, Union, overload
 
 import pandas as pd
 
@@ -119,13 +119,35 @@ def digest_by_image(
 # Docs
 
 
+@overload
+def get_docs(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultIds:
+    pass
+
+
+@overload
+def get_docs(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultIds]:
+    pass
+
+
 def get_docs(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultIds:
+) -> Union[ResultIds, Coroutine[Any, Any, ResultIds]]:
     """return list ids """
     if batcher is None:
         batcher = Config.BATCHER
@@ -136,6 +158,30 @@ def get_docs(
     return f.get_docs(auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_doc(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultDoc:
+    pass
+
+
+@overload
+def get_doc(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultDoc]:
+    pass
+
+
 def get_doc(
     id: str,
     *,
@@ -143,7 +189,7 @@ def get_doc(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultDoc:
+) -> Union[ResultDoc, Coroutine[Any, Any, ResultDoc]]:
     """return doc by `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -154,6 +200,30 @@ def get_doc(
     return f.get_docs_id(id, auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_doc_by_name(
+    name: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultDoc:
+    pass
+
+
+@overload
+def get_doc_by_name(
+    name: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultDoc]:
+    pass
+
+
 def get_doc_by_name(
     name: str,
     *,
@@ -161,7 +231,7 @@ def get_doc_by_name(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultDoc:
+) -> Union[ResultDoc, Coroutine[Any, Any, ResultDoc]]:
     """return doc by `name` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -170,6 +240,34 @@ def get_doc_by_name(
     if is_async:
         return f.get_docs_name_async(name, auth=auth, conn_url=conn_url)
     return f.get_docs_name(name, auth=auth, conn_url=conn_url)
+
+
+@overload
+def create_doc(
+    data: Union[Alias.Json, Dict, Type[BaseModel]],
+    name: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def create_doc(
+    data: Union[Alias.Json, Dict, Type[BaseModel]],
+    name: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
 
 
 def create_doc(
@@ -181,7 +279,7 @@ def create_doc(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """save doc with `data` and `name`, return `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -201,6 +299,36 @@ def create_doc(
     )
 
 
+@overload
+def update_doc(
+    id: str,
+    data: Alias.Json,
+    name: Optional[str],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def update_doc(
+    id: str,
+    data: Alias.Json,
+    name: Optional[str],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
+
+
 def update_doc(
     id: str,
     data: Alias.Json,
@@ -211,7 +339,7 @@ def update_doc(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """update doc by `id`, return `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -227,6 +355,32 @@ def update_doc(
     )
 
 
+@overload
+def delete_doc(
+    id: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_doc(
+    id: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def delete_doc(
     id: str,
     wait: bool = True,
@@ -235,7 +389,7 @@ def delete_doc(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """delete doc by `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -246,6 +400,30 @@ def delete_doc(
     return f.delete_docs_id(id, wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def delete_docs(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_docs(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def delete_docs(
     wait: bool = True,
     *,
@@ -253,7 +431,7 @@ def delete_docs(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """delete all docs"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -267,13 +445,35 @@ def delete_docs(
 # Collections
 
 
+@overload
+def get_collections(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultOwnAndSharedIds:
+    pass
+
+
+@overload
+def get_collections(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultOwnAndSharedIds]:
+    pass
+
+
 def get_collections(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultOwnAndSharedIds:
+) -> Union[ResultOwnAndSharedIds, Coroutine[Any, Any, ResultOwnAndSharedIds]]:
     """return 2 list: own collections ids and shared collections ids"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -282,6 +482,34 @@ def get_collections(
     if is_async:
         return f.get_collections_async(auth=auth, conn_url=conn_url)
     return f.get_collections(auth=auth, conn_url=conn_url)
+
+
+@overload
+def get_collections_by_name(
+    name: str,
+    operation_id: Optional[str] = None,
+    run_id: Optional[str] = None,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultOwnAndSharedIds:
+    pass
+
+
+@overload
+def get_collections_by_name(
+    name: str,
+    operation_id: Optional[str] = None,
+    run_id: Optional[str] = None,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultOwnAndSharedIds]:
+    pass
 
 
 def get_collections_by_name(
@@ -293,7 +521,7 @@ def get_collections_by_name(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultOwnAndSharedIds:
+) -> Union[ResultOwnAndSharedIds, Coroutine[Any, Any, ResultOwnAndSharedIds]]:
     """return 2 list: own collections ids and shared collections ids by `name` and mb also `operation_id` and `run_id` with which it was saved"""
     assert not (
         operation_id is None and run_id is not None
@@ -311,6 +539,38 @@ def get_collections_by_name(
     )
 
 
+@overload
+def get_collection_by_name(
+    name: str,
+    operation_id: Optional[str] = None,
+    run_id: Optional[str] = None,
+    offset: int = 0,
+    limit: int = -1,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultCollection:
+    pass
+
+
+@overload
+def get_collection_by_name(
+    name: str,
+    operation_id: Optional[str] = None,
+    run_id: Optional[str] = None,
+    offset: int = 0,
+    limit: int = -1,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultCollection]:
+    pass
+
+
 def get_collection_by_name(
     name: str,
     operation_id: Optional[str] = None,
@@ -322,7 +582,7 @@ def get_collection_by_name(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultCollection:
+) -> Union[ResultCollection, Coroutine[Any, Any, ResultCollection]]:
     """return collection by `name` and mb also `operation_id` and `run_id` with which it was saved. raise if there are multiple collections, pagination: unlimited - `limit` < 0"""
     assert not (
         operation_id is None and run_id is not None
@@ -340,6 +600,34 @@ def get_collection_by_name(
     )
 
 
+@overload
+def get_collection(
+    id: str,
+    offset: int = 0,
+    limit: int = -1,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultCollection:
+    pass
+
+
+@overload
+def get_collection(
+    id: str,
+    offset: int = 0,
+    limit: int = -1,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultCollection]:
+    pass
+
+
 def get_collection(
     id: str,
     offset: int = 0,
@@ -349,7 +637,7 @@ def get_collection(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultCollection:
+) -> Union[ResultCollection, Coroutine[Any, Any, ResultCollection]]:
     """return collection by `id`, pagination: unlimited - `limit` < 0"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -358,6 +646,34 @@ def get_collection(
     if is_async:
         return f.get_collections_id_async(id, offset, limit, auth=auth, conn_url=conn_url)
     return f.get_collections_id(id, offset, limit, auth=auth, conn_url=conn_url)
+
+
+@overload
+def get_collections_ids_by_group_name(
+    group_name: str,
+    operation_id: str,
+    run_id: Optional[str] = None,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultIds:
+    pass
+
+
+@overload
+def get_collections_ids_by_group_name(
+    group_name: str,
+    operation_id: str,
+    run_id: Optional[str] = None,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultIds]:
+    pass
 
 
 def get_collections_ids_by_group_name(
@@ -369,7 +685,7 @@ def get_collections_ids_by_group_name(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultIds:
+) -> Union[ResultIds, Coroutine[Any, Any, ResultIds]]:
     """return collections ids by `group_name`, `operation_id` and `run_id` with which it was saved"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -384,6 +700,34 @@ def get_collections_ids_by_group_name(
     )
 
 
+@overload
+def get_collections_by_group_name(
+    group_name: str,
+    operation_id: str,
+    run_id: Optional[str] = None,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultCollections:
+    pass
+
+
+@overload
+def get_collections_by_group_name(
+    group_name: str,
+    operation_id: str,
+    run_id: Optional[str] = None,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultCollections]:
+    pass
+
+
 def get_collections_by_group_name(
     group_name: str,
     operation_id: str,
@@ -393,7 +737,7 @@ def get_collections_by_group_name(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultCollections:
+) -> Union[ResultCollections, Coroutine[Any, Any, ResultCollections]]:
     """return collections by `group_name`, `operation_id` and `run_id` with which it was saved"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -408,6 +752,36 @@ def get_collections_by_group_name(
     )
 
 
+@overload
+def create_collection(
+    ids: List[str],
+    name: Optional[str] = None,
+    metadata: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def create_collection(
+    ids: List[str],
+    name: Optional[str] = None,
+    metadata: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
+
+
 def create_collection(
     ids: List[str],
     name: Optional[str] = None,
@@ -418,7 +792,7 @@ def create_collection(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """save collection by list docs `ids`, return id"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -440,6 +814,38 @@ def create_collection(
     )
 
 
+@overload
+def update_collection(
+    id: str,
+    ids: List[str],
+    name: Optional[str] = None,
+    metadata: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def update_collection(
+    id: str,
+    ids: List[str],
+    name: Optional[str] = None,
+    metadata: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
+
+
 def update_collection(
     id: str,
     ids: List[str],
@@ -451,7 +857,7 @@ def update_collection(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """update collection with `id` by list docs `ids`, return `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -475,6 +881,36 @@ def update_collection(
     )
 
 
+@overload
+def s3_put_collection(
+    id: str,
+    is_csv=True,
+    key: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def s3_put_collection(
+    id: str,
+    is_csv=True,
+    key: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def s3_put_collection(
     id: str,
     is_csv=True,
@@ -485,7 +921,7 @@ def s3_put_collection(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """is_csv = false -> save json, key by default = id"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -509,6 +945,36 @@ def s3_put_collection(
     )
 
 
+@overload
+def create_collection_by_docs(
+    docs: List[Alias.Json],
+    name: Optional[str] = None,
+    metadata: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def create_collection_by_docs(
+    docs: List[Alias.Json],
+    name: Optional[str] = None,
+    metadata: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
+
+
 def create_collection_by_docs(
     docs: List[Alias.Json],
     name: Optional[str] = None,
@@ -519,7 +985,7 @@ def create_collection_by_docs(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """save collection by `docs`, return `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -541,6 +1007,38 @@ def create_collection_by_docs(
     )
 
 
+@overload
+def update_collection_by_docs(
+    id: str,
+    docs: List[Alias.Json],
+    name: Optional[str] = None,
+    metadata: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def update_collection_by_docs(
+    id: str,
+    docs: List[Alias.Json],
+    name: Optional[str] = None,
+    metadata: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
+
+
 def update_collection_by_docs(
     id: str,
     docs: List[Alias.Json],
@@ -552,7 +1050,7 @@ def update_collection_by_docs(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """update collection by `id` with `docs`, return `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -576,6 +1074,34 @@ def update_collection_by_docs(
     )
 
 
+@overload
+def add_to_collection(
+    id: str,
+    ids: List[str],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def add_to_collection(
+    id: str,
+    ids: List[str],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def add_to_collection(
     id: str,
     ids: List[str],
@@ -585,7 +1111,7 @@ def add_to_collection(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """add to collection with `id` docs with `ids` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -601,6 +1127,34 @@ def add_to_collection(
     )
 
 
+@overload
+def copy_collection(
+    id: str,
+    full_copy: bool = True,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def copy_collection(
+    id: str,
+    full_copy: bool = True,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
+
+
 def copy_collection(
     id: str,
     full_copy: bool = True,
@@ -610,7 +1164,7 @@ def copy_collection(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """copy collection with `id`, if not `full_copy` docs same as in collection with `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -625,6 +1179,36 @@ def copy_collection(
     )
 
 
+@overload
+def apply_scheme(
+    coll_id: str,
+    scheme_name: str,
+    mode: str = "drop",
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def apply_scheme(
+    coll_id: str,
+    scheme_name: str,
+    mode: str = "drop",
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
+
+
 def apply_scheme(
     coll_id: str,
     scheme_name: str,
@@ -635,7 +1219,7 @@ def apply_scheme(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """apply scheme with `scheme_name` to collection with `coll_id` return new collection with another `coll_id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -659,6 +1243,36 @@ def apply_scheme(
     )
 
 
+@overload
+def fix_scheme(
+    coll_id: str,
+    scheme_name: str,
+    mode="check",
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def fix_scheme(
+    coll_id: str,
+    scheme_name: str,
+    mode="check",
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def fix_scheme(
     coll_id: str,
     scheme_name: str,
@@ -669,7 +1283,7 @@ def fix_scheme(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """optimization to core (not necessary call), sets the schema with `scheme_name` for the collection with `coll_id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -685,6 +1299,32 @@ def fix_scheme(
     )
 
 
+@overload
+def unfix_scheme(
+    coll_id: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def unfix_scheme(
+    coll_id: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def unfix_scheme(
     coll_id: str,
     wait: bool = True,
@@ -693,7 +1333,7 @@ def unfix_scheme(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """unfix scheme for collection with `coll_id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -708,6 +1348,34 @@ def unfix_scheme(
     )
 
 
+@overload
+def update_metadata(
+    coll_id: str,
+    metadata: Optional[str],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def update_metadata(
+    coll_id: str,
+    metadata: Optional[str],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def update_metadata(
     coll_id: str,
     metadata: Optional[str],
@@ -717,7 +1385,7 @@ def update_metadata(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """update `metadata` for collection with `coll_id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -733,6 +1401,30 @@ def update_metadata(
     )
 
 
+@overload
+def delete_collections(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_collections(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def delete_collections(
     wait: bool = True,
     *,
@@ -740,7 +1432,7 @@ def delete_collections(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """delete all collections"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -751,6 +1443,32 @@ def delete_collections(
     return f.delete_collections(wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def delete_collection(
+    id: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_collection(
+    id: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def delete_collection(
     id: str,
     wait: bool = True,
@@ -759,7 +1477,7 @@ def delete_collection(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """delete collection with `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -770,6 +1488,32 @@ def delete_collection(
     return f.delete_collections_id(id, wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def s3_delete_collection(
+    key: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def s3_delete_collection(
+    key: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def s3_delete_collection(
     key: str,
     wait: bool = True,
@@ -778,7 +1522,7 @@ def s3_delete_collection(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """delete collection from s3 by `key` (that =id if not specified in s3_save_collection)"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -787,6 +1531,34 @@ def s3_delete_collection(
     if is_async:
          return f.delete_collections_id_s3_async(key, wait=wait, auth=auth, conn_url=conn_url)
     return f.delete_collections_id_s3(key, wait=wait, auth=auth, conn_url=conn_url)
+
+
+@overload
+def delete_from_collection(
+    id: str,
+    ids: List[str],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_from_collection(
+    id: str,
+    ids: List[str],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
 
 
 def delete_from_collection(
@@ -798,7 +1570,7 @@ def delete_from_collection(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """delete docs with `ids` from collection with `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -817,6 +1589,32 @@ def delete_from_collection(
 # CollectionObjects
 
 
+@overload
+def get_collection_objects(
+    path: Optional[str] = None,
+    recursive: Optional[bool] = None,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> FilesDirs:
+    pass
+
+
+@overload
+def get_collection_objects(
+    path: Optional[str] = None,
+    recursive: Optional[bool] = None,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, FilesDirs]:
+    pass
+
+
 def get_collection_objects(
     path: Optional[str] = None,
     recursive: Optional[bool] = None,
@@ -825,7 +1623,7 @@ def get_collection_objects(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> FilesDirs:
+) -> Union[FilesDirs, Coroutine[Any, Any, FilesDirs]]:
     """return struct with list of paths: directories and files: walk if `recursive` else ls"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -836,6 +1634,30 @@ def get_collection_objects(
     return f.get_collection_objects(path, recursive, auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_collection_object(
+    path: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> bytes:
+    pass
+
+
+@overload
+def get_collection_object(
+    path: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, bytes]:
+    pass
+
+
 def get_collection_object(
     path: str,
     *,
@@ -843,7 +1665,7 @@ def get_collection_object(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> bytes:
+) -> Union[bytes, Coroutine[Any, Any, bytes]]:
     """return collection object bytes by `path`"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -858,6 +1680,36 @@ def get_collection_object(
     )
 
 
+@overload
+def post_collection_object_presigned_url(
+    path: str,
+    expires_in: int,
+    callback_url: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> str:
+    pass
+
+
+@overload
+def post_collection_object_presigned_url(
+    path: str,
+    expires_in: int,
+    callback_url: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, str]:
+    pass
+
+
 def post_collection_object_presigned_url(
     path: str,
     expires_in: int,
@@ -868,7 +1720,7 @@ def post_collection_object_presigned_url(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> str:
+) -> Union[str, Coroutine[Any, Any, str]]:
     """get presigned url to put object with `path`, valid only `expiresIn` seconds, one-time use"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -877,6 +1729,36 @@ def post_collection_object_presigned_url(
     if is_async:
         return f.post_collection_object_presigned_url_async(path, callback_url, expires_in, wait=wait, auth=auth, conn_url=conn_url)
     return f.post_collection_object_presigned_url(path, callback_url, expires_in, wait=wait, auth=auth, conn_url=conn_url)
+
+
+@overload
+def get_collection_object_presigned_url(
+    path: str,
+    expires_in: int,
+    callback_url: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> str:
+    pass
+
+
+@overload
+def get_collection_object_presigned_url(
+    path: str,
+    expires_in: int,
+    callback_url: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, str]:
+    pass
 
 
 def get_collection_object_presigned_url(
@@ -889,7 +1771,7 @@ def get_collection_object_presigned_url(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> str:
+) -> Union[str, Coroutine[Any, Any, str]]:
     """get presigned url to get object with `path`, valid only `expiresIn` seconds, one-time use"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -900,6 +1782,30 @@ def get_collection_object_presigned_url(
     return f.get_collection_object_presigned_url(path, callback_url, expires_in, wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def load_collection_object_presigned(
+    signature: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> bytes:
+    pass
+
+
+@overload
+def load_collection_object_presigned(
+    signature: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, bytes]:
+    pass
+
+
 def load_collection_object_presigned(
     signature: str,
     *,
@@ -907,7 +1813,7 @@ def load_collection_object_presigned(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> bytes:
+) -> Union[bytes, Coroutine[Any, Any, bytes]]:
     """get collection object by presigned `signature`"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -916,6 +1822,36 @@ def load_collection_object_presigned(
     if is_async:
         return f.get_collections_object_presigned_async(signature, auth=auth, conn_url=conn_url)
     return f.get_collections_object_presigned(signature, auth=auth, conn_url=conn_url)
+
+
+@overload
+def update_collection_object(
+    path: str,
+    data: bytes,
+    zip: bool = False,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def update_collection_object(
+    path: str,
+    data: bytes,
+    zip: bool = False,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
 
 
 def update_collection_object(
@@ -928,7 +1864,7 @@ def update_collection_object(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """update collection object with `path` by `data` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -937,6 +1873,34 @@ def update_collection_object(
     if is_async:
         return f.post_collections_object_async(path, data, zip, wait=wait, auth=auth, conn_url=conn_url)
     return f.post_collections_object(path, data, zip, wait=wait, auth=auth, conn_url=conn_url)
+
+
+@overload
+def update_collection_object_presigned(
+    signature: str,
+    data: bytes,
+    zip: bool = False,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def update_collection_object_presigned(
+    signature: str,
+    data: bytes,
+    zip: bool = False,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
 
 
 def update_collection_object_presigned(
@@ -948,7 +1912,7 @@ def update_collection_object_presigned(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """update collection object by `data` with presigned `signature`"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -959,6 +1923,30 @@ def update_collection_object_presigned(
     return f.post_collections_object_presigned(signature, data, zip, auth=auth, conn_url=conn_url)
 
 
+@overload
+def delete_collection_objects(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_collection_objects(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def delete_collection_objects(
     wait: bool = True,
     *,
@@ -966,7 +1954,7 @@ def delete_collection_objects(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """delete all collection objects"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -977,6 +1965,32 @@ def delete_collection_objects(
     return f.delete_collection_objects(wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def delete_collection_object(
+    path: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_collection_object(
+    path: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def delete_collection_object(
     path: str,
     wait: bool = True,
@@ -985,7 +1999,7 @@ def delete_collection_object(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """delete collection object with `path` (or directory with them) """
     if batcher is None:
         batcher = Config.BATCHER
@@ -999,13 +2013,35 @@ def delete_collection_object(
 # Endpoint
 
 
+@overload
+def get_endpoints(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Endpoints:
+    pass
+
+
+@overload
+def get_endpoints(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Endpoints]:
+    pass
+
+
 def get_endpoints(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Endpoints:
+) -> Union[Endpoints, Coroutine[Any, Any, Endpoints]]:
     """get registered endpoints structs"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -1016,6 +2052,30 @@ def get_endpoints(
     return f.get_endpoints(auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_endpoint(
+    hash: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Endpoint:
+    pass
+
+
+@overload
+def get_endpoint(
+    hash: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Endpoint]:
+    pass
+
+
 def get_endpoint(
     hash: str,
     *,
@@ -1023,7 +2083,7 @@ def get_endpoint(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Endpoint:
+) -> Union[Endpoint, Coroutine[Any, Any, Endpoint]]:
     """get endpoint struct by hash"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -1034,6 +2094,30 @@ def get_endpoint(
     return f.get_endpoint_by_hash(hash, auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_run_endpoint(
+    hash: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> EndpointRunInfo:
+    pass
+
+
+@overload
+def get_run_endpoint(
+    hash: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, EndpointRunInfo]:
+    pass
+
+
 def get_run_endpoint(
     hash: str,
     *,
@@ -1041,7 +2125,7 @@ def get_run_endpoint(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> EndpointRunInfo:
+) -> Union[EndpointRunInfo, Coroutine[Any, Any, EndpointRunInfo]]:
     """get info for endpoint"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -1050,6 +2134,36 @@ def get_run_endpoint(
     if is_async:
         return f.get_endpoint_run_async(hash, auth=auth, conn_url=conn_url)
     return f.get_endpoint_run(hash, auth=auth, conn_url=conn_url)
+
+
+@overload
+def run_endpoint(
+    hash: str,
+    endpoint_override: Optional[EndpointOverride] = None,
+    with_show: bool = True,
+    *,
+    with_auth: bool = True,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Union[AppLogsWithResults, FlattenAppLogsWithResults, Any]:
+    pass
+
+
+@overload
+def run_endpoint(
+    hash: str,
+    endpoint_override: Optional[EndpointOverride] = None,
+    with_show: bool = True,
+    *,
+    with_auth: bool = True,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Union[Coroutine[Any, Any, AppLogsWithResults], Coroutine[Any, Any, FlattenAppLogsWithResults], Coroutine[Any, Any, Any]]:
+    pass
 
 
 def run_endpoint(
@@ -1062,7 +2176,7 @@ def run_endpoint(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Union[AppLogsWithResults, FlattenAppLogsWithResults, Any]:
+) -> Union[AppLogsWithResults, FlattenAppLogsWithResults, Any, Coroutine[Any, Any, AppLogsWithResults], Coroutine[Any, Any, FlattenAppLogsWithResults], Coroutine[Any, Any, Any]]:
     """run by endpoint, failed if `taskId`, `cfgId` not set or it is not active"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -1075,6 +2189,50 @@ def run_endpoint(
     if is_async:
         return f.run_endpoint_async(hash, endpoint_override, with_show=with_show, with_auth=with_auth, auth=auth, conn_url=conn_url)
     return f.run_endpoint(hash, endpoint_override, with_show=with_show, with_auth=with_auth, auth=auth, conn_url=conn_url)
+
+
+@overload
+def create_endpoint(
+    task_id: Optional[str] = None,
+    pipeline_id: Optional[str] = None,
+    cfg_id: Optional[str] = None,
+    sla: Optional[str] = None,
+    active: Optional[bool] = None,
+    prepare: Optional[bool] = None,
+    run_settings: Optional[RunSettings] = None,
+    enable_not_auth: Optional[str] = None,
+    expected_colls_with_schemes: Optional[Dict[str, str]] = None,
+    description: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def create_endpoint(
+    task_id: Optional[str] = None,
+    pipeline_id: Optional[str] = None,
+    cfg_id: Optional[str] = None,
+    sla: Optional[str] = None,
+    active: Optional[bool] = None,
+    prepare: Optional[bool] = None,
+    run_settings: Optional[RunSettings] = None,
+    enable_not_auth: Optional[str] = None,
+    expected_colls_with_schemes: Optional[Dict[str, str]] = None,
+    description: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
 
 
 def create_endpoint(
@@ -1094,7 +2252,7 @@ def create_endpoint(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """create endpoint, return hash, url - api/v1/endpoints/run/{hash}. fields may not be initialized - this will only cause an error at startup"""
     assert task_id is None or pipeline_id is None, "endpoint should be defined in one way"
     if batcher is None:
@@ -1106,6 +2264,52 @@ def create_endpoint(
     if is_async:
         return f.create_endpoint_async(data, wait=wait, auth=auth, conn_url=conn_url)
     return f.create_endpoint(data, wait=wait, auth=auth, conn_url=conn_url)
+
+
+@overload
+def update_endpoint(
+    hash: str,
+    task_id: Optional[str] = None,
+    pipeline_id: Optional[str] = None,
+    cfg_id: Optional[str] = None,
+    sla: Optional[str] = None,
+    active: Optional[bool] = None,
+    prepare: Optional[bool] = None,
+    run_settings: Optional[RunSettings] = None,
+    enable_not_auth: Optional[str] = None,
+    expected_colls_with_schemes: Optional[Dict[str, str]] = None,
+    description: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def update_endpoint(
+    hash: str,
+    task_id: Optional[str] = None,
+    pipeline_id: Optional[str] = None,
+    cfg_id: Optional[str] = None,
+    sla: Optional[str] = None,
+    active: Optional[bool] = None,
+    prepare: Optional[bool] = None,
+    run_settings: Optional[RunSettings] = None,
+    enable_not_auth: Optional[str] = None,
+    expected_colls_with_schemes: Optional[Dict[str, str]] = None,
+    description: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
 
 
 def update_endpoint(
@@ -1126,7 +2330,7 @@ def update_endpoint(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """update endpoint, return hash, url - api/v1/endpoints/run/{hash}. update field if it is not None"""
     assert task_id is None or pipeline_id is None, "endpoint should be defined in one way"
     if batcher is None:
@@ -1140,6 +2344,32 @@ def update_endpoint(
     return f.update_endpoint(data, wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def pause_endpoint(
+    hash: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def pause_endpoint(
+    hash: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def pause_endpoint(
     hash: str,
     wait: bool = True,
@@ -1148,7 +2378,7 @@ def pause_endpoint(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     if batcher is None:
         batcher = Config.BATCHER
     if batcher is not None:
@@ -1156,6 +2386,32 @@ def pause_endpoint(
     if is_async:
         return f.pause_endpoint_async(hash, wait=wait, auth=auth, conn_url=conn_url)
     return f.pause_endpoint(hash, wait=wait, auth=auth, conn_url=conn_url)
+
+
+@overload
+def resume_endpoint(
+    hash: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def resume_endpoint(
+    hash: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
 
 
 def resume_endpoint(
@@ -1166,7 +2422,7 @@ def resume_endpoint(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     if batcher is None:
         batcher = Config.BATCHER
     if batcher is not None:
@@ -1176,6 +2432,30 @@ def resume_endpoint(
     return f.resume_endpoint(hash, wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def delete_endpoints(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_endpoints(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def delete_endpoints(
     wait: bool = True,
     *,
@@ -1183,7 +2463,7 @@ def delete_endpoints(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """delete all endpoints"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -1194,6 +2474,32 @@ def delete_endpoints(
     return f.delete_endpoints(wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def delete_endpoint(
+    hash: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_endpoint(
+    hash: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def delete_endpoint(
     hash: str,
     wait: bool = True,
@@ -1202,7 +2508,7 @@ def delete_endpoint(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """delete endpoint with `hash` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -1216,13 +2522,35 @@ def delete_endpoint(
 # Scheme
 
 
+@overload
+def get_schemes(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultOwnAndSharedIds:
+    pass
+
+
+@overload
+def get_schemes(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultOwnAndSharedIds]:
+    pass
+
+
 def get_schemes(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultOwnAndSharedIds:
+) -> Union[ResultOwnAndSharedIds, Coroutine[Any, Any, ResultOwnAndSharedIds]]:
     """return 2 list: own schemes ids and shared schemes ids"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -1233,6 +2561,30 @@ def get_schemes(
     return f.get_schemes(auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_scheme(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultScheme:
+    pass
+
+
+@overload
+def get_scheme(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultScheme]:
+    pass
+
+
 def get_scheme(
     id: str,
     *,
@@ -1240,7 +2592,7 @@ def get_scheme(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultScheme:
+) -> Union[ResultScheme, Coroutine[Any, Any, ResultScheme]]:
     """return scheme by `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -1251,6 +2603,30 @@ def get_scheme(
     return f.get_schemes_id(id, auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_scheme_raw(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Json:
+    pass
+
+
+@overload
+def get_scheme_raw(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Json]:
+    pass
+
+
 def get_scheme_raw(
     id: str,
     *,
@@ -1258,7 +2634,7 @@ def get_scheme_raw(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Json:
+) -> Union[Alias.Json, Coroutine[Any, Any, Alias.Json]]:
     """return raw scheme data by `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -1269,6 +2645,32 @@ def get_scheme_raw(
     return f.get_schemes_id_raw(id, auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_schemes_mapping(
+    scheme_from_id: str,
+    scheme_to_id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultMapping:
+    pass
+
+
+@overload
+def get_schemes_mapping(
+    scheme_from_id: str,
+    scheme_to_id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultMapping]:
+    pass
+
+
 def get_schemes_mapping(
     scheme_from_id: str,
     scheme_to_id: str,
@@ -1277,7 +2679,7 @@ def get_schemes_mapping(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultMapping:
+) -> Union[ResultMapping, Coroutine[Any, Any, ResultMapping]]:
     """return mapping by schemes ids, does not assume if it is not"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -1292,6 +2694,34 @@ def get_schemes_mapping(
     )
 
 
+@overload
+def create_scheme(
+    scheme_data: Union[Dict[str, Any], Alias.Json],
+    name: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def create_scheme(
+    scheme_data: Union[Dict[str, Any], Alias.Json],
+    name: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
+
+
 def create_scheme(
     scheme_data: Union[Dict[str, Any], Alias.Json],
     name: str,
@@ -1301,7 +2731,7 @@ def create_scheme(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """create scheme\n
     `scheme_data` must be json or dict
     return `id` """
@@ -1317,6 +2747,36 @@ def create_scheme(
     return f.post_schemes(data, wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def update_scheme(
+    id: str,
+    scheme_data: Union[Dict[str, Any], Alias.Json],
+    name: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def update_scheme(
+    id: str,
+    scheme_data: Union[Dict[str, Any], Alias.Json],
+    name: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
+
+
 def update_scheme(
     id: str,
     scheme_data: Union[Dict[str, Any], Alias.Json],
@@ -1327,7 +2787,7 @@ def update_scheme(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """update scheme\n
     `scheme_data` must be json or dict
     return `id` """
@@ -1343,6 +2803,36 @@ def update_scheme(
     return f.post_schemes_id(id, data, wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def create_schemes_mapping(
+    scheme_from_id: str,
+    scheme_to_id: str,
+    mapping: Dict[str, str],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def create_schemes_mapping(
+    scheme_from_id: str,
+    scheme_to_id: str,
+    mapping: Dict[str, str],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
+
+
 def create_schemes_mapping(
     scheme_from_id: str,
     scheme_to_id: str,
@@ -1353,7 +2843,7 @@ def create_schemes_mapping(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """save mapping between schemes with ids"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -1377,6 +2867,30 @@ def create_schemes_mapping(
     )
 
 
+@overload
+def delete_schemes(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_schemes(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def delete_schemes(
     wait: bool = True,
     *,
@@ -1384,7 +2898,7 @@ def delete_schemes(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """delete all schemes"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -1395,6 +2909,32 @@ def delete_schemes(
     return f.delete_schemes(wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def delete_scheme(
+    id: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_scheme(
+    id: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def delete_scheme(
     id: str,
     wait: bool = True,
@@ -1403,7 +2943,7 @@ def delete_scheme(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """delete scheme by `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -1412,6 +2952,34 @@ def delete_scheme(
     if is_async:
         return f.delete_schemes_id_async(id, wait=wait, auth=auth, conn_url=conn_url)
     return f.delete_schemes_id(id, wait=wait, auth=auth, conn_url=conn_url)
+
+
+@overload
+def delete_schemes_mapping(
+    scheme_from_id: str,
+    scheme_to_id: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_schemes_mapping(
+    scheme_from_id: str,
+    scheme_to_id: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
 
 
 def delete_schemes_mapping(
@@ -1423,7 +2991,7 @@ def delete_schemes_mapping(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """delete mapping between schemes with ids"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -1448,13 +3016,35 @@ def delete_schemes_mapping(
 # Common
 
 
+@overload
+def check_auth(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def check_auth(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def check_auth(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """check auth in core for current user"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -1465,11 +3055,32 @@ def check_auth(
     return f.get_check_auth(auth=auth, conn_url=conn_url)
 
 
+@overload
 def ping(
     conn_url: Optional[str] = None,
+    *,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def ping(
+    conn_url: Optional[str] = None,
+    *,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
+def ping(
+    conn_url: Optional[str] = None,
+    *,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """return `pong` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -1482,6 +3093,30 @@ def ping(
 # UserShare
 
 
+@overload
+def get_shared_collection(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultLogins:
+    pass
+
+
+@overload
+def get_shared_collection(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultLogins]:
+    pass
+
+
 def get_shared_collection(
     id: str,
     *,
@@ -1489,7 +3124,7 @@ def get_shared_collection(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultLogins:
+) -> Union[ResultLogins, Coroutine[Any, Any, ResultLogins]]:
     """return list logins to which user has given access to the collection with `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -1500,6 +3135,30 @@ def get_shared_collection(
     return f.get_share_collection_id(id, auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_shared_scheme(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultLogins:
+    pass
+
+
+@overload
+def get_shared_scheme(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultLogins]:
+    pass
+
+
 def get_shared_scheme(
     id: str,
     *,
@@ -1507,7 +3166,7 @@ def get_shared_scheme(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultLogins:
+) -> Union[ResultLogins, Coroutine[Any, Any, ResultLogins]]:
     """return list logins to which user has given access to the scheme with `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -1518,6 +3177,30 @@ def get_shared_scheme(
     return f.get_share_scheme_id(id, auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_shared_app(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultLogins:
+    pass
+
+
+@overload
+def get_shared_app(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultLogins]:
+    pass
+
+
 def get_shared_app(
     id: str,
     *,
@@ -1525,7 +3208,7 @@ def get_shared_app(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultLogins:
+) -> Union[ResultLogins, Coroutine[Any, Any, ResultLogins]]:
     """return list logins to which user has given access to the app with `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -1536,6 +3219,30 @@ def get_shared_app(
     return f.get_share_userApp_id(id, auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_shared_by_login(
+    login: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultSharedForLogin:
+    pass
+
+
+@overload
+def get_shared_by_login(
+    login: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultSharedForLogin]:
+    pass
+
+
 def get_shared_by_login(
     login: str,
     *,
@@ -1543,7 +3250,7 @@ def get_shared_by_login(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultSharedForLogin:
+) -> Union[ResultSharedForLogin, Coroutine[Any, Any, ResultSharedForLogin]]:
     """return structure with all info about share to user with `login` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -1552,6 +3259,34 @@ def get_shared_by_login(
     if is_async:
         return f.get_share_login_async(login, auth=auth, conn_url=conn_url)
     return f.get_share_login(login, auth=auth, conn_url=conn_url)
+
+
+@overload
+def share_collection(
+    id: str,
+    user_logins: List[str],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def share_collection(
+    id: str,
+    user_logins: List[str],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
 
 
 def share_collection(
@@ -1563,7 +3298,7 @@ def share_collection(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """gives access to the collection with `id` to all users with `user_logins` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -1587,6 +3322,34 @@ def share_collection(
     )
 
 
+@overload
+def share_scheme(
+    id: str,
+    user_logins: List[str],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def share_scheme(
+    id: str,
+    user_logins: List[str],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def share_scheme(
     id: str,
     user_logins: List[str],
@@ -1596,7 +3359,7 @@ def share_scheme(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """gives access to the scheme with `id` to all users with `user_logins` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -1620,6 +3383,34 @@ def share_scheme(
     )
 
 
+@overload
+def share_app(
+    id: str,
+    user_logins: List[str],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def share_app(
+    id: str,
+    user_logins: List[str],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def share_app(
     id: str,
     user_logins: List[str],
@@ -1629,7 +3420,7 @@ def share_app(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """gives access to the app with `id` to all users with `user_logins` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -1653,6 +3444,38 @@ def share_app(
     )
 
 
+@overload
+def share(
+    user_logins: List[str],
+    collections_ids: Optional[List[str]] = None,
+    schemes_ids: Optional[List[str]] = None,
+    user_apps_ids: Optional[List[str]] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def share(
+    user_logins: List[str],
+    collections_ids: Optional[List[str]] = None,
+    schemes_ids: Optional[List[str]] = None,
+    user_apps_ids: Optional[List[str]] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def share(
     user_logins: List[str],
     collections_ids: Optional[List[str]] = None,
@@ -1664,7 +3487,7 @@ def share(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """gives access to everything listed to all users with `user_logins` """
     assert user_logins is not None, '"user_logins" is empty'
     if batcher is None:
@@ -1695,6 +3518,38 @@ def share(
     )
 
 
+@overload
+def delete_shared(
+    user_logins: List[str],
+    collections_ids: Optional[List[str]] = None,
+    schemes_ids: Optional[List[str]] = None,
+    user_apps_ids: Optional[List[str]] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_shared(
+    user_logins: List[str],
+    collections_ids: Optional[List[str]] = None,
+    schemes_ids: Optional[List[str]] = None,
+    user_apps_ids: Optional[List[str]] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def delete_shared(
     user_logins: List[str],
     collections_ids: Optional[List[str]] = None,
@@ -1706,7 +3561,7 @@ def delete_shared(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """removes access to everything listed to all users with `user_logins` """
     assert user_logins is not None, '"user_logins" is empty'
     if batcher is None:
@@ -1737,6 +3592,30 @@ def delete_shared(
     )
 
 
+@overload
+def delete_shared_all(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_shared_all(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def delete_shared_all(
     wait: bool = True,
     *,
@@ -1744,7 +3623,7 @@ def delete_shared_all(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """removes access to everything for all for current user"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -1758,6 +3637,30 @@ def delete_shared_all(
 # Registration
 
 
+@overload
+def get_user(
+    login: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def get_user(
+    login: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def get_user(
     login: str,
     *,
@@ -1765,7 +3668,7 @@ def get_user(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """admin: displays saved information about the user"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -1776,13 +3679,35 @@ def get_user(
     return f.get_register_login(login, auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_users(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultLogins:
+    pass
+
+
+@overload
+def get_users(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultLogins]:
+    pass
+
+
 def get_users(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultLogins:
+) -> Union[ResultLogins, Coroutine[Any, Any, ResultLogins]]:
     """admin: returns a list of all logins"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -1793,6 +3718,32 @@ def get_users(
     return f.get_register_all(auth=auth, conn_url=conn_url)
 
 
+@overload
+def create_user(
+    login: str,
+    password: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def create_user(
+    login: str,
+    password: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def create_user(
     login: str,
     password: str,
@@ -1801,7 +3752,7 @@ def create_user(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """create user in malevich-core, all operations will continue on his behalf"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -1813,6 +3764,32 @@ def create_user(
     return f.post_register(data, auth=auth, conn_url=conn_url)
 
 
+@overload
+def delete_user_login(
+    login: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> None:
+    pass
+
+
+@overload
+def delete_user_login(
+    login: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, None]:
+    pass
+
+
 def delete_user_login(
     login: str,
     wait: bool = True,
@@ -1821,7 +3798,7 @@ def delete_user_login(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> None:
+) -> Union[None, Coroutine[Any, Any, None]]:
     """admin: delete user by `login` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -1832,13 +3809,35 @@ def delete_user_login(
     f.delete_register_login(login, wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def delete_user(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_user(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def delete_user(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """delete current user, not raise if user not exist"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -1852,13 +3851,35 @@ def delete_user(
 # UserApps
 
 
+@overload
+def get_apps(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultOwnAndSharedIds:
+    pass
+
+
+@overload
+def get_apps(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultOwnAndSharedIds]:
+    pass
+
+
 def get_apps(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultOwnAndSharedIds:
+) -> Union[ResultOwnAndSharedIds, Coroutine[Any, Any, ResultOwnAndSharedIds]]:
     """return apps ids for current user"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -1869,13 +3890,35 @@ def get_apps(
     return f.get_userApps(auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_apps_real(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultOwnAndSharedIds:
+    pass
+
+
+@overload
+def get_apps_real(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultOwnAndSharedIds]:
+    pass
+
+
 def get_apps_real(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultOwnAndSharedIds:
+) -> Union[ResultOwnAndSharedIds, Coroutine[Any, Any, ResultOwnAndSharedIds]]:
     """return apps real ids for current user"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -1886,13 +3929,35 @@ def get_apps_real(
     return f.get_userApps_realIds(auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_apps_map(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultOwnAndSharedIdsMap:
+    pass
+
+
+@overload
+def get_apps_map(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultOwnAndSharedIdsMap]:
+    pass
+
+
 def get_apps_map(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultOwnAndSharedIdsMap:
+) -> Union[ResultOwnAndSharedIdsMap, Coroutine[Any, Any, ResultOwnAndSharedIdsMap]]:
     """return apps ids with real ids for current user"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -1903,6 +3968,30 @@ def get_apps_map(
     return f.get_userApps_mapIds(auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_app_map(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def get_app_map(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
+
+
 def get_app_map(
     id: str,
     *,
@@ -1910,7 +3999,7 @@ def get_app_map(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """return real id by app id for current user"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -1921,6 +4010,30 @@ def get_app_map(
     return f.get_userApps_mapId(id, auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_app(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> UserApp:
+    pass
+
+
+@overload
+def get_app(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, UserApp]:
+    pass
+
+
 def get_app(
     id: str,
     *,
@@ -1928,7 +4041,7 @@ def get_app(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> UserApp:
+) -> Union[UserApp, Coroutine[Any, Any, UserApp]]:
     """return app by `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -1939,6 +4052,30 @@ def get_app(
     return f.get_userApps_id(id, auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_app_real(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> UserApp:
+    pass
+
+
+@overload
+def get_app_real(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, UserApp]:
+    pass
+
+
 def get_app_real(
     id: str,
     *,
@@ -1946,7 +4083,7 @@ def get_app_real(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> UserApp:
+) -> Union[UserApp, Coroutine[Any, Any, UserApp]]:
     """return app by real `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -1955,6 +4092,54 @@ def get_app_real(
     if is_async:
         return f.get_userApps_realId_async(id, auth=auth, conn_url=conn_url)
     return f.get_userApps_realId(id, auth=auth, conn_url=conn_url)
+
+
+@overload
+def create_app(
+    app_id: str,
+    processor_id: str,
+    input_id: Optional[str] = None,
+    output_id: Optional[str] = None,
+    app_cfg: Optional[Union[Dict[str, Any], Alias.Json]] = None,
+    image_ref: Optional[str] = None,
+    image_auth: Optional[AUTH] = None,
+    image_tag: Optional[str] = None,
+    platform: str = "base",
+    platform_settings: Optional[str] = None,
+    extra_collections_from: Optional[Dict[str, Union[List[str], str]]] = None,
+    wait: bool = True,
+    *,
+    use_system_auth: bool = True,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def create_app(
+    app_id: str,
+    processor_id: str,
+    input_id: Optional[str] = None,
+    output_id: Optional[str] = None,
+    app_cfg: Optional[Union[Dict[str, Any], Alias.Json]] = None,
+    image_ref: Optional[str] = None,
+    image_auth: Optional[AUTH] = None,
+    image_tag: Optional[str] = None,
+    platform: str = "base",
+    platform_settings: Optional[str] = None,
+    extra_collections_from: Optional[Dict[str, Union[List[str], str]]] = None,
+    wait: bool = True,
+    *,
+    use_system_auth: bool = True,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
 
 
 def create_app(
@@ -1976,7 +4161,7 @@ def create_app(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """create app\n
     `app_cfg` must be json or dict or None\n
     return `id` """
@@ -2014,6 +4199,56 @@ def create_app(
     return f.post_userApps(data, wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def update_app(
+    id: str,
+    app_id: str,
+    processor_id: str,
+    input_id: Optional[str] = None,
+    output_id: Optional[str] = None,
+    app_cfg: Optional[Union[Dict[str, Any], Alias.Json]] = None,
+    image_ref: Optional[str] = None,
+    image_auth: Optional[AUTH] = None,
+    image_tag: Optional[str] = None,
+    platform: str = "base",
+    platform_settings: Optional[str] = None,
+    extra_collections_from: Optional[Dict[str, Union[List[str], str]]] = None,
+    wait: bool = True,
+    *,
+    use_system_auth: bool = True,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def update_app(
+    id: str,
+    app_id: str,
+    processor_id: str,
+    input_id: Optional[str] = None,
+    output_id: Optional[str] = None,
+    app_cfg: Optional[Union[Dict[str, Any], Alias.Json]] = None,
+    image_ref: Optional[str] = None,
+    image_auth: Optional[AUTH] = None,
+    image_tag: Optional[str] = None,
+    platform: str = "base",
+    platform_settings: Optional[str] = None,
+    extra_collections_from: Optional[Dict[str, Union[List[str], str]]] = None,
+    wait: bool = True,
+    *,
+    use_system_auth: bool = True,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def update_app(
     id: str,
     app_id: str,
@@ -2034,7 +4269,7 @@ def update_app(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """update app by `id`\n
     `app_cfg` must be json or dict or None"""
     assert (
@@ -2071,6 +4306,30 @@ def update_app(
     return f.post_userApps_id(id, data, wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def delete_apps(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_apps(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def delete_apps(
     wait: bool = True,
     *,
@@ -2078,7 +4337,7 @@ def delete_apps(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """delete all user apps"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -2089,6 +4348,32 @@ def delete_apps(
     return f.delete_userApps(wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def delete_app(
+    id: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_app(
+    id: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def delete_app(
     id: str,
     wait: bool = True,
@@ -2097,7 +4382,7 @@ def delete_app(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """delete user app by `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -2111,13 +4396,35 @@ def delete_app(
 # UserTasks
 
 
+@overload
+def get_tasks(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultIds:
+    pass
+
+
+@overload
+def get_tasks(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultIds]:
+    pass
+
+
 def get_tasks(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultIds:
+) -> Union[ResultIds, Coroutine[Any, Any, ResultIds]]:
     """return tasks ids for current user"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -2128,13 +4435,35 @@ def get_tasks(
     return f.get_userTasks(auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_tasks_real(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultIds:
+    pass
+
+
+@overload
+def get_tasks_real(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultIds]:
+    pass
+
+
 def get_tasks_real(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultIds:
+) -> Union[ResultIds, Coroutine[Any, Any, ResultIds]]:
     """return tasks real ids for current user"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -2145,13 +4474,35 @@ def get_tasks_real(
     return f.get_userTasks_realIds(auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_tasks_map(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultIdsMap:
+    pass
+
+
+@overload
+def get_tasks_map(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultIdsMap]:
+    pass
+
+
 def get_tasks_map(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultIdsMap:
+) -> Union[ResultIdsMap, Coroutine[Any, Any, ResultIdsMap]]:
     """return tasks ids with real ids for current user"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -2162,6 +4513,30 @@ def get_tasks_map(
     return f.get_userTasks_mapIds(auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_task_map(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def get_task_map(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
+
+
 def get_task_map(
     id: str,
     *,
@@ -2169,7 +4544,7 @@ def get_task_map(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """return real id by task id for current user"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -2180,6 +4555,30 @@ def get_task_map(
     return f.get_userTasks_mapId(id, auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_task(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> UserTask:
+    pass
+
+
+@overload
+def get_task(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, UserTask]:
+    pass
+
+
 def get_task(
     id: str,
     *,
@@ -2187,7 +4586,7 @@ def get_task(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> UserTask:
+) -> Union[UserTask, Coroutine[Any, Any, UserTask]]:
     """return task by `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -2198,6 +4597,30 @@ def get_task(
     return f.get_userTasks_id(id, auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_task_real(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> UserTask:
+    pass
+
+
+@overload
+def get_task_real(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, UserTask]:
+    pass
+
+
 def get_task_real(
     id: str,
     *,
@@ -2205,7 +4628,7 @@ def get_task_real(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> UserTask:
+) -> Union[UserTask, Coroutine[Any, Any, UserTask]]:
     """return task by real `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -2214,6 +4637,40 @@ def get_task_real(
     if is_async:
         return f.get_userTasks_realId_async(id, auth=auth, conn_url=conn_url)
     return f.get_userTasks_realId(id, auth=auth, conn_url=conn_url)
+
+
+@overload
+def create_task(
+    task_id: str,
+    app_id: Optional[str] = None,
+    apps_depends: Optional[List[str]] = None,
+    tasks_depends: Optional[List[str]] = None,
+    synthetic: bool = False,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def create_task(
+    task_id: str,
+    app_id: Optional[str] = None,
+    apps_depends: Optional[List[str]] = None,
+    tasks_depends: Optional[List[str]] = None,
+    synthetic: bool = False,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
 
 
 def create_task(
@@ -2228,7 +4685,7 @@ def create_task(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """create task"""
     if synthetic:
         assert app_id is None, "app_id should be None for synthetic task"
@@ -2254,6 +4711,40 @@ def create_task(
     return f.post_userTasks(data, wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def update_task(
+    id: str,
+    task_id: str,
+    app_id: str,
+    apps_depends: Optional[List[str]] = None,
+    tasks_depends: Optional[List[str]] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def update_task(
+    id: str,
+    task_id: str,
+    app_id: str,
+    apps_depends: Optional[List[str]] = None,
+    tasks_depends: Optional[List[str]] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def update_task(
     id: str,
     task_id: str,
@@ -2266,7 +4757,7 @@ def update_task(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """update task by `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -2287,6 +4778,30 @@ def update_task(
     return f.post_userTasks_id(id, data, wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def delete_tasks(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_tasks(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def delete_tasks(
     wait: bool = True,
     *,
@@ -2294,7 +4809,7 @@ def delete_tasks(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """delete all user tasks"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -2305,6 +4820,32 @@ def delete_tasks(
     return f.delete_userTasks(wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def delete_task(
+    id: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_task(
+    id: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def delete_task(
     id: str,
     wait: bool = True,
@@ -2313,7 +4854,7 @@ def delete_task(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """delete user task by `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -2327,13 +4868,35 @@ def delete_task(
 # UserPipelines
 
 
+@overload
+def get_pipelines(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultIds:
+    pass
+
+
+@overload
+def get_pipelines(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultIds]:
+    pass
+
+
 def get_pipelines(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultIds:
+) -> Union[ResultIds, Coroutine[Any, Any, ResultIds]]:
     """return pipelines ids for current user"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -2344,13 +4907,35 @@ def get_pipelines(
     return f.get_userPipelines(auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_pipelines_real(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultIds:
+    pass
+
+
+@overload
+def get_pipelines_real(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultIds]:
+    pass
+
+
 def get_pipelines_real(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultIds:
+) -> Union[ResultIds, Coroutine[Any, Any, ResultIds]]:
     """return pipelines real ids for current user"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -2361,13 +4946,35 @@ def get_pipelines_real(
     return f.get_userPipelines_realIds(auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_pipelines_map(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultIdsMap:
+    pass
+
+
+@overload
+def get_pipelines_map(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultIdsMap]:
+    pass
+
+
 def get_pipelines_map(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultIdsMap:
+) -> Union[ResultIdsMap, Coroutine[Any, Any, ResultIdsMap]]:
     """return pipelines ids with real ids for current user"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -2378,6 +4985,30 @@ def get_pipelines_map(
     return f.get_userPipelines_mapIds(auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_pipeline_map(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def get_pipeline_map(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
+
+
 def get_pipeline_map(
     id: str,
     *,
@@ -2385,7 +5016,7 @@ def get_pipeline_map(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """return real id by pipeline id for current user"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -2396,6 +5027,30 @@ def get_pipeline_map(
     return f.get_userPipelines_mapId(id, auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_pipeline(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Pipeline:
+    pass
+
+
+@overload
+def get_pipeline(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Pipeline]:
+    pass
+
+
 def get_pipeline(
     id: str,
     *,
@@ -2403,7 +5058,7 @@ def get_pipeline(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Pipeline:
+) -> Union[Pipeline, Coroutine[Any, Any, Pipeline]]:
     """return pipeline by `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -2414,6 +5069,30 @@ def get_pipeline(
     return f.get_userPipelines_id(id, auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_pipeline_real(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Pipeline:
+    pass
+
+
+@overload
+def get_pipeline_real(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Pipeline]:
+    pass
+
+
 def get_pipeline_real(
     id: str,
     *,
@@ -2421,7 +5100,7 @@ def get_pipeline_real(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Pipeline:
+) -> Union[Pipeline, Coroutine[Any, Any, Pipeline]]:
     """return pipeline by real `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -2432,6 +5111,30 @@ def get_pipeline_real(
     return f.get_userPipelines_realId(id, auth=auth, conn_url=conn_url)
 
 
+@overload
+def search_pipeline_by_image_tag(
+    tag: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultIds:
+    pass
+
+
+@overload
+def search_pipeline_by_image_tag(
+    tag: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultIds]:
+    pass
+
+
 def search_pipeline_by_image_tag(
     tag: str,
     *,
@@ -2439,7 +5142,7 @@ def search_pipeline_by_image_tag(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultIds:
+) -> Union[ResultIds, Coroutine[Any, Any, ResultIds]]:
     """return pipelines ids by `tag`"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -2450,6 +5153,30 @@ def search_pipeline_by_image_tag(
     return f.get_userPipelines_tagSearch(tag, auth=auth, conn_url=conn_url)
 
 
+@overload
+def search_pipeline_by_image_tag_real(
+    tag: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultIds:
+    pass
+
+
+@overload
+def search_pipeline_by_image_tag_real(
+    tag: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultIds]:
+    pass
+
+
 def search_pipeline_by_image_tag_real(
     tag: str,
     *,
@@ -2457,7 +5184,7 @@ def search_pipeline_by_image_tag_real(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultIds:
+) -> Union[ResultIds, Coroutine[Any, Any, ResultIds]]:
     """return real pipelines ids by `tag`"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -2466,6 +5193,40 @@ def search_pipeline_by_image_tag_real(
     if is_async:
         return f.get_userPipelines_realIds_tagSearch_async(tag, auth=auth, conn_url=conn_url)
     return f.get_userPipelines_realIds_tagSearch(tag, auth=auth, conn_url=conn_url)
+
+
+@overload
+def create_pipeline(
+    pipeline_id: str,
+    processors: Dict[str, Processor] = None,
+    conditions: Dict[str, Condition] = None,
+    results: Dict[str, List[Result]] = None,
+    pull_collection_policy: PullCollectionPolicy = PullCollectionPolicy.IF_NOT_EXIST,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def create_pipeline(
+    pipeline_id: str,
+    processors: Dict[str, Processor] = None,
+    conditions: Dict[str, Condition] = None,
+    results: Dict[str, List[Result]] = None,
+    pull_collection_policy: PullCollectionPolicy = PullCollectionPolicy.IF_NOT_EXIST,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
 
 
 def create_pipeline(
@@ -2480,7 +5241,7 @@ def create_pipeline(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """create pipeline"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -2504,6 +5265,42 @@ def create_pipeline(
     return f.post_userPipelines(data, wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def update_pipeline(
+    id: str,
+    pipeline_id: str,
+    processors: Dict[str, Processor] = None,
+    conditions: Dict[str, Condition] = None,
+    results: Dict[str, List[Result]] = None,
+    pull_collection_policy: PullCollectionPolicy = PullCollectionPolicy.IF_NOT_EXIST,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def update_pipeline(
+    id: str,
+    pipeline_id: str,
+    processors: Dict[str, Processor] = None,
+    conditions: Dict[str, Condition] = None,
+    results: Dict[str, List[Result]] = None,
+    pull_collection_policy: PullCollectionPolicy = PullCollectionPolicy.IF_NOT_EXIST,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def update_pipeline(
     id: str,
     pipeline_id: str,
@@ -2517,7 +5314,7 @@ def update_pipeline(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """update pipeline by `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -2541,6 +5338,30 @@ def update_pipeline(
     return f.post_userPipelines_id(id, data, wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def delete_pipelines(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_pipelines(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def delete_pipelines(
     wait: bool = True,
     *,
@@ -2548,7 +5369,7 @@ def delete_pipelines(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """delete all user pipelines"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -2559,6 +5380,32 @@ def delete_pipelines(
     return f.delete_userPipelines(wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def delete_pipeline(
+    id: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_pipeline(
+    id: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def delete_pipeline(
     id: str,
     wait: bool = True,
@@ -2567,7 +5414,7 @@ def delete_pipeline(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """delete user pipeline by `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -2581,13 +5428,35 @@ def delete_pipeline(
 # UserCfgs
 
 
+@overload
+def get_cfgs(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultIds:
+    pass
+
+
+@overload
+def get_cfgs(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultIds]:
+    pass
+
+
 def get_cfgs(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultIds:
+) -> Union[ResultIds, Coroutine[Any, Any, ResultIds]]:
     """return cfgs ids for current user"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -2598,13 +5467,35 @@ def get_cfgs(
     return f.get_userCfgs(auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_cfgs_real(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultIds:
+    pass
+
+
+@overload
+def get_cfgs_real(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultIds]:
+    pass
+
+
 def get_cfgs_real(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultIds:
+) -> Union[ResultIds, Coroutine[Any, Any, ResultIds]]:
     """return cfgs real ids for current user"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -2615,13 +5506,35 @@ def get_cfgs_real(
     return f.get_userCfgs_realIds(auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_cfgs_map(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultIdsMap:
+    pass
+
+
+@overload
+def get_cfgs_map(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultIdsMap]:
+    pass
+
+
 def get_cfgs_map(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultIdsMap:
+) -> Union[ResultIdsMap, Coroutine[Any, Any, ResultIdsMap]]:
     """return cfgs ids with real ids for current user"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -2632,6 +5545,29 @@ def get_cfgs_map(
     return f.get_userCfgs_mapIds(auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_cfg_map(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def get_cfg_map(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
+
 
 def get_cfg_map(
     id: str,
@@ -2640,7 +5576,7 @@ def get_cfg_map(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """return real id by cfg id for current user"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -2651,6 +5587,30 @@ def get_cfg_map(
     return f.get_userCfgs_mapId(id, auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_cfg(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultUserCfg:
+    pass
+
+
+@overload
+def get_cfg(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultUserCfg]:
+    pass
+
+
 def get_cfg(
     id: str,
     *,
@@ -2658,7 +5618,7 @@ def get_cfg(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultUserCfg:
+) -> Union[ResultUserCfg, Coroutine[Any, Any, ResultUserCfg]]:
     """return cfg by `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -2669,6 +5629,30 @@ def get_cfg(
     return f.get_userCfgs_id(id, auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_cfg_real(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultUserCfg:
+    pass
+
+
+@overload
+def get_cfg_real(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultUserCfg]:
+    pass
+
+
 def get_cfg_real(
     id: str,
     *,
@@ -2676,7 +5660,7 @@ def get_cfg_real(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultUserCfg:
+) -> Union[ResultUserCfg, Coroutine[Any, Any, ResultUserCfg]]:
     """return cfg by real `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -2704,6 +5688,34 @@ def __fix_cfg(cfg: Union[Dict[str, Any], Alias.Json, Cfg]) -> str:
     return cfg_json
 
 
+@overload
+def create_cfg(
+    cfg_id: str,
+    cfg: Union[Dict[str, Any], Alias.Json, Cfg],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def create_cfg(
+    cfg_id: str,
+    cfg: Union[Dict[str, Any], Alias.Json, Cfg],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
+
+
 def create_cfg(
     cfg_id: str,
     cfg: Union[Dict[str, Any], Alias.Json, Cfg],
@@ -2713,7 +5725,7 @@ def create_cfg(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """create configuration file\n
     `cfg` must be json or dict or Cfg\n
     return `id` """
@@ -2727,6 +5739,36 @@ def create_cfg(
     return f.post_userCfgs(data, wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def update_cfg(
+    id: str,
+    cfg_id: str,
+    cfg: Union[Dict[str, Any], Alias.Json, Cfg],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def update_cfg(
+    id: str,
+    cfg_id: str,
+    cfg: Union[Dict[str, Any], Alias.Json, Cfg],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def update_cfg(
     id: str,
     cfg_id: str,
@@ -2737,7 +5779,7 @@ def update_cfg(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """update configuration file\n
     `cfg` must be json or dict or Cfg"""
     if batcher is None:
@@ -2750,6 +5792,30 @@ def update_cfg(
     return f.post_userCfgs_id(id, data, wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def delete_cfgs(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_cfgs(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def delete_cfgs(
     wait: bool = True,
     *,
@@ -2757,7 +5823,7 @@ def delete_cfgs(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """delete all user cfgs"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -2768,6 +5834,32 @@ def delete_cfgs(
     return f.delete_userCfgs(wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def delete_cfg(
+    id: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_cfg(
+    id: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def delete_cfg(
     id: str,
     wait: bool = True,
@@ -2776,7 +5868,7 @@ def delete_cfg(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """delete user cfg by `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -2790,13 +5882,35 @@ def delete_cfg(
 # OperationResults
 
 
+@overload
+def get_operations_results(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultIds:
+    pass
+
+
+@overload
+def get_operations_results(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultIds]:
+    pass
+
+
 def get_operations_results(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultIds:
+) -> Union[ResultIds, Coroutine[Any, Any, ResultIds]]:
     """return list of operations ids"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -2807,6 +5921,30 @@ def get_operations_results(
     return f.get_operationResults(auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_operation_result(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> str:
+    pass
+
+
+@overload
+def get_operation_result(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, str]:
+    pass
+
+
 def get_operation_result(
     id: str,
     *,
@@ -2814,7 +5952,7 @@ def get_operation_result(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> str:
+) -> Union[str, Coroutine[Any, Any, str]]:
     """return result by operation `id` if operation status is `OK` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -2825,6 +5963,30 @@ def get_operation_result(
     return f.get_operationResults_id(id, auth=auth, conn_url=conn_url)
 
 
+@overload
+def delete_operations_results(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_operations_results(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def delete_operations_results(
     wait: bool = True,
     *,
@@ -2832,7 +5994,7 @@ def delete_operations_results(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """delete all operations results"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -2843,6 +6005,32 @@ def delete_operations_results(
     return f.delete_operationResults(wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def delete_operation_result(
+    id: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_operation_result(
+    id: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def delete_operation_result(
     id: str,
     wait: bool = True,
@@ -2851,7 +6039,7 @@ def delete_operation_result(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """delete operation result by `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -2865,6 +6053,30 @@ def delete_operation_result(
 # TempRun
 
 
+@overload
+def get_run_condition(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Condition:
+    pass
+
+
+@overload
+def get_run_condition(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Condition]:
+    pass
+
+
 def get_run_condition(
     id: str,
     *,
@@ -2872,7 +6084,7 @@ def get_run_condition(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Condition:
+) -> Union[Condition, Coroutine[Any, Any, Condition]]:
     """return run condition by operation `id` for running task"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -2883,6 +6095,32 @@ def get_run_condition(
     return f.get_run_condition(id, auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_run_active_runs(
+    tags: Optional[Dict[str, str]] = None,
+    with_tags: bool = False,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Union[ResultIds, ResultTags]:
+    pass
+
+
+@overload
+def get_run_active_runs(
+    tags: Optional[Dict[str, str]] = None,
+    with_tags: bool = False,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Union[Coroutine[Any, Any, ResultIds], Coroutine[Any, Any, ResultTags]]:
+    pass
+
+
 def get_run_active_runs(
     tags: Optional[Dict[str, str]] = None,
     with_tags: bool = False,
@@ -2891,7 +6129,7 @@ def get_run_active_runs(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Union[ResultIds, ResultTags]:
+) -> Union[ResultIds, ResultTags, Coroutine[Any, Any, ResultIds], Coroutine[Any, Any, ResultTags]]:
     """return list running operationIds, filter by tags if set, return id -> tags if with_tags"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -2910,6 +6148,30 @@ def get_run_active_runs(
         return f.get_run_activeRuns(auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_run_main_task_cfg(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> MainTaskCfg:
+    pass
+
+
+@overload
+def get_run_main_task_cfg(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, MainTaskCfg]:
+    pass
+
+
 def get_run_main_task_cfg(
     id: str,
     *,
@@ -2917,7 +6179,7 @@ def get_run_main_task_cfg(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> MainTaskCfg:
+) -> Union[MainTaskCfg, Coroutine[Any, Any, MainTaskCfg]]:
     """return mainTaskCfg by operation `id` for running task"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -2928,6 +6190,30 @@ def get_run_main_task_cfg(
     return f.get_run_mainTaskCfg(id, auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_run_main_pipeline_cfg(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> MainPipelineCfg:
+    pass
+
+
+@overload
+def get_run_main_pipeline_cfg(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, MainPipelineCfg]:
+    pass
+
+
 def get_run_main_pipeline_cfg(
     id: str,
     *,
@@ -2935,7 +6221,7 @@ def get_run_main_pipeline_cfg(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> MainPipelineCfg:
+) -> Union[MainPipelineCfg, Coroutine[Any, Any, MainPipelineCfg]]:
     """return mainPipelineCfg by operation `id` for running pipeline"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -2946,6 +6232,32 @@ def get_run_main_pipeline_cfg(
     return f.get_run_mainPipelineCfg(id, auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_task_runs(
+    task_id: str,
+    cfg_id: Optional[str] = None,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultIds:
+    pass
+
+
+@overload
+def get_task_runs(
+    task_id: str,
+    cfg_id: Optional[str] = None,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultIds]:
+    pass
+
+
 def get_task_runs(
     task_id: str,
     cfg_id: Optional[str] = None,
@@ -2954,7 +6266,7 @@ def get_task_runs(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultIds:
+) -> Union[ResultIds, Coroutine[Any, Any, ResultIds]]:
     """return list running operationIds with `task_id` and `cfg_id` if specified"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -2971,6 +6283,36 @@ def get_task_runs(
 # Manager
 
 
+@overload
+def logs(
+    id: str,
+    run_id: Optional[str] = None,
+    force: bool = True,
+    with_show: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> AppLogs:
+    pass
+
+
+@overload
+def logs(
+    id: str,
+    run_id: Optional[str] = None,
+    force: bool = True,
+    with_show: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, AppLogs]:
+    pass
+
+
 def logs(
     id: str,
     run_id: Optional[str] = None,
@@ -2981,7 +6323,7 @@ def logs(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> AppLogs:
+) -> Union[AppLogs, Coroutine[Any, Any, AppLogs]]:
     """return task logs by operation `id` and `run_id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -2991,6 +6333,40 @@ def logs(
     if is_async:
         return f.get_manager_logs_async(data, with_show=with_show, auth=auth, conn_url=conn_url)
     return f.get_manager_logs(data, with_show=with_show, auth=auth, conn_url=conn_url)
+
+
+@overload
+def logs_app(
+    id: str,
+    task_id: str,
+    app_id: str,
+    run_id: Optional[str] = None,
+    force: bool = True,
+    with_show: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> AppLogs:
+    pass
+
+
+@overload
+def logs_app(
+    id: str,
+    task_id: str,
+    app_id: str,
+    run_id: Optional[str] = None,
+    force: bool = True,
+    with_show: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, AppLogs]:
+    pass
 
 
 def logs_app(
@@ -3005,7 +6381,7 @@ def logs_app(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> AppLogs:
+) -> Union[AppLogs, Coroutine[Any, Any, AppLogs]]:
     """return app logs by operation `id`, `run_id`, `task_id` (that "null" if not exist) and `app_id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -3019,13 +6395,35 @@ def logs_app(
     return f.get_manager_logs(data, with_show=with_show, auth=auth, conn_url=conn_url)
 
 
+@overload
+def logs_clickhouse(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Json:
+    pass
+
+
+@overload
+def logs_clickhouse(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Json]:
+    pass
+
+
 def logs_clickhouse(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Json:
+) -> Union[Alias.Json, Coroutine[Any, Any, Alias.Json]]:
     """return all clickhouse logs"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -3036,6 +6434,30 @@ def logs_clickhouse(
     return f.get_clickhouse_all(auth=auth, conn_url=conn_url)
 
 
+@overload
+def logs_clickhouse_id(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Json:
+    pass
+
+
+@overload
+def logs_clickhouse_id(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Json]:
+    pass
+
+
 def logs_clickhouse_id(
     id: str,
     *,
@@ -3043,7 +6465,7 @@ def logs_clickhouse_id(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Json:
+) -> Union[Alias.Json, Coroutine[Any, Any, Alias.Json]]:
     """return clickhouse logs by operation `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -3054,6 +6476,30 @@ def logs_clickhouse_id(
     return f.get_clickhouse_id(id, auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_dag_key_value(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Json:
+    pass
+
+
+@overload
+def get_dag_key_value(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Json]:
+    pass
+
+
 def get_dag_key_value(
     id: str,
     *,
@@ -3061,7 +6507,7 @@ def get_dag_key_value(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Json:
+) -> Union[Alias.Json, Coroutine[Any, Any, Alias.Json]]:
     """return key-value cfg from dag by operation `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -3070,6 +6516,34 @@ def get_dag_key_value(
     if is_async:
         return f.get_manager_dagKeyValue_operationId_async(id, auth=auth, conn_url=conn_url)
     return f.get_manager_dagKeyValue_operationId(id, auth=auth, conn_url=conn_url)
+
+
+@overload
+def update_dag_key_value(
+    data: Dict[str, str],
+    operationId: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> None:
+    pass
+
+
+@overload
+def update_dag_key_value(
+    data: Dict[str, str],
+    operationId: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, None]:
+    pass
 
 
 def update_dag_key_value(
@@ -3081,7 +6555,7 @@ def update_dag_key_value(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> None:
+) -> Union[None, Coroutine[Any, Any, None]]:
     """update key-value cfg from dag by operation `id` and `data` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -3103,6 +6577,32 @@ def update_dag_key_value(
     )
 
 
+@overload
+def get_app_info(
+    id: str,
+    parse: bool = False,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Union[Alias.Json, AppFunctionsInfo]:
+    pass
+
+
+@overload
+def get_app_info(
+    id: str,
+    parse: bool = False,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Union[Coroutine[Any, Any, Alias.Json], Coroutine[Any, Any, AppFunctionsInfo]]:
+    pass
+
+
 def get_app_info(
     id: str,
     parse: bool = False,
@@ -3111,7 +6611,7 @@ def get_app_info(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Union[Alias.Json, AppFunctionsInfo]:
+) -> Union[Alias.Json, AppFunctionsInfo, Coroutine[Any, Any, Alias.Json], Coroutine[Any, Any, AppFunctionsInfo]]:
     """return json with functions app info, `id` is appId"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -3122,6 +6622,32 @@ def get_app_info(
     return f.get_app_info(id, parse=parse, auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_app_info_by_real_id(
+    id: str,
+    parse: bool = False,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Union[Alias.Json, AppFunctionsInfo]:
+    pass
+
+
+@overload
+def get_app_info_by_real_id(
+    id: str,
+    parse: bool = False,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Union[Coroutine[Any, Any, Alias.Json], Coroutine[Any, Any, AppFunctionsInfo]]:
+    pass
+
+
 def get_app_info_by_real_id(
     id: str,
     parse: bool = False,
@@ -3130,7 +6656,7 @@ def get_app_info_by_real_id(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Union[Alias.Json, AppFunctionsInfo]:
+) -> Union[Alias.Json, AppFunctionsInfo, Coroutine[Any, Any, Alias.Json], Coroutine[Any, Any, AppFunctionsInfo]]:
     """return json with functions app info, `id` is real id for app"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -3139,6 +6665,38 @@ def get_app_info_by_real_id(
     if is_async:
         return f.get_app_info_by_real_id_async(id, parse=parse, auth=auth, conn_url=conn_url)
     return f.get_app_info_by_real_id(id, parse=parse, auth=auth, conn_url=conn_url)
+
+
+@overload
+def get_image_info(
+    image_ref: str,
+    image_auth: Optional[AUTH] = None,
+    image_tag: Optional[str] = None,
+    parse: bool = False,
+    *,
+    use_system_auth: bool = False,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Union[Alias.Json, AppFunctionsInfo]:
+    pass
+
+
+@overload
+def get_image_info(
+    image_ref: str,
+    image_auth: Optional[AUTH] = None,
+    image_tag: Optional[str] = None,
+    parse: bool = False,
+    *,
+    use_system_auth: bool = False,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Union[Coroutine[Any, Any, Alias.Json], Coroutine[Any, Any, AppFunctionsInfo]]:
+    pass
 
 
 def get_image_info(
@@ -3152,7 +6710,7 @@ def get_image_info(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Union[Alias.Json, AppFunctionsInfo]:
+) -> Union[Alias.Json, AppFunctionsInfo, Coroutine[Any, Any, Alias.Json], Coroutine[Any, Any, AppFunctionsInfo]]:
     """return json with functions image info"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -3168,6 +6726,32 @@ def get_image_info(
     return f.get_image_info(data, parse=parse, auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_task_schedules(
+    operation_id: str,
+    with_show: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Schedules:
+    pass
+
+
+@overload
+def get_task_schedules(
+    operation_id: str,
+    with_show: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Schedules]:
+    pass
+
+
 def get_task_schedules(
     operation_id: str,
     with_show: bool = True,
@@ -3176,7 +6760,7 @@ def get_task_schedules(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Schedules:
+) -> Union[Schedules, Coroutine[Any, Any, Schedules]]:
     """return schedule ids by `operation_id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -3190,6 +6774,64 @@ def get_task_schedules(
     return f.get_task_schedules(
         data, with_show=with_show, auth=auth, conn_url=conn_url
     )
+
+
+@overload
+def task_full(
+    task_id: str,
+    cfg_id: str,
+    info_url: Optional[str] = None,
+    debug_mode: bool = False,
+    core_manage: bool = False,
+    single_request: bool = False,
+    profile_mode: Optional[str] = None,
+    save_fails: bool = True,
+    with_show: bool = True,
+    long: bool = False,
+    long_timeout: Optional[int] = WAIT_RESULT_TIMEOUT,
+    scaleInfo: List[ScaleInfo] = None,
+    component: TaskComponent = None,
+    policy: TaskPolicy = None,
+    schedule: Optional[Schedule] = None,
+    restrictions: Optional[Restrictions] = None,
+    tags: Optional[Dict[str, str]] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Union[Alias.Id, AppLogs]:
+    pass
+
+
+@overload
+def task_full(
+    task_id: str,
+    cfg_id: str,
+    info_url: Optional[str] = None,
+    debug_mode: bool = False,
+    core_manage: bool = False,
+    single_request: bool = False,
+    profile_mode: Optional[str] = None,
+    save_fails: bool = True,
+    with_show: bool = True,
+    long: bool = False,
+    long_timeout: Optional[int] = WAIT_RESULT_TIMEOUT,
+    scaleInfo: List[ScaleInfo] = None,
+    component: TaskComponent = None,
+    policy: TaskPolicy = None,
+    schedule: Optional[Schedule] = None,
+    restrictions: Optional[Restrictions] = None,
+    tags: Optional[Dict[str, str]] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Union[Coroutine[Any, Any, Alias.Id], Coroutine[Any, Any, AppLogs]]:
+    pass
 
 
 # FIXME check component
@@ -3217,7 +6859,7 @@ def task_full(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Union[Alias.Id, AppLogs]:
+) -> Union[Alias.Id, AppLogs, Coroutine[Any, Any, Alias.Id], Coroutine[Any, Any, AppLogs]]:
     """prepare, run and stop task by `task_id`, `cfg_id` and other
 
     Args:
@@ -3294,6 +6936,74 @@ def task_full(
     )
 
 
+@overload
+def task_prepare(
+    task_id: str,
+    cfg_id: Optional[str] = None,
+    info_url: Optional[str] = None,
+    debug_mode: bool = False,
+    core_manage: bool = False,
+    kafka_mode: bool = False,
+    single_request: bool = False,
+    kafka_mode_url_response: Optional[str] = None,
+    with_listener: bool = False,
+    tl_without_data: Optional[int] = None,
+    wait_runs: bool = True,
+    with_logs: bool = False,
+    profile_mode: Optional[str] = None,
+    save_fails: bool = True,
+    with_show: bool = None,
+    long: bool = False,
+    long_timeout: int = WAIT_RESULT_TIMEOUT,
+    scaleInfo: List[ScaleInfo] = None,
+    component: TaskComponent = None,
+    policy: TaskPolicy = None,
+    restrictions: Optional[Restrictions] = None,
+    tags: Optional[Dict[str, str]] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Union[Alias.Id, AppLogs]:
+    pass
+
+
+@overload
+def task_prepare(
+    task_id: str,
+    cfg_id: Optional[str] = None,
+    info_url: Optional[str] = None,
+    debug_mode: bool = False,
+    core_manage: bool = False,
+    kafka_mode: bool = False,
+    single_request: bool = False,
+    kafka_mode_url_response: Optional[str] = None,
+    with_listener: bool = False,
+    tl_without_data: Optional[int] = None,
+    wait_runs: bool = True,
+    with_logs: bool = False,
+    profile_mode: Optional[str] = None,
+    save_fails: bool = True,
+    with_show: bool = None,
+    long: bool = False,
+    long_timeout: int = WAIT_RESULT_TIMEOUT,
+    scaleInfo: List[ScaleInfo] = None,
+    component: TaskComponent = None,
+    policy: TaskPolicy = None,
+    restrictions: Optional[Restrictions] = None,
+    tags: Optional[Dict[str, str]] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Union[Coroutine[Any, Any, Alias.Id], Coroutine[Any, Any, AppLogs]]:
+    pass
+
+
 def task_prepare(
     task_id: str,
     cfg_id: Optional[str] = None,
@@ -3323,7 +7033,7 @@ def task_prepare(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Union[Alias.Id, AppLogs]:
+) -> Union[Alias.Id, AppLogs, Coroutine[Any, Any, Alias.Id], Coroutine[Any, Any, AppLogs]]:
     """prepare task by `task_id`, `cfg_id` and other, return `operation_id`
 
     Args:
@@ -3411,6 +7121,54 @@ def task_prepare(
     )
 
 
+@overload
+def task_run(
+    operation_id: str,
+    cfg_id: Optional[str] = None,
+    info_url: Optional[str] = None,
+    debug_mode: Optional[bool] = None,
+    run_id: Optional[str] = None,
+    single_request: Optional[bool] = None,
+    profile_mode: Optional[str] = None,
+    with_show: bool = None,
+    long: bool = False,
+    long_timeout: int = WAIT_RESULT_TIMEOUT,
+    with_logs: bool = False,
+    schedule: Optional[Schedule] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Optional[Union[Alias.Id, AppLogs]]:
+    pass
+
+
+@overload
+def task_run(
+    operation_id: str,
+    cfg_id: Optional[str] = None,
+    info_url: Optional[str] = None,
+    debug_mode: Optional[bool] = None,
+    run_id: Optional[str] = None,
+    single_request: Optional[bool] = None,
+    profile_mode: Optional[str] = None,
+    with_show: bool = None,
+    long: bool = False,
+    long_timeout: int = WAIT_RESULT_TIMEOUT,
+    with_logs: bool = False,
+    schedule: Optional[Schedule] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Optional[Union[Alias.Id, AppLogs]]]:
+    pass
+
+
 def task_run(
     operation_id: str,
     cfg_id: Optional[str] = None,
@@ -3430,7 +7188,7 @@ def task_run(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Optional[Union[Alias.Id, AppLogs]]:
+) -> Union[Optional[Union[Alias.Id, AppLogs]], Coroutine[Any, Any, Optional[Union[Alias.Id, AppLogs]]]]:
     """run prepared task by `operation_id` with `cfg_id` and other overridden parameters
 
     Args:
@@ -3490,6 +7248,66 @@ def task_run(
     )
 
 
+@overload
+def pipeline_full(
+    pipeline_id: str,
+    cfg_id: str,
+    info_url: Optional[str] = None,
+    debug_mode: bool = False,
+    core_manage: bool = False,
+    single_request: bool = False,
+    profile_mode: Optional[str] = None,
+    component: TaskComponent = None,
+    policy: TaskPolicy = None,
+    schedule: Optional[Schedule] = None,
+    restrictions: Optional[Restrictions] = None,
+    scaleInfo: List[ScaleInfo] = None,
+    save_fails: bool = True,
+    tags: Optional[Dict[str, str]] = None,
+    with_show: bool = True,
+    long: bool = False,
+    long_timeout: Optional[int] = WAIT_RESULT_TIMEOUT,
+    return_response: bool = False,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Union[Alias.Id, AppLogs]:
+    pass
+
+
+@overload
+def pipeline_full(
+    pipeline_id: str,
+    cfg_id: str,
+    info_url: Optional[str] = None,
+    debug_mode: bool = False,
+    core_manage: bool = False,
+    single_request: bool = False,
+    profile_mode: Optional[str] = None,
+    component: TaskComponent = None,
+    policy: TaskPolicy = None,
+    schedule: Optional[Schedule] = None,
+    restrictions: Optional[Restrictions] = None,
+    scaleInfo: List[ScaleInfo] = None,
+    save_fails: bool = True,
+    tags: Optional[Dict[str, str]] = None,
+    with_show: bool = True,
+    long: bool = False,
+    long_timeout: Optional[int] = WAIT_RESULT_TIMEOUT,
+    return_response: bool = False,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Union[Coroutine[Any, Any, Alias.Id], Coroutine[Any, Any, AppLogs]]:
+    pass
+
+
 def pipeline_full(
     pipeline_id: str,
     cfg_id: str,
@@ -3515,7 +7333,7 @@ def pipeline_full(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Union[Alias.Id, AppLogs]:
+) -> Union[Alias.Id, AppLogs, Coroutine[Any, Any, Alias.Id], Coroutine[Any, Any, AppLogs]]:
     if schedule is not None:
         schedule.validate()
     if batcher is None:
@@ -3577,6 +7395,80 @@ def pipeline_full(
     )
 
 
+@overload
+def pipeline_prepare(
+    pipeline_id: str,
+    cfg_id: str,
+    info_url: Optional[str] = None,
+    debug_mode: bool = False,
+    core_manage: bool = False,
+    kafka_mode: bool = False,
+    single_request: bool = False,
+    tl_without_data: Optional[int] = None,
+    wait_runs: bool = True,
+    profile_mode: Optional[str] = None,
+    with_logs: bool = False,
+    component: TaskComponent = None,
+    policy: TaskPolicy = None,
+    restrictions: Optional[Restrictions] = None,
+    scaleInfo: List[ScaleInfo] = None,
+    with_listener: bool = False,
+    kafka_mode_url_response: Optional[str] = None,
+    synthetic: bool = False,
+    save_fails: bool = True,
+    scale_count: int = 1,
+    tags: Optional[Dict[str, str]] = None,
+    with_show: bool = True,
+    long: bool = False,
+    long_timeout: Optional[int] = WAIT_RESULT_TIMEOUT,
+    return_response: bool = False,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Union[Alias.Id, AppLogs]:
+    pass
+
+
+@overload
+def pipeline_prepare(
+    pipeline_id: str,
+    cfg_id: str,
+    info_url: Optional[str] = None,
+    debug_mode: bool = False,
+    core_manage: bool = False,
+    kafka_mode: bool = False,
+    single_request: bool = False,
+    tl_without_data: Optional[int] = None,
+    wait_runs: bool = True,
+    profile_mode: Optional[str] = None,
+    with_logs: bool = False,
+    component: TaskComponent = None,
+    policy: TaskPolicy = None,
+    restrictions: Optional[Restrictions] = None,
+    scaleInfo: List[ScaleInfo] = None,
+    with_listener: bool = False,
+    kafka_mode_url_response: Optional[str] = None,
+    synthetic: bool = False,
+    save_fails: bool = True,
+    scale_count: int = 1,
+    tags: Optional[Dict[str, str]] = None,
+    with_show: bool = True,
+    long: bool = False,
+    long_timeout: Optional[int] = WAIT_RESULT_TIMEOUT,
+    return_response: bool = False,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Union[Coroutine[Any, Any, Alias.Id], Coroutine[Any, Any, AppLogs]]:
+    pass
+
+
 def pipeline_prepare(
     pipeline_id: str,
     cfg_id: str,
@@ -3609,7 +7501,7 @@ def pipeline_prepare(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Union[Alias.Id, AppLogs]:
+) -> Union[Alias.Id, AppLogs, Coroutine[Any, Any, Alias.Id], Coroutine[Any, Any, AppLogs]]:
     if batcher is None:
         batcher = Config.BATCHER
     if scaleInfo is None:
@@ -3669,6 +7561,34 @@ def pipeline_prepare(
     )
 
 
+@overload
+def task_unschedule(
+    schedule_id: str,
+    with_show: bool = True,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def task_unschedule(
+    schedule_id: str,
+    with_show: bool = True,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def task_unschedule(
     schedule_id: str,
     with_show: bool = True,
@@ -3678,7 +7598,7 @@ def task_unschedule(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """unschedule task by `schedule_id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -3694,6 +7614,38 @@ def task_unschedule(
     )
 
 
+@overload
+def task_stop(
+    operation_id: str,
+    with_logs: bool = False,
+    info_url: Optional[str] = None,
+    with_show: bool = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Optional[Union[Alias.Id, AppLogs]]:
+    pass
+
+
+@overload
+def task_stop(
+    operation_id: str,
+    with_logs: bool = False,
+    info_url: Optional[str] = None,
+    with_show: bool = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Optional[Union[Alias.Id, AppLogs]]]:
+    pass
+
+
 def task_stop(
     operation_id: str,
     with_logs: bool = False,
@@ -3705,7 +7657,7 @@ def task_stop(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Optional[Union[Alias.Id, AppLogs]]:
+) -> Union[Optional[Union[Alias.Id, AppLogs]], Coroutine[Any, Any, Optional[Union[Alias.Id, AppLogs]]]]:
     """stop task by `operation_id`
 
     Args:
@@ -3731,6 +7683,36 @@ def task_stop(
     )
 
 
+@overload
+def task_stop_all(
+    with_logs: bool = False,
+    info_url: Optional[str] = None,
+    with_show: bool = True,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Json:
+    pass
+
+
+@overload
+def task_stop_all(
+    with_logs: bool = False,
+    info_url: Optional[str] = None,
+    with_show: bool = True,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Json]:
+    pass
+
+
 def task_stop_all(
     with_logs: bool = False,
     info_url: Optional[str] = None,
@@ -3741,7 +7723,7 @@ def task_stop_all(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Json:
+) -> Union[Alias.Json, Coroutine[Any, Any, Alias.Json]]:
     """stop all tasks"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -3757,6 +7739,34 @@ def task_stop_all(
     )
 
 
+@overload
+def task_resume(
+    operation_id: str,
+    with_show: bool = True,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Empty:
+    pass
+
+
+@overload
+def task_resume(
+    operation_id: str,
+    with_show: bool = True,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Empty]:
+    pass
+
+
 def task_resume(
     operation_id: str,
     with_show: bool = True,
@@ -3766,7 +7776,7 @@ def task_resume(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Empty:
+) -> Union[Alias.Empty, Coroutine[Any, Any, Alias.Empty]]:
     """resume task by `operation_id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -3782,6 +7792,34 @@ def task_resume(
     )
 
 
+@overload
+def task_pause(
+    operation_id: str,
+    with_show: bool = True,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Empty:
+    pass
+
+
+@overload
+def task_pause(
+    operation_id: str,
+    with_show: bool = True,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Empty]:
+    pass
+
+
 def task_pause(
     operation_id: str,
     with_show: bool = True,
@@ -3791,7 +7829,7 @@ def task_pause(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Empty:
+) -> Union[Alias.Empty, Coroutine[Any, Any, Alias.Empty]]:
     """pause task by `operation_id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -3807,6 +7845,40 @@ def task_pause(
     )
 
 
+@overload
+def app_stop(
+    operation_id: str,
+    task_id: Optional[str],
+    app_id: str,
+    run_id: str,
+    with_show: bool = True,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Empty:
+    pass
+
+
+@overload
+def app_stop(
+    operation_id: str,
+    task_id: Optional[str],
+    app_id: str,
+    run_id: str,
+    with_show: bool = True,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Empty]:
+    pass
+
+
 def app_stop(
     operation_id: str,
     task_id: Optional[str],
@@ -3819,7 +7891,7 @@ def app_stop(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Empty:
+) -> Union[Alias.Empty, Coroutine[Any, Any, Alias.Empty]]:
     """stop app by `operation_id`, `task_id` and `app_id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -3837,6 +7909,40 @@ def app_stop(
     )
 
 
+@overload
+def app_resume(
+    operation_id: str,
+    task_id: Optional[str],
+    app_id: str,
+    run_id: str,
+    with_show: bool = True,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Empty:
+    pass
+
+
+@overload
+def app_resume(
+    operation_id: str,
+    task_id: Optional[str],
+    app_id: str,
+    run_id: str,
+    with_show: bool = True,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Empty]:
+    pass
+
+
 def app_resume(
     operation_id: str,
     task_id: Optional[str],
@@ -3849,7 +7955,7 @@ def app_resume(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Empty:
+) -> Union[Alias.Empty, Coroutine[Any, Any, Alias.Empty]]:
     """resume app by `operation_id`, `task_id` and `app_id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -3867,6 +7973,40 @@ def app_resume(
     )
 
 
+@overload
+def app_pause(
+    operation_id: str,
+    task_id: Optional[str],
+    app_id: str,
+    run_id: str,
+    with_show: bool = True,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Empty:
+    pass
+
+
+@overload
+def app_pause(
+    operation_id: str,
+    task_id: Optional[str],
+    app_id: str,
+    run_id: str,
+    with_show: bool = True,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Empty]:
+    pass
+
+
 def app_pause(
     operation_id: str,
     task_id: Optional[str],
@@ -3879,7 +8019,7 @@ def app_pause(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Empty:
+) -> Union[Alias.Empty, Coroutine[Any, Any, Alias.Empty]]:
     """pause app by `operation_id`, `task_id` and `app_id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -3900,13 +8040,35 @@ def app_pause(
 # Limits
 
 
+@overload
+def get_user_limits(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> UserLimits:
+    pass
+
+
+@overload
+def get_user_limits(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, UserLimits]:
+    pass
+
+
 def get_user_limits(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> UserLimits:
+) -> Union[UserLimits, Coroutine[Any, Any, UserLimits]]:
     """return limits for user"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -3915,6 +8077,44 @@ def get_user_limits(
     if is_async:
         return f.get_limits_async(auth=auth, conn_url=conn_url)
     return f.get_limits(auth=auth, conn_url=conn_url)
+
+
+@overload
+def update_user_limits(
+    memory_request: Optional[int] = None,
+    memory_limit: Optional[int] = None,
+    cpu_request: Optional[int] = None,
+    cpu_limit: Optional[int] = None,
+    storage_request: Optional[int] = None,
+    storage_limit: Optional[int] = None,
+    gpu_disk: Optional[int] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def update_user_limits(
+    memory_request: Optional[int] = None,
+    memory_limit: Optional[int] = None,
+    cpu_request: Optional[int] = None,
+    cpu_limit: Optional[int] = None,
+    storage_request: Optional[int] = None,
+    storage_limit: Optional[int] = None,
+    gpu_disk: Optional[int] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
 
 
 def update_user_limits(
@@ -3931,7 +8131,7 @@ def update_user_limits(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """update limits for user"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -3945,6 +8145,50 @@ def update_user_limits(
     return f.post_limits(
         data, wait=wait, auth=auth, conn_url=conn_url
     )
+
+
+@overload
+def update_user_limits_scope(
+    login: str,
+    app_memory_request: Optional[int] = None,
+    app_memory_limit: Optional[int] = None,
+    app_cpu_request: Optional[int] = None,
+    app_cpu_limit: Optional[int] = None,
+    app_storage_request: Optional[int] = None,
+    app_storage_limit: Optional[int] = None,
+    assets_limit: Optional[int] = None,
+    allow_common_gpu: Optional[bool] = None,
+    gpu_disk_max: Optional[int] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def update_user_limits_scope(
+    login: str,
+    app_memory_request: Optional[int] = None,
+    app_memory_limit: Optional[int] = None,
+    app_cpu_request: Optional[int] = None,
+    app_cpu_limit: Optional[int] = None,
+    app_storage_request: Optional[int] = None,
+    app_storage_limit: Optional[int] = None,
+    assets_limit: Optional[int] = None,
+    allow_common_gpu: Optional[bool] = None,
+    gpu_disk_max: Optional[int] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
 
 
 def update_user_limits_scope(
@@ -3964,7 +8208,7 @@ def update_user_limits_scope(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """update limits scope for user, for superuser/admin"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -3983,13 +8227,35 @@ def update_user_limits_scope(
 # HandlerUrls
 
 
+@overload
+def get_user_handler_url(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> str:
+    pass
+
+
+@overload
+def get_user_handler_url(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, str]:
+    pass
+
+
 def get_user_handler_url(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> str:
+) -> Union[str, Coroutine[Any, Any, str]]:
     """return handler url for user"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -4000,6 +8266,32 @@ def get_user_handler_url(
     return f.get_handler_url(auth=auth, conn_url=conn_url)
 
 
+@overload
+def update_user_handler_url(
+    url: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def update_user_handler_url(
+    url: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def update_user_handler_url(
     url: Optional[str] = None,
     wait: bool = True,
@@ -4008,7 +8300,7 @@ def update_user_handler_url(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """update handler url for user"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -4026,13 +8318,35 @@ def update_user_handler_url(
 # Analytics
 
 
+@overload
+def get_analytics(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> UserAnalyticsBatch:
+    pass
+
+
+@overload
+def get_analytics(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, UserAnalyticsBatch]:
+    pass
+
+
 def get_analytics(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> UserAnalyticsBatch:
+) -> Union[UserAnalyticsBatch, Coroutine[Any, Any, UserAnalyticsBatch]]:
     """return all analytics for current user """
     if batcher is None:
         batcher = Config.BATCHER
@@ -4043,6 +8357,30 @@ def get_analytics(
     return f.get_analytics(auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_analytics_by_id(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> UserAnalytics:
+    pass
+
+
+@overload
+def get_analytics_by_id(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, UserAnalytics]:
+    pass
+
+
 def get_analytics_by_id(
     id: str,
     *,
@@ -4050,7 +8388,7 @@ def get_analytics_by_id(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> UserAnalytics:
+) -> Union[UserAnalytics, Coroutine[Any, Any, UserAnalytics]]:
     """return analytics by `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -4061,6 +8399,30 @@ def get_analytics_by_id(
     return f.get_analytics_by_id(id, auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_analytics_by_name(
+    name: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> UserAnalyticsBatch:
+    pass
+
+
+@overload
+def get_analytics_by_name(
+    name: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, UserAnalyticsBatch]:
+    pass
+
+
 def get_analytics_by_name(
     name: str,
     *,
@@ -4068,7 +8430,7 @@ def get_analytics_by_name(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> UserAnalyticsBatch:
+) -> Union[UserAnalyticsBatch, Coroutine[Any, Any, UserAnalyticsBatch]]:
     """return analytics by `name` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -4077,6 +8439,36 @@ def get_analytics_by_name(
     if is_async:
         return f.get_analytics_by_name_async(name, auth=auth, conn_url=conn_url)
     return f.get_analytics_by_name(name, auth=auth, conn_url=conn_url)
+
+
+@overload
+def create_analytics(
+    data: Dict[str, Any],
+    name: str,
+    timestamp: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def create_analytics(
+    data: Dict[str, Any],
+    name: str,
+    timestamp: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
 
 
 def create_analytics(
@@ -4089,7 +8481,7 @@ def create_analytics(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """save analytics with `data`, `name` and `timestamp`, return `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -4105,6 +8497,38 @@ def create_analytics(
     )
 
 
+@overload
+def update_analytics(
+    id: str,
+    data: Dict[str, Any],
+    name: str,
+    timestamp: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def update_analytics(
+    id: str,
+    data: Dict[str, Any],
+    name: str,
+    timestamp: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
+
+
 def update_analytics(
     id: str,
     data: Dict[str, Any],
@@ -4116,7 +8540,7 @@ def update_analytics(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """update analytics by `id` with `data`, `name` and `timestamp`, return `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -4132,6 +8556,32 @@ def update_analytics(
     )
 
 
+@overload
+def update_analytics_many(
+    data: List[UserAnalytics],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultIds:
+    pass
+
+
+@overload
+def update_analytics_many(
+    data: List[UserAnalytics],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultIds]:
+    pass
+
+
 def update_analytics_many(
     data: List[UserAnalytics],
     wait: bool = True,
@@ -4140,7 +8590,7 @@ def update_analytics_many(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultIds:
+) -> Union[ResultIds, Coroutine[Any, Any, ResultIds]]:
     """update analytics by list of UserAnalytics, return ResultIds """
     if batcher is None:
         batcher = Config.BATCHER
@@ -4159,6 +8609,30 @@ def update_analytics_many(
 # RunsInfo
 
 
+@overload
+def get_last_runs(
+    count: int = 10,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultIds:
+    pass
+
+
+@overload
+def get_last_runs(
+    count: int = 10,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultIds]:
+    pass
+
+
 def get_last_runs(
     count: int = 10,
     *,
@@ -4166,7 +8640,7 @@ def get_last_runs(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultIds:
+) -> Union[ResultIds, Coroutine[Any, Any, ResultIds]]:
     """return last operationIds (prepared task/pipeline)"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -4177,6 +8651,30 @@ def get_last_runs(
     return f.get_runsInfo_last_operation_ids(count, auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_last_failed_runs(
+    count: int = 5,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> ResultIds:
+    pass
+
+
+@overload
+def get_last_failed_runs(
+    count: int = 5,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultIds]:
+    pass
+
+
 def get_last_failed_runs(
     count: int = 5,
     *,
@@ -4184,7 +8682,7 @@ def get_last_failed_runs(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> ResultIds:
+) -> Union[ResultIds, Coroutine[Any, Any, ResultIds]]:
     """return last operationIds (failed prepare/run of task/pipeline)"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -4198,6 +8696,32 @@ def get_last_failed_runs(
 # WSApp
 
 
+@overload
+def get_ws_apps(
+    only_active: bool = False,
+    full: bool = False,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Union[ResultIds, WSApps]:
+    pass
+
+
+@overload
+def get_ws_apps(
+    only_active: bool = False,
+    full: bool = False,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Union[Coroutine[Any, Any, ResultIds], Coroutine[Any, Any, WSApps]]:
+    pass
+
+
 def get_ws_apps(
     only_active: bool = False,
     full: bool = False,
@@ -4206,7 +8730,7 @@ def get_ws_apps(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Union[ResultIds, WSApps]:
+) -> Union[ResultIds, WSApps, Coroutine[Any, Any, ResultIds], Coroutine[Any, Any, WSApps]]:
     """return list ids or list ws apps structure"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -4217,6 +8741,30 @@ def get_ws_apps(
     return f.get_ws_apps(only_active, full, auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_ws_app(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> WSApp:
+    pass
+
+
+@overload
+def get_ws_app(
+    id: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, WSApp]:
+    pass
+
+
 def get_ws_app(
     id: str,
     *,
@@ -4224,7 +8772,7 @@ def get_ws_app(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> WSApp:
+) -> Union[WSApp, Coroutine[Any, Any, WSApp]]:
     """return ws app struct by `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -4235,6 +8783,30 @@ def get_ws_app(
     return f.get_ws_apps_id(id, auth=auth, conn_url=conn_url)
 
 
+@overload
+def create_ws_app(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> WSApp:
+    pass
+
+
+@overload
+def create_ws_app(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, WSApp]:
+    pass
+
+
 def create_ws_app(
     wait: bool = True,
     *,
@@ -4242,7 +8814,7 @@ def create_ws_app(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> WSApp:
+) -> Union[WSApp, Coroutine[Any, Any, WSApp]]:
     """save ws app, return ws app struct"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -4253,6 +8825,32 @@ def create_ws_app(
     return f.post_ws_apps(wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def delete_ws_app(
+    id: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_ws_app(
+    id: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def delete_ws_app(
     id: str,
     wait: bool = True,
@@ -4261,7 +8859,7 @@ def delete_ws_app(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """delete ws app by `id` """
     if batcher is None:
         batcher = Config.BATCHER
@@ -4272,6 +8870,32 @@ def delete_ws_app(
     return f.delete_ws_apps_id(id, wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def delete_ws_apps(
+    only_not_active: bool = False,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_ws_apps(
+    only_not_active: bool = False,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def delete_ws_apps(
     only_not_active: bool = False,
     wait: bool = True,
@@ -4280,7 +8904,7 @@ def delete_ws_apps(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """delete all ws apps (only not active if `only_not_active`)"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -4294,13 +8918,35 @@ def delete_ws_apps(
 # MCP Tools
 
 
+@overload
+def get_mcp_tools(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> List[MCPTool]:
+    pass
+
+
+@overload
+def get_mcp_tools(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, List[MCPTool]]:
+    pass
+
+
 def get_mcp_tools(
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> List[MCPTool]:
+) -> Union[List[MCPTool], Coroutine[Any, Any, List[MCPTool]]]:
     """return list of mcp tools"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -4311,6 +8957,30 @@ def get_mcp_tools(
     return f.get_mcp_tools(auth=auth, conn_url=conn_url)
 
 
+@overload
+def get_mcp_tools_list(
+    *,
+    with_auth: bool = True,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> List[MCPToolSimple]:
+    pass
+
+
+@overload
+def get_mcp_tools_list(
+    *,
+    with_auth: bool = True,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, List[MCPToolSimple]]:
+    pass
+
+
 def get_mcp_tools_list(
     *,
     with_auth: bool = True,
@@ -4318,7 +8988,7 @@ def get_mcp_tools_list(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> List[MCPToolSimple]:
+) -> Union[List[MCPToolSimple], Coroutine[Any, Any, List[MCPToolSimple]]]:
     """return list of mcp tools (simple)"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -4327,6 +8997,34 @@ def get_mcp_tools_list(
     if is_async:
         return f.get_mcp_tools_list_async(with_auth=with_auth, auth=auth, conn_url=conn_url)
     return f.get_mcp_tools_list(with_auth=with_auth, auth=auth, conn_url=conn_url)
+
+
+@overload
+def get_mcp_tool(
+    id: Optional[str] = None,
+    name: Optional[str] = None,
+    *,
+    with_auth: bool = True,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Union[MCPToolSimple, MCPTool]:
+    pass
+
+
+@overload
+def get_mcp_tool(
+    id: Optional[str] = None,
+    name: Optional[str] = None,
+    *,
+    with_auth: bool = True,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Union[Coroutine[Any, Any, MCPToolSimple], Coroutine[Any, Any, MCPTool]]:
+    pass
 
 
 def get_mcp_tool(
@@ -4338,7 +9036,7 @@ def get_mcp_tool(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Union[MCPToolSimple, MCPTool]:
+) -> Union[MCPToolSimple, MCPTool, Coroutine[Any, Any, MCPToolSimple], Coroutine[Any, Any, MCPTool]]:
     """return mcp tool struct by `id` or `name` """
     assert id is not None or name is not None, "id or name should be set"
     if batcher is None:
@@ -4348,6 +9046,48 @@ def get_mcp_tool(
     if is_async:
         return f.get_mcp_tool_id_name_async(id, name, with_auth=with_auth, auth=auth, conn_url=conn_url)
     return f.get_mcp_tool_id_name(id, name, with_auth=with_auth, auth=auth, conn_url=conn_url)
+
+
+@overload
+def post_mcp_tool(
+    name: str,
+    description: Optional[str] = None,
+    input_schema: Optional[Dict[str, Any]] = None,
+    task_id: Optional[str] = None,
+    pipeline_id: Optional[str] = None,
+    cfg_id: Optional[str] = None,
+    run_settings: Optional[RunSettings] = None,
+    enable_not_auth: Optional[str] = None,
+    id: Optional[str] = None,   # set it on update
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def post_mcp_tool(
+    name: str,
+    description: Optional[str] = None,
+    input_schema: Optional[Dict[str, Any]] = None,
+    task_id: Optional[str] = None,
+    pipeline_id: Optional[str] = None,
+    cfg_id: Optional[str] = None,
+    run_settings: Optional[RunSettings] = None,
+    enable_not_auth: Optional[str] = None,
+    id: Optional[str] = None,   # set it on update
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
 
 
 def post_mcp_tool(
@@ -4366,7 +9106,7 @@ def post_mcp_tool(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """create mcp tool, return id"""
     assert task_id is None or pipeline_id is None, "mcp tool should be defined in one way"
     if batcher is None:
@@ -4380,6 +9120,36 @@ def post_mcp_tool(
     return f.post_mcp_tool(data, wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def call_mcp_tool(
+    name: str,
+    arguments: Dict[str, Any],
+    with_show: bool = True,
+    *,
+    with_auth: bool = True,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Union[AppLogsWithResults, Any]:
+    pass
+
+
+@overload
+def call_mcp_tool(
+    name: str,
+    arguments: Dict[str, Any],
+    with_show: bool = True,
+    *,
+    with_auth: bool = True,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Union[Coroutine[Any, Any, AppLogsWithResults], Coroutine[Any, Any, Any]]:
+    pass
+
+
 def call_mcp_tool(
     name: str,
     arguments: Dict[str, Any],
@@ -4390,7 +9160,7 @@ def call_mcp_tool(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Union[AppLogsWithResults, Any]:
+) -> Union[AppLogsWithResults, Any, Coroutine[Any, Any, AppLogsWithResults], Coroutine[Any, Any, Any]]:
     """run by mcp tool"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -4402,6 +9172,34 @@ def call_mcp_tool(
     return f.call_mcp_tool(data, with_show=with_show, with_auth=with_auth, auth=auth, conn_url=conn_url)
 
 
+@overload
+def delete_mcp_tool(
+    id: Optional[str] = None,
+    name: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_mcp_tool(
+    id: Optional[str] = None,
+    name: Optional[str] = None,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def delete_mcp_tool(
     id: Optional[str] = None,
     name: Optional[str] = None,
@@ -4411,7 +9209,7 @@ def delete_mcp_tool(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """delete mcp tool by `id` or `name` """
     assert id is not None or name is not None, "id or name should be set"
     if batcher is None:
@@ -4423,6 +9221,30 @@ def delete_mcp_tool(
     return f.delete_mcp_tool_id_name(id, name, wait=wait, auth=auth, conn_url=conn_url)
 
 
+@overload
+def delete_mcp_tools(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_mcp_tools(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
 def delete_mcp_tools(
     wait: bool = True,
     *,
@@ -4430,7 +9252,7 @@ def delete_mcp_tools(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Info:
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
     """delete all mcp tools"""
     if batcher is None:
         batcher = Config.BATCHER
@@ -4485,6 +9307,34 @@ async def kafka_send(
 # other
 
 
+@overload
+def create_collection_from_file(
+    filename: str,
+    name: Optional[str] = None,
+    metadata: Optional[Union[Dict[str, Any], str]] = None,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def create_collection_from_file(
+    filename: str,
+    name: Optional[str] = None,
+    metadata: Optional[Union[Dict[str, Any], str]] = None,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
+
+
 def create_collection_from_file(
     filename: str,
     name: Optional[str] = None,
@@ -4494,12 +9344,42 @@ def create_collection_from_file(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """create collection\n
     return collection id"""
     return fh.create_collection_from_file_df(
         filename, name, metadata, auth=auth, conn_url=conn_url, batcher=batcher, is_async=is_async
     )
+
+
+@overload
+def update_collection_from_file(
+    id: str,
+    filename: str,
+    name: Optional[str] = None,
+    metadata: Optional[Union[Dict[str, Any], str]] = None,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def update_collection_from_file(
+    id: str,
+    filename: str,
+    name: Optional[str] = None,
+    metadata: Optional[Union[Dict[str, Any], str]] = None,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
 
 
 def update_collection_from_file(
@@ -4512,12 +9392,40 @@ def update_collection_from_file(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """create collection\n
     return collection id"""
     return fh.update_collection_from_file_df(
         id, filename, name, metadata, auth=auth, conn_url=conn_url, batcher=batcher, is_async=is_async
     )
+
+
+@overload
+def create_collection_from_df(
+    data: pd.DataFrame,
+    name: Optional[str] = None,
+    metadata: Optional[Union[Dict[str, Any], str]] = None,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def create_collection_from_df(
+    data: pd.DataFrame,
+    name: Optional[str] = None,
+    metadata: Optional[Union[Dict[str, Any], str]] = None,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
 
 
 def create_collection_from_df(
@@ -4529,12 +9437,42 @@ def create_collection_from_df(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """create collection\n
     return collection id"""
     return fh.create_collection_from_df(
         data, name, metadata, auth=auth, conn_url=conn_url, batcher=batcher, is_async=is_async
     )
+
+
+@overload
+def update_collection_from_df(
+    id: str,
+    data: pd.DataFrame,
+    name: Optional[str] = None,
+    metadata: Optional[Union[Dict[str, Any], str]] = None,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def update_collection_from_df(
+    id: str,
+    data: pd.DataFrame,
+    name: Optional[str] = None,
+    metadata: Optional[Union[Dict[str, Any], str]] = None,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
 
 
 def update_collection_from_df(
@@ -4547,7 +9485,7 @@ def update_collection_from_df(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """update collection by id\n
     return collection id"""
     return fh.update_collection_from_df(
@@ -4570,6 +9508,34 @@ async def get_collection_to_df_async(
     return pd.DataFrame.from_records(records)
 
 
+@overload
+def get_collection_to_df(
+    id: str,
+    offset: int = 0,
+    limit: int = -1,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> pd.DataFrame:
+    pass
+
+
+@overload
+def get_collection_to_df(
+    id: str,
+    offset: int = 0,
+    limit: int = -1,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, pd.DataFrame]:
+    pass
+
+
 def get_collection_to_df(
     id: str,
     offset: int = 0,
@@ -4579,7 +9545,7 @@ def get_collection_to_df(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> pd.DataFrame:
+) -> Union[pd.DataFrame, Coroutine[Any, Any, pd.DataFrame]]:
     """return df from collection by `id`, pagination: unlimited - `limit` < 0"""
     if is_async:
         return get_collection_to_df_async(id, offset, limit, conn_url=conn_url, batcher=batcher)
@@ -4607,6 +9573,38 @@ async def get_collection_by_name_to_df_async(
     return pd.DataFrame.from_records(records)
 
 
+@overload
+def get_collection_by_name_to_df(
+    name: str,
+    operation_id: Optional[str] = None,
+    run_id: Optional[str] = None,
+    offset: int = 0,
+    limit: int = -1,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> pd.DataFrame:
+    pass
+
+
+@overload
+def get_collection_by_name_to_df(
+    name: str,
+    operation_id: Optional[str] = None,
+    run_id: Optional[str] = None,
+    offset: int = 0,
+    limit: int = -1,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, pd.DataFrame]:
+    pass
+
+
 def get_collection_by_name_to_df(
     name: str,
     operation_id: Optional[str] = None,
@@ -4618,7 +9616,7 @@ def get_collection_by_name_to_df(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> pd.DataFrame:
+) -> Union[pd.DataFrame, Coroutine[Any, Any, pd.DataFrame]]:
     """return df from collection by `name` and mb also `operation_id` and `run_id` with which it was saved. raise if there are multiple collections, pagination: unlimited - `limit` < 0"""
     if is_async:
         return get_collection_by_name_to_df_async(
@@ -4631,6 +9629,32 @@ def get_collection_by_name_to_df(
     return pd.DataFrame.from_records(records)
 
 
+@overload
+def create_doc_from_file(
+    filename: str,
+    name: Optional[str] = None,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Alias.Id:
+    pass
+
+
+@overload
+def create_doc_from_file(
+    filename: str,
+    name: Optional[str] = None,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
+
+
 def create_doc_from_file(
     filename: str,
     name: Optional[str] = None,
@@ -4639,7 +9663,7 @@ def create_doc_from_file(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     """create doc\n
     return doc id"""
     with open(filename) as f:
@@ -4647,6 +9671,32 @@ def create_doc_from_file(
     return create_doc(
         data, name, auth=auth, conn_url=conn_url, batcher=batcher, is_async=is_async
     )
+
+
+@overload
+def create_schemes_by_path(
+    path: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False],
+) -> Dict[str, Alias.Id]:
+    pass
+
+
+@overload
+def create_schemes_by_path(
+    path: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Dict[str, Alias.Id]]:
+    pass
 
 
 def create_schemes_by_path(
@@ -4657,7 +9707,7 @@ def create_schemes_by_path(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Dict[str, Alias.Id]:
+) -> Union[Dict[str, Alias.Id], Coroutine[Any, Any, Dict[str, Alias.Id]]]:
     """schemes are created from json along the path to the directory, scheme_name - is the name of the file without '.json', returned a dict from the name of the created scheme to id"""
     res = dict()
     for filename in os.listdir(path):

@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Coroutine, Dict, List, Literal, Optional, Union, overload
 from uuid import uuid4
 
 import pandas as pd
@@ -32,20 +32,71 @@ from malevich_coretools.secondary import Config, to_json
 __all__ = ["create_collection_from_file_df", "update_collection_from_file_df", "raw_collection_from_df", "raw_collection_from_file", "create_collection_from_df", "update_collection_from_df", "create_app_settings", "create_user_config", "create_task_component", "create_task_policy", "create_restrictions", "create_run_settings", "create_endpoint_override", "create_cfg_struct"]
 
 
+@overload
 def create_collection_from_file_df(
     file: str,
     name: Optional[str],
     metadata: Optional[Union[Dict[str, Any], str]],
     *args,
+    is_async: Literal[False],
     **kwargs
 ) -> Alias.Id:
+    pass
+
+
+@overload
+def create_collection_from_file_df(
+    file: str,
+    name: Optional[str],
+    metadata: Optional[Union[Dict[str, Any], str]],
+    *args,
+    is_async: Literal[True],
+    **kwargs
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
+
+
+def create_collection_from_file_df(
+    file: str,
+    name: Optional[str],
+    metadata: Optional[Union[Dict[str, Any], str]],
+    *args,
+    is_async: bool = False,
+    **kwargs
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     try:
         data = pd.read_csv(file)
     except pd.errors.EmptyDataError:
         data = pd.DataFrame()
     if name is None:
         name = file
-    return create_collection_from_df(data, name=file, metadata=metadata, *args, **kwargs)
+    return create_collection_from_df(data, name=file, metadata=metadata, *args, is_async=is_async, **kwargs)
+
+
+@overload
+def update_collection_from_file_df(
+    id: str,
+    file: str,
+    name: Optional[str],
+    metadata: Optional[Union[Dict[str, Any], str]],
+    *args,
+    is_async: Literal[False],
+    **kwargs
+) -> Alias.Id:
+    pass
+
+
+@overload
+def update_collection_from_file_df(
+    id: str,
+    file: str,
+    name: Optional[str],
+    metadata: Optional[Union[Dict[str, Any], str]],
+    *args,
+    is_async: Literal[True],
+    **kwargs
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
 
 
 def update_collection_from_file_df(
@@ -54,15 +105,16 @@ def update_collection_from_file_df(
     name: Optional[str],
     metadata: Optional[Union[Dict[str, Any], str]],
     *args,
+    is_async: bool = False,
     **kwargs
-) -> Alias.Id:
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     try:
         data = pd.read_csv(file)
     except pd.errors.EmptyDataError:
         data = pd.DataFrame()
     if name is None:
         name = file
-    return update_collection_from_df(id, data, name=file, metadata=metadata, *args, **kwargs)
+    return update_collection_from_df(id, data, name=file, metadata=metadata, *args, is_async=is_async, **kwargs)
 
 
 def raw_collection_from_df(
@@ -95,15 +147,41 @@ def raw_collection_from_file(
     return raw_collection_from_df(data, name, metadata)
 
 
+@overload
 def create_collection_from_df(
     data: pd.DataFrame,
     name: Optional[str],
     metadata: Optional[Union[Dict[str, Any], str]],
     batcher: Optional[Batcher] = None,
-    is_async: bool = False,
     *args,
+    is_async: Literal[False],
     **kwargs
 ) -> Alias.Id:
+    pass
+
+
+@overload
+def create_collection_from_df(
+    data: pd.DataFrame,
+    name: Optional[str],
+    metadata: Optional[Union[Dict[str, Any], str]],
+    batcher: Optional[Batcher] = None,
+    *args,
+    is_async: Literal[True],
+    **kwargs
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
+
+
+def create_collection_from_df(
+    data: pd.DataFrame,
+    name: Optional[str],
+    metadata: Optional[Union[Dict[str, Any], str]],
+    batcher: Optional[Batcher] = None,
+    *args,
+    is_async: bool = False,
+    **kwargs
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     if batcher is None:
         batcher = Config.BATCHER
     data = raw_collection_from_df(data, name, metadata)
@@ -114,16 +192,44 @@ def create_collection_from_df(
     return post_collections_data(data, *args, **kwargs)
 
 
+@overload
 def update_collection_from_df(
     id: str,
     data: pd.DataFrame,
     name: Optional[str],
     metadata: Optional[Union[Dict[str, Any], str]],
     batcher: Optional[Batcher] = None,
-    is_async: bool = False,
     *args,
+    is_async: Literal[False],
     **kwargs
 ) -> Alias.Id:
+    pass
+
+
+@overload
+def update_collection_from_df(
+    id: str,
+    data: pd.DataFrame,
+    name: Optional[str],
+    metadata: Optional[Union[Dict[str, Any], str]],
+    batcher: Optional[Batcher] = None,
+    *args,
+    is_async: Literal[True],
+    **kwargs
+) -> Coroutine[Any, Any, Alias.Id]:
+    pass
+
+
+def update_collection_from_df(
+    id: str,
+    data: pd.DataFrame,
+    name: Optional[str],
+    metadata: Optional[Union[Dict[str, Any], str]],
+    batcher: Optional[Batcher] = None,
+    *args,
+    is_async: bool = False,
+    **kwargs
+) -> Union[Alias.Id, Coroutine[Any, Any, Alias.Id]]:
     if batcher is None:
         batcher = Config.BATCHER
     data = raw_collection_from_df(data, name, metadata)
