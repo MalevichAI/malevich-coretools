@@ -7,7 +7,6 @@ from typing import Any, Callable, Optional
 
 import aiohttp
 import requests
-from aiohttp.client_exceptions import ClientResponseError
 from requests.models import Response
 
 from malevich_coretools.abstract.abstract import *  # noqa: F403
