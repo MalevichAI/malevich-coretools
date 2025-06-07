@@ -125,7 +125,7 @@ def get_docs(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultIds:
     pass
 
@@ -165,7 +165,7 @@ def get_doc(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultDoc:
     pass
 
@@ -207,7 +207,7 @@ def get_doc_by_name(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultDoc:
     pass
 
@@ -251,7 +251,7 @@ def create_doc(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -309,7 +309,7 @@ def update_doc(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -363,7 +363,7 @@ def delete_doc(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -407,7 +407,7 @@ def delete_docs(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -451,7 +451,7 @@ def get_collections(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultOwnAndSharedIds:
     pass
 
@@ -493,7 +493,7 @@ def get_collections_by_name(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultOwnAndSharedIds:
     pass
 
@@ -550,7 +550,7 @@ def get_collection_by_name(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultCollection:
     pass
 
@@ -609,7 +609,7 @@ def get_collection(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultCollection:
     pass
 
@@ -657,7 +657,7 @@ def get_collections_ids_by_group_name(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultIds:
     pass
 
@@ -709,7 +709,7 @@ def get_collections_by_group_name(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultCollections:
     pass
 
@@ -762,7 +762,7 @@ def create_collection(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -825,7 +825,7 @@ def update_collection(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -891,7 +891,7 @@ def s3_put_collection(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -955,7 +955,7 @@ def create_collection_by_docs(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -1018,7 +1018,7 @@ def update_collection_by_docs(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -1083,7 +1083,7 @@ def add_to_collection(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -1136,7 +1136,7 @@ def copy_collection(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -1189,7 +1189,7 @@ def apply_scheme(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -1253,7 +1253,7 @@ def fix_scheme(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -1307,7 +1307,7 @@ def unfix_scheme(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -1357,7 +1357,7 @@ def update_metadata(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -1408,7 +1408,7 @@ def delete_collections(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -1451,7 +1451,7 @@ def delete_collection(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -1496,7 +1496,7 @@ def s3_delete_collection(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -1542,7 +1542,7 @@ def delete_from_collection(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -1597,7 +1597,7 @@ def get_collection_objects(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> FilesDirs:
     pass
 
@@ -1641,7 +1641,7 @@ def get_collection_object(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> bytes:
     pass
 
@@ -1690,7 +1690,7 @@ def post_collection_object_presigned_url(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> str:
     pass
 
@@ -1741,7 +1741,7 @@ def get_collection_object_presigned_url(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> str:
     pass
 
@@ -1789,7 +1789,7 @@ def load_collection_object_presigned(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> bytes:
     pass
 
@@ -1834,7 +1834,7 @@ def update_collection_object(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -1884,7 +1884,7 @@ def update_collection_object_presigned(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -1930,7 +1930,7 @@ def delete_collection_objects(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -1973,7 +1973,7 @@ def delete_collection_object(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -2019,7 +2019,7 @@ def get_endpoints(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Endpoints:
     pass
 
@@ -2059,7 +2059,7 @@ def get_endpoint(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Endpoint:
     pass
 
@@ -2101,7 +2101,7 @@ def get_run_endpoint(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> EndpointRunInfo:
     pass
 
@@ -2146,7 +2146,7 @@ def run_endpoint(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Union[AppLogsWithResults, FlattenAppLogsWithResults, Any]:
     pass
 
@@ -2208,7 +2208,7 @@ def create_endpoint(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -2284,7 +2284,7 @@ def update_endpoint(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -2352,7 +2352,7 @@ def pause_endpoint(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -2396,7 +2396,7 @@ def resume_endpoint(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -2439,7 +2439,7 @@ def delete_endpoints(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -2482,7 +2482,7 @@ def delete_endpoint(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -2528,7 +2528,7 @@ def get_schemes(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultOwnAndSharedIds:
     pass
 
@@ -2568,7 +2568,7 @@ def get_scheme(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultScheme:
     pass
 
@@ -2610,7 +2610,7 @@ def get_scheme_raw(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Json:
     pass
 
@@ -2653,7 +2653,7 @@ def get_schemes_mapping(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultMapping:
     pass
 
@@ -2703,7 +2703,7 @@ def create_scheme(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -2757,7 +2757,7 @@ def update_scheme(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -2813,7 +2813,7 @@ def create_schemes_mapping(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -2874,7 +2874,7 @@ def delete_schemes(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -2917,7 +2917,7 @@ def delete_scheme(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -2963,7 +2963,7 @@ def delete_schemes_mapping(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -3022,7 +3022,7 @@ def check_auth(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -3060,7 +3060,7 @@ def ping(
     conn_url: Optional[str] = None,
     *,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -3100,7 +3100,7 @@ def get_shared_collection(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultLogins:
     pass
 
@@ -3142,7 +3142,7 @@ def get_shared_scheme(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultLogins:
     pass
 
@@ -3184,7 +3184,7 @@ def get_shared_app(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultLogins:
     pass
 
@@ -3226,7 +3226,7 @@ def get_shared_by_login(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultSharedForLogin:
     pass
 
@@ -3270,7 +3270,7 @@ def share_collection(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -3331,7 +3331,7 @@ def share_scheme(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -3392,7 +3392,7 @@ def share_app(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -3455,7 +3455,7 @@ def share(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -3529,7 +3529,7 @@ def delete_shared(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -3599,7 +3599,7 @@ def delete_shared_all(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -3644,7 +3644,7 @@ def get_user(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -3685,7 +3685,7 @@ def get_users(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultLogins:
     pass
 
@@ -3726,7 +3726,7 @@ def create_user(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -3772,7 +3772,7 @@ def delete_user_login(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> None:
     pass
 
@@ -3815,7 +3815,7 @@ def delete_user(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -3857,7 +3857,7 @@ def get_apps(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultOwnAndSharedIds:
     pass
 
@@ -3896,7 +3896,7 @@ def get_apps_real(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultOwnAndSharedIds:
     pass
 
@@ -3935,7 +3935,7 @@ def get_apps_map(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultOwnAndSharedIdsMap:
     pass
 
@@ -3975,7 +3975,7 @@ def get_app_map(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -4017,7 +4017,7 @@ def get_app(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> UserApp:
     pass
 
@@ -4059,7 +4059,7 @@ def get_app_real(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> UserApp:
     pass
 
@@ -4113,7 +4113,7 @@ def create_app(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -4219,7 +4219,7 @@ def update_app(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -4313,7 +4313,7 @@ def delete_apps(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -4356,7 +4356,7 @@ def delete_app(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -4402,7 +4402,7 @@ def get_tasks(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultIds:
     pass
 
@@ -4441,7 +4441,7 @@ def get_tasks_real(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultIds:
     pass
 
@@ -4480,7 +4480,7 @@ def get_tasks_map(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultIdsMap:
     pass
 
@@ -4520,7 +4520,7 @@ def get_task_map(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -4562,7 +4562,7 @@ def get_task(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> UserTask:
     pass
 
@@ -4604,7 +4604,7 @@ def get_task_real(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> UserTask:
     pass
 
@@ -4651,7 +4651,7 @@ def create_task(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -4723,7 +4723,7 @@ def update_task(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -4785,7 +4785,7 @@ def delete_tasks(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -4828,7 +4828,7 @@ def delete_task(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -4874,7 +4874,7 @@ def get_pipelines(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultIds:
     pass
 
@@ -4913,7 +4913,7 @@ def get_pipelines_real(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultIds:
     pass
 
@@ -4952,7 +4952,7 @@ def get_pipelines_map(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultIdsMap:
     pass
 
@@ -4992,7 +4992,7 @@ def get_pipeline_map(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -5034,7 +5034,7 @@ def get_pipeline(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Pipeline:
     pass
 
@@ -5076,7 +5076,7 @@ def get_pipeline_real(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Pipeline:
     pass
 
@@ -5118,7 +5118,7 @@ def search_pipeline_by_image_tag(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultIds:
     pass
 
@@ -5160,7 +5160,7 @@ def search_pipeline_by_image_tag_real(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultIds:
     pass
 
@@ -5207,7 +5207,7 @@ def create_pipeline(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -5278,7 +5278,7 @@ def update_pipeline(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -5345,7 +5345,7 @@ def delete_pipelines(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -5388,7 +5388,7 @@ def delete_pipeline(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -5434,7 +5434,7 @@ def get_cfgs(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultIds:
     pass
 
@@ -5473,7 +5473,7 @@ def get_cfgs_real(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultIds:
     pass
 
@@ -5512,7 +5512,7 @@ def get_cfgs_map(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultIdsMap:
     pass
 
@@ -5552,7 +5552,7 @@ def get_cfg_map(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -5594,7 +5594,7 @@ def get_cfg(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultUserCfg:
     pass
 
@@ -5636,7 +5636,7 @@ def get_cfg_real(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultUserCfg:
     pass
 
@@ -5697,7 +5697,7 @@ def create_cfg(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -5749,7 +5749,7 @@ def update_cfg(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -5799,7 +5799,7 @@ def delete_cfgs(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -5842,7 +5842,7 @@ def delete_cfg(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -5888,7 +5888,7 @@ def get_operations_results(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultIds:
     pass
 
@@ -5928,7 +5928,7 @@ def get_operation_result(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> str:
     pass
 
@@ -5970,7 +5970,7 @@ def delete_operations_results(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -6013,7 +6013,7 @@ def delete_operation_result(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -6060,7 +6060,7 @@ def get_run_condition(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Condition:
     pass
 
@@ -6103,7 +6103,7 @@ def get_run_active_runs(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Union[ResultIds, ResultTags]:
     pass
 
@@ -6155,7 +6155,7 @@ def get_run_main_task_cfg(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> MainTaskCfg:
     pass
 
@@ -6197,7 +6197,7 @@ def get_run_main_pipeline_cfg(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> MainPipelineCfg:
     pass
 
@@ -6240,7 +6240,7 @@ def get_task_runs(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultIds:
     pass
 
@@ -6293,7 +6293,7 @@ def logs(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> AppLogs:
     pass
 
@@ -6347,7 +6347,7 @@ def logs_app(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> AppLogs:
     pass
 
@@ -6401,7 +6401,7 @@ def logs_clickhouse(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Json:
     pass
 
@@ -6441,7 +6441,7 @@ def logs_clickhouse_id(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Json:
     pass
 
@@ -6483,7 +6483,7 @@ def get_dag_key_value(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Json:
     pass
 
@@ -6527,7 +6527,7 @@ def update_dag_key_value(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> None:
     pass
 
@@ -6585,7 +6585,7 @@ def get_app_info(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Union[Alias.Json, AppFunctionsInfo]:
     pass
 
@@ -6630,7 +6630,7 @@ def get_app_info_by_real_id(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Union[Alias.Json, AppFunctionsInfo]:
     pass
 
@@ -6678,7 +6678,7 @@ def get_image_info(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Union[Alias.Json, AppFunctionsInfo]:
     pass
 
@@ -6734,7 +6734,7 @@ def get_task_schedules(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Schedules:
     pass
 
@@ -6800,7 +6800,7 @@ def task_full(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Union[Alias.Id, AppLogs]:
     pass
 
@@ -6965,7 +6965,7 @@ def task_prepare(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Union[Alias.Id, AppLogs]:
     pass
 
@@ -7140,7 +7140,7 @@ def task_run(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Optional[Union[Alias.Id, AppLogs]]:
     pass
 
@@ -7273,7 +7273,7 @@ def pipeline_full(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Union[Alias.Id, AppLogs]:
     pass
 
@@ -7427,7 +7427,7 @@ def pipeline_prepare(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Union[Alias.Id, AppLogs]:
     pass
 
@@ -7570,7 +7570,7 @@ def task_unschedule(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -7625,7 +7625,7 @@ def task_stop(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Optional[Union[Alias.Id, AppLogs]]:
     pass
 
@@ -7693,7 +7693,7 @@ def task_stop_all(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Json:
     pass
 
@@ -7748,7 +7748,7 @@ def task_resume(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Empty:
     pass
 
@@ -7801,7 +7801,7 @@ def task_pause(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Empty:
     pass
 
@@ -7857,7 +7857,7 @@ def app_stop(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Empty:
     pass
 
@@ -7921,7 +7921,7 @@ def app_resume(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Empty:
     pass
 
@@ -7985,7 +7985,7 @@ def app_pause(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Empty:
     pass
 
@@ -8046,7 +8046,7 @@ def get_user_limits(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> UserLimits:
     pass
 
@@ -8093,7 +8093,7 @@ def update_user_limits(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -8164,7 +8164,7 @@ def update_user_limits_scope(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -8233,7 +8233,7 @@ def get_user_handler_url(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> str:
     pass
 
@@ -8274,7 +8274,7 @@ def update_user_handler_url(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -8324,7 +8324,7 @@ def get_analytics(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> UserAnalyticsBatch:
     pass
 
@@ -8364,7 +8364,7 @@ def get_analytics_by_id(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> UserAnalytics:
     pass
 
@@ -8406,7 +8406,7 @@ def get_analytics_by_name(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> UserAnalyticsBatch:
     pass
 
@@ -8451,7 +8451,7 @@ def create_analytics(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -8508,7 +8508,7 @@ def update_analytics(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -8564,7 +8564,7 @@ def update_analytics_many(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultIds:
     pass
 
@@ -8616,7 +8616,7 @@ def get_last_runs(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultIds:
     pass
 
@@ -8658,7 +8658,7 @@ def get_last_failed_runs(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> ResultIds:
     pass
 
@@ -8704,7 +8704,7 @@ def get_ws_apps(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Union[ResultIds, WSApps]:
     pass
 
@@ -8748,7 +8748,7 @@ def get_ws_app(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> WSApp:
     pass
 
@@ -8790,7 +8790,7 @@ def create_ws_app(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> WSApp:
     pass
 
@@ -8833,7 +8833,7 @@ def delete_ws_app(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -8878,7 +8878,7 @@ def delete_ws_apps(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -8924,7 +8924,7 @@ def get_mcp_tools(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> List[MCPTool]:
     pass
 
@@ -8964,7 +8964,7 @@ def get_mcp_tools_list(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> List[MCPToolSimple]:
     pass
 
@@ -9008,7 +9008,7 @@ def get_mcp_tool(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Union[MCPToolSimple, MCPTool]:
     pass
 
@@ -9064,7 +9064,7 @@ def post_mcp_tool(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -9130,7 +9130,7 @@ def call_mcp_tool(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Union[AppLogsWithResults, Any]:
     pass
 
@@ -9181,7 +9181,7 @@ def delete_mcp_tool(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -9228,7 +9228,7 @@ def delete_mcp_tools(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Info:
     pass
 
@@ -9316,7 +9316,7 @@ def create_collection_from_file(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -9362,7 +9362,7 @@ def update_collection_from_file(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -9409,7 +9409,7 @@ def create_collection_from_df(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -9455,7 +9455,7 @@ def update_collection_from_df(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -9517,7 +9517,7 @@ def get_collection_to_df(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> pd.DataFrame:
     pass
 
@@ -9584,7 +9584,7 @@ def get_collection_by_name_to_df(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> pd.DataFrame:
     pass
 
@@ -9637,7 +9637,7 @@ def create_doc_from_file(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Alias.Id:
     pass
 
@@ -9681,7 +9681,7 @@ def create_schemes_by_path(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
 ) -> Dict[str, Alias.Id]:
     pass
 

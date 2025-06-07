@@ -7,6 +7,7 @@ from typing import Any, Callable, Optional
 
 import aiohttp
 import requests
+from aiohttp.client_exceptions import ClientResponseError
 from requests.models import Response
 
 from malevich_coretools.abstract.abstract import *  # noqa: F403
@@ -1630,29 +1631,35 @@ async def __get_result(id: str, is_text: bool = True, check_time: float = LONG_S
 
 async def __async_check_response(response: aiohttp.ClientResponse, show_func: Optional[Callable]=None, path: Optional[str] = None):  # noqa: ANN202
     if not response.ok:
+        text = await response.text()
         if show_func is None:
             if path is not None:
-                text = await response.text()
                 msg = f"failed: {text}" if len(text) > 0 else "failed"
                 Config.logger.error(f"{path} {msg}")
             else:
-                Config.logger.error(await response.text())
+                Config.logger.error(text)
         else:
             if path is not None:
                 Config.logger.error(f"{path} failed")
-            show_func(await response.text(), err=True)
+            show_func(text, err=True)
+
+        if response.reason is not None and len(response.reason) == 0:
+            response.reason = text
     response.raise_for_status()
 
 
 def __check_response(path: str, response: Response, show_func: Optional[Callable]=None):  # noqa: ANN202
     if response.status_code >= 400:
+        text = response.text
         if show_func is None:
-            text = response.text
             msg = f"failed: {text}" if len(text) > 0 else "failed"
             Config.logger.error(f"{path} {msg}")
         else:
             Config.logger.error(f"{path} failed")
-            show_func(response.text, err=True)
+            show_func(text, err=True)
+
+        if response.reason is not None and len(response.reason) == 0:
+            response.reason = text
     response.raise_for_status()
 
 

@@ -38,7 +38,7 @@ def create_collection_from_file_df(
     name: Optional[str],
     metadata: Optional[Union[Dict[str, Any], str]],
     *args,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
     **kwargs
 ) -> Alias.Id:
     pass
@@ -80,7 +80,7 @@ def update_collection_from_file_df(
     name: Optional[str],
     metadata: Optional[Union[Dict[str, Any], str]],
     *args,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
     **kwargs
 ) -> Alias.Id:
     pass
@@ -154,7 +154,7 @@ def create_collection_from_df(
     metadata: Optional[Union[Dict[str, Any], str]],
     batcher: Optional[Batcher] = None,
     *args,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
     **kwargs
 ) -> Alias.Id:
     pass
@@ -200,7 +200,7 @@ def update_collection_from_df(
     metadata: Optional[Union[Dict[str, Any], str]],
     batcher: Optional[Batcher] = None,
     *args,
-    is_async: Literal[False],
+    is_async: Literal[False] = False,
     **kwargs
 ) -> Alias.Id:
     pass
