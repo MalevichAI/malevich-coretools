@@ -60,6 +60,10 @@ def __show_logs_result(res: LogsResult):  # noqa: ANN202
     if len(res.data) > 0:
         print("------- main:")
         print(res.data)
+    if res.logs is None:
+        res.logs = {}
+    if res.userLogs is None:
+        res.userLogs = {}
     for run_id, logs in res.logs.items():
         print(f"------- {run_id}:")
         userLogs = res.userLogs.get(run_id, "")
@@ -119,7 +123,9 @@ def show_logs_colored(app_logs: AppLogs, colors_dict: Optional[Dict[str, str]] =
             if len(logs_result.data) > 0:
                 for line in logs_result.data.splitlines():
                     format(f"{app_name_prefix}$main: {line}", color)
-            if len(logs_result.logs) > 0:
+            if logs_result.logs is not None and len(logs_result.logs) > 0:
+                if logs_result.userLogs is None:
+                    logs_result.userLogs = {}
                 for run_id, logs in logs_result.logs.items():
                     user_logs = logs_result.userLogs.get(run_id, "")
                     if len(user_logs) > 0:

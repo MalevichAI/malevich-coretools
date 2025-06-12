@@ -385,8 +385,8 @@ class CollectionMetadata(BaseModel):
 
 class LogsResult(BaseModel):
     data: str
-    logs: Dict[str, str]
-    userLogs: Dict[str, str] = {}
+    logs: Optional[Dict[str, str]] = {}
+    userLogs: Optional[Dict[str, str]] = {}
 
 
 class AppLog(BaseModel):
