@@ -241,6 +241,7 @@ class RunTask(Operation):
     profileMode: Optional[str] = None
     withLogs: bool = False
     schedule: Optional[Schedule] = None
+    broadcast: bool = False
 
 
 class AppManage(Operation):

@@ -7135,6 +7135,7 @@ def task_run(
     long_timeout: int = WAIT_RESULT_TIMEOUT,
     with_logs: bool = False,
     schedule: Optional[Schedule] = None,
+    broadcast: bool = False,
     wait: bool = True,
     *,
     auth: Optional[AUTH] = None,
@@ -7159,6 +7160,7 @@ def task_run(
     long_timeout: int = WAIT_RESULT_TIMEOUT,
     with_logs: bool = False,
     schedule: Optional[Schedule] = None,
+    broadcast: bool = False,
     wait: bool = True,
     *,
     auth: Optional[AUTH] = None,
@@ -7182,6 +7184,7 @@ def task_run(
     long_timeout: int = WAIT_RESULT_TIMEOUT,
     with_logs: bool = False,
     schedule: Optional[Schedule] = None,
+    broadcast: bool = False,
     wait: bool = True,
     *,
     auth: Optional[AUTH] = None,
@@ -7204,6 +7207,7 @@ def task_run(
         long_timeout (Optional[int]): default timeout for long run (hour by default). If 'long=False' ignored. If None, then there is no limit. Doesn't stop the task, just stops trying to get the run result
         with_logs (bool): return run logs if True after end
         schedule: (Optional[Schedule]): schedule task runs settings - return scheduleId instead of operationId
+        broadcast: run scale pipeline (for new scale)
         wait (bool): is it worth waiting for the result or immediately return `operation_id`
         auth (Optional[AUTH]): redefined auth if not None"""
     if schedule is not None:
@@ -7224,6 +7228,7 @@ def task_run(
         profileMode=profile_mode,
         withLogs=with_logs,
         schedule=schedule,
+        broadcast=broadcast,
     )
     if batcher is not None:
         return batcher.add("sendTaskRun", data=data, result_model=AppLogs if with_logs or schedule is not None else None)
