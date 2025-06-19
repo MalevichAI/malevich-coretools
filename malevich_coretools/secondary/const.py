@@ -227,6 +227,11 @@ MCP_TOOLS_ALL = lambda wait: with_wait(f"{MCP_TOOLS_MAIN}/all", wait)
 MCP_TOOLS_LIST = f"{MCP_TOOLS_MAIN}/list"
 MCP_TOOLS_CALL = f"{MCP_TOOLS_MAIN}/call"
 
+## AppErrorInfoController
+APP_ERROR_INFO_MAIN = f"{API_VERSION}/errors"
+APP_ERROR_INFO = lambda wait: with_wait(f"{APP_ERROR_INFO_MAIN}/", wait)
+APP_ERROR_INFO_ID = lambda operationId, wait: with_wait(f"{APP_ERROR_INFO_MAIN}/{operationId}", wait)
+
 ### Kafka
 KAFKA_SEND = f"{MANAGER_MAIN}/kafkaMsg"
 

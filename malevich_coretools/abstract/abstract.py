@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 from pydantic import BaseModel
 
@@ -676,3 +676,37 @@ class MCPToolCall(BaseModel):
 class RunsFilter(BaseModel):
     data: Optional[Dict[str, str]] = None
     withTags: bool = False
+
+
+class AppLocalScheme(BaseModel):
+    keys: List[str]
+    optionalKeys: Set[str]
+
+
+class AppErrorInfo(BaseModel):
+    operationId: str
+    runId: str
+    bindId: str
+    funId: str
+    iteration: int
+    isProcessor: bool = True
+    trace: str
+    errType: str
+    errArgs: List[str]
+    isMalevichErr: bool
+    cfg: Optional[Dict[str, Any]]
+    schemes: Optional[Dict[str, AppLocalScheme]] = None
+    args: List[List[Union[Union[str, List[str]], List[Union[str, List[str]]]]]] = None  # mb empty for send info structure
+    argsNames: List[str]
+
+
+class AppErrorInfos(BaseModel):
+    data: List[AppErrorInfo]
+
+
+class AppErrorInfoFilter(BaseModel):
+    operationId: str
+    runId: Optional[str] = None
+    bindId: Optional[str] = None
+    errType: Optional[str] = None
+    isMalevichErr: bool = False

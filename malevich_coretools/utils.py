@@ -9268,6 +9268,156 @@ def delete_mcp_tools(
     return f.delete_mcp_tools(wait=wait, auth=auth, conn_url=conn_url)
 
 
+# app error info
+
+
+@overload
+def get_app_error_info(
+    operation_id: str,
+    run_id: Optional[str] = None,
+    bind_id: Optional[str] = None,
+    err_type: Optional[str] = None,
+    is_malevich_err: bool = False,
+    *,
+    with_auth: bool = True,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False] = False,
+) -> AppErrorInfos:
+    pass
+
+
+@overload
+def get_app_error_info(
+    operation_id: str,
+    run_id: Optional[str] = None,
+    bind_id: Optional[str] = None,
+    err_type: Optional[str] = None,
+    is_malevich_err: bool = False,
+    *,
+    with_auth: bool = True,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, AppErrorInfos]:
+    pass
+
+
+def get_app_error_info(
+    operation_id: str,
+    run_id: Optional[str] = None,
+    bind_id: Optional[str] = None,
+    err_type: Optional[str] = None,
+    is_malevich_err: bool = False,
+    *,
+    with_auth: bool = True,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: bool = False,
+) -> Union[AppErrorInfos, Coroutine[Any, Any, AppErrorInfos]]:
+    """return mcp tool struct by `id` or `name` """
+    assert id is not None or name is not None, "id or name should be set"
+    data = AppErrorInfoFilter(operationId=operation_id, runId=run_id, bindId=bind_id, errType=err_type, isMalevichErr=is_malevich_err)
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getAppErrorInfo", data=data, result_model=AppErrorInfos)
+    if is_async:
+        return f.get_app_error_info_async(data, with_auth=with_auth, auth=auth, conn_url=conn_url)
+    return f.get_app_error_info(data, with_auth=with_auth, auth=auth, conn_url=conn_url)
+
+
+@overload
+def delete_app_error_info(
+    operation_id: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False] = False,
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_app_error_info(
+    operation_id: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
+def delete_app_error_info(
+    operation_id: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: bool = False,
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
+    """delete app error info by `operationId` """
+    assert id is not None or name is not None, "id or name should be set"
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteAppErrorInfoByOperationId", vars={"operationId": operation_id})
+    if is_async:
+        return f.delete_app_error_info_async(operation_id, wait=wait, auth=auth, conn_url=conn_url)
+    return f.delete_app_error_info(operation_id, wait=wait, auth=auth, conn_url=conn_url)
+
+
+@overload
+def delete_app_error_infos(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False] = False,
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_app_error_infos(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
+def delete_app_error_infos(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: bool = False,
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
+    """delete all app error infos"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteAppErrorInfos")
+    if is_async:
+        return f.delete_app_error_infos_async(wait=wait, auth=auth, conn_url=conn_url)
+    return f.delete_app_error_infos(wait=wait, auth=auth, conn_url=conn_url)
+
+
 # kafka
 
 

@@ -1578,6 +1578,30 @@ async def delete_mcp_tools_async(wait: bool, *args, **kwargs) -> Alias.Info:
     return await send_to_core_modify_async(MCP_TOOLS_ALL(wait), *args, **kwargs, is_post=False)
 
 
+def get_app_error_info(data: AppErrorInfoFilter, *args, **kwargs) -> AppErrorInfos:
+    return model_from_json(send_to_core_modify(APP_ERROR_INFO(None), data, *args, **kwargs), AppErrorInfos)
+
+
+async def get_app_error_info_async(data: AppErrorInfoFilter, *args, **kwargs) -> AppErrorInfos:
+    return model_from_json(await send_to_core_modify_async(APP_ERROR_INFO(None), data, *args, **kwargs), AppErrorInfos)
+
+
+def delete_app_error_info(id: str, wait: bool, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify(APP_ERROR_INFO_ID(id, wait), *args, **kwargs, is_post=False)
+
+
+async def delete_app_error_info_async(id: str, wait: bool, *args, **kwargs) -> Alias.Info:
+    return await send_to_core_modify_async(APP_ERROR_INFO_ID(id, wait), *args, **kwargs, is_post=False)
+
+
+def delete_app_error_infos(wait: bool, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify(APP_ERROR_INFO(wait), *args, **kwargs, is_post=False)
+
+
+async def delete_app_error_infos_async(wait: bool, *args, **kwargs) -> Alias.Info:
+    return await send_to_core_modify_async(APP_ERROR_INFO(wait), *args, **kwargs, is_post=False)
+
+
 async def kafka_send(data: KafkaMsg, *args, **kwargs) -> Union[Alias.Info, KafkaMsg]:
     result = await send_to_core_post_async(KAFKA_SEND, data, *args, **kwargs)
     try:
