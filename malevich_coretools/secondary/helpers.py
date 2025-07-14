@@ -71,6 +71,10 @@ def __show_logs_result(res: LogsResult):  # noqa: ANN202
             print(userLogs)
             print("-------")
         print(logs)
+    for run_id, logs in res.userLogs.items():
+        if run_id not in res.logs:
+            print(f"------- {run_id}:")
+            print(logs)
 
 
 def show_logs(app_logs: AppLogs, err: bool = False) -> None:  # noqa: ANN202
@@ -133,6 +137,10 @@ def show_logs_colored(app_logs: AppLogs, colors_dict: Optional[Dict[str, str]] =
                             format(f"{app_name_prefix}${run_id}: {line}", color)
                     if len(logs) > 0:
                         for line in logs.splitlines():
+                            format(f"{app_name_prefix}${run_id}: {line}", color)
+                for run_id, user_logs in logs_result.userLogs.items():
+                    if run_id not in logs_result.logs:
+                        for line in user_logs.splitlines():
                             format(f"{app_name_prefix}${run_id}: {line}", color)
 
 
