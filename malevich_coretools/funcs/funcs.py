@@ -1711,7 +1711,7 @@ async def send_to_core_get_async(path: str, with_auth=True, show_func: Optional[
         auth = (Config.CORE_USERNAME, Config.CORE_PASSWORD) if with_auth else None
     if auth is not None:
         auth = aiohttp.BasicAuth(login=auth[0], password=auth[1], encoding='utf-8')
-    async with async_session or aiohttp.ClientSession(auth=auth, connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
+    async with async_session or aiohttp.ClientSession(auth=auth, connector=aiohttp.TCPConnector(verify_ssl=False), timeout=aiohttp.ClientTimeout(total=None)) as session:
         async with session.get(f"{host}{path}", headers=HEADERS) as response:
             await __async_check_response(response, show_func, f"{host}{path}")
             if response.status == HTTPStatus.NO_CONTENT:
@@ -1762,7 +1762,7 @@ async def send_to_core_modify_async(path: str, operation: Optional[Any] = None, 
     if operation is not None:
         operation = json.dumps(operation.model_dump())
 
-    async with async_session or aiohttp.ClientSession(auth=auth if with_auth else None, connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
+    async with async_session or aiohttp.ClientSession(auth=auth if with_auth else None, connector=aiohttp.TCPConnector(verify_ssl=False), timeout=aiohttp.ClientTimeout(total=None)) as session:
         if is_post:
             response_cm = session.post(f"{host}{path}", data=operation, headers=HEADERS)
         else:
@@ -1816,7 +1816,7 @@ async def send_to_core_modify_raw_async(path: str, data: bytes, with_auth: bool=
         auth = (Config.CORE_USERNAME, Config.CORE_PASSWORD)
     auth = aiohttp.BasicAuth(login=auth[0], password=auth[1], encoding='utf-8')
 
-    async with async_session or aiohttp.ClientSession(auth=auth if with_auth else None, connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
+    async with async_session or aiohttp.ClientSession(auth=auth if with_auth else None, connector=aiohttp.TCPConnector(verify_ssl=False), timeout=aiohttp.ClientTimeout(total=None)) as session:
         if is_post:
             response_cm = session.post(f"{host}{path}", data=data, headers=HEADERS_RAW)
         else:
