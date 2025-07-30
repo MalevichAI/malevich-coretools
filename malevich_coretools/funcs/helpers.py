@@ -439,6 +439,7 @@ def base_settings(
     storage_request: Optional[int] = None,
     storage_limit: Optional[int] = None,
     kubeconfig: Optional[str] = None,
+    allow_kafka: bool = False,
 ) -> str:
     return BasePlatformSettings(
         memoryRequest=memory_request,
@@ -448,4 +449,5 @@ def base_settings(
         storageRequest=storage_request,
         storageLimit=storage_limit,
         kubeconfig=kubeconfig,
+        allowKafka=allow_kafka,
     ).model_dump_json()

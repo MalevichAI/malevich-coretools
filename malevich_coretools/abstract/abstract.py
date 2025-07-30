@@ -197,6 +197,7 @@ class MainTask(BaseModel):
     profileMode: Optional[str] = None
     withLogs: bool = False  # use only in prepare
     saveFails: bool = True
+    clearDagLogs: bool = True
     scaleCount: int = 1
     scaleInfo: List[ScaleInfo]
     component: TaskComponent
@@ -228,6 +229,7 @@ class MainPipeline(BaseModel):
     run: bool = True
     synthetic: bool = False
     saveFails: bool = True
+    clearDagLogs: bool = True
     scaleCount: int = 1
     tags: Optional[Dict[str, str]] = None
 
@@ -604,7 +606,7 @@ class UserLimits(BaseModel):
     defaultGpuDisk: int
 
 
-class BasePlatformSettings(BaseModel):
+class BasePlatformSettingsMain(BaseModel):
     memoryRequest: Optional[int] = None
     memoryLimit: Optional[int] = None
     cpuRequest: Optional[int] = None
@@ -614,7 +616,11 @@ class BasePlatformSettings(BaseModel):
     kubeconfig: Optional[str] = None
 
 
-class Limits(BasePlatformSettings):
+class BasePlatformSettings(BasePlatformSettingsMain):
+    allowKafka: bool = False
+
+
+class Limits(BasePlatformSettingsMain):
     gpuDisk: Optional[int] = None
 
 
