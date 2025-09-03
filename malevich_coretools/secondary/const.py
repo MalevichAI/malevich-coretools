@@ -39,13 +39,13 @@ def with_key_values(url: str, key_values: Dict[str, Optional[str]]) -> str:
 
 ## DocsController
 DOCS_MAIN = f"{API_VERSION}/docs"
-DOCS = lambda wait: with_wait(f"{DOCS_MAIN}/", wait)
+DOCS = lambda wait: with_wait(DOCS_MAIN, wait)
 DOCS_ID = lambda id, wait: with_wait(f"{DOCS_MAIN}/{id}", wait)
 DOCS_NAME = lambda name, wait: with_wait(f"{DOCS_MAIN}/name/{name}", wait)
 
 ## CollectionsController
 COLLECTIONS_MAIN = f"{API_VERSION}/collections"
-COLLECTIONS = lambda wait: with_wait(f"{COLLECTIONS_MAIN}/", wait)
+COLLECTIONS = lambda wait: with_wait(COLLECTIONS_MAIN, wait)
 COLLECTIONS_IDS_NAME = lambda name, operation_id, run_id: with_key_values(f"{COLLECTIONS_MAIN}/ids/name/{urllib.parse.quote(str(name), safe='')}", {"operationId": operation_id, "runId": run_id})
 COLLECTIONS_NAME = lambda name, operation_id, run_id, offset, limit: with_key_values(f"{COLLECTIONS_MAIN}/name/{urllib.parse.quote(str(name), safe='')}", {"operationId": operation_id, "runId": run_id, "offset": offset, "limit": limit})
 COLLECTIONS_IDS_GROUP_NAME = lambda name, operation_id, run_id: with_key_values(f"{COLLECTIONS_MAIN}/ids/groupName/{urllib.parse.quote(str(name), safe='')}", {"operationId": operation_id, "runId": run_id})
@@ -67,7 +67,7 @@ COLLECTIONS_METADATA = lambda id, wait: with_wait(f"{COLLECTIONS_MAIN}/{urllib.p
 COLLECTION_OBJECTS_MAIN = f"{API_VERSION}/collectionObjects"
 COLLECTION_OBJECTS_ALL_GET = lambda path, recursive: with_key_values(f"{COLLECTION_OBJECTS_MAIN}/all", {"path": path, "recursive": recursive})
 COLLECTION_OBJECTS_ALL = lambda wait: with_wait(f"{COLLECTION_OBJECTS_MAIN}/all", wait)
-COLLECTION_OBJECTS_PATH = lambda path, wait, zip: with_key_values(f"{COLLECTION_OBJECTS_MAIN}/", {"path": path, "wait": None if wait is None else bool_to_str(wait), "zip": None if zip is None else bool_to_str(zip)})
+COLLECTION_OBJECTS_PATH = lambda path, wait, zip: with_key_values(COLLECTION_OBJECTS_MAIN, {"path": path, "wait": None if wait is None else bool_to_str(wait), "zip": None if zip is None else bool_to_str(zip)})
 COLLECTION_OBJECTS_PRESIGN_PUT = lambda path, callback_url, expires_in, wait: with_key_values(f"{COLLECTION_OBJECTS_MAIN}/presign/put", {"path": path, "callback_url": callback_url, "expiresIn": expires_in, "wait": bool_to_str(wait)})
 COLLECTION_OBJECTS_PRESIGN_GET = lambda path, callback_url, expires_in, wait: with_key_values(f"{COLLECTION_OBJECTS_MAIN}/presign/get", {"path": path, "callback_url": callback_url, "expiresIn": expires_in, "wait": bool_to_str(wait)})
 COLLECTION_OBJECTS_PRESIGN = lambda signature, zip: with_key_values(f"{COLLECTION_OBJECTS_MAIN}/presign", {"signature": signature, "zip": None if zip is None else bool_to_str(zip)})
@@ -84,7 +84,7 @@ ENDPOINTS_RESUME = lambda hash, wait: with_wait(f"{ENDPOINTS_MAIN}/resume/{urlli
 
 ## SchemeController
 SCHEMES_MAIN = f"{API_VERSION}/schemes"
-SCHEMES = lambda wait: with_wait(f"{SCHEMES_MAIN}/", wait)
+SCHEMES = lambda wait: with_wait(SCHEMES_MAIN, wait)
 SCHEMES_ID = lambda id, wait: with_wait(f"{SCHEMES_MAIN}/{urllib.parse.quote(str(id), safe='')}", wait)
 SCHEMES_ID_RAW = lambda id: f"{SCHEMES_MAIN}/{urllib.parse.quote(str(id), safe='')}/raw"
 SCHEMES_MAPPING = lambda wait: with_wait(f"{SCHEMES_MAIN}/mapping", wait)
@@ -100,7 +100,7 @@ PING = "ping"
 
 ## UserShareController
 SHARE_MAIN = f"{API_VERSION}/share"
-SHARE = lambda wait: with_wait(f"{SHARE_MAIN}/", wait)
+SHARE = lambda wait: with_wait(SHARE_MAIN, wait)
 SHARE_COLLECTION_ID = lambda id, wait: with_wait(f"{SHARE_MAIN}/collection/{urllib.parse.quote(str(id), safe='')}", wait)
 SHARE_SCHEME_ID = lambda id, wait: with_wait(f"{SHARE_MAIN}/scheme/{urllib.parse.quote(str(id), safe='')}", wait)
 SHARE_USER_APP_ID = lambda id, wait: with_wait(f"{SHARE_MAIN}/userApp/{urllib.parse.quote(str(id), safe='')}", wait)
@@ -109,13 +109,13 @@ SHARE_ALL = lambda wait: with_wait(f"{SHARE_MAIN}/all", wait)
 
 ## RegistrationController
 REGISTER_MAIN = f"{API_VERSION}/register"
-REGISTER = f"{REGISTER_MAIN}/"
+REGISTER = REGISTER_MAIN
 REGISTER_LOGIN = lambda login, wait: with_wait(f"{REGISTER_MAIN}/login/{urllib.parse.quote(str(login), safe='')}", wait)
 REGISTER_ALL = f"{REGISTER_MAIN}/all"
 
 ## UserAppsController
 USER_APPS_MAIN = f"{API_VERSION}/userApps"
-USER_APPS = lambda wait: with_wait(f"{USER_APPS_MAIN}/", wait)
+USER_APPS = lambda wait: with_wait(USER_APPS_MAIN, wait)
 USER_APPS_REAL_IDS = f"{USER_APPS_MAIN}/realIds"
 USER_APPS_MAP_IDS = f"{USER_APPS_MAIN}/mapIds"
 USER_APPS_MAP_ID = lambda id: f"{USER_APPS_MAIN}/mapIds/{urllib.parse.quote(str(id), safe='')}"
@@ -124,7 +124,7 @@ USER_APPS_REAL_ID = lambda id: f"{USER_APPS_MAIN}/realIds/{urllib.parse.quote(st
 
 ## UserTasksController
 USER_TASKS_MAIN = f"{API_VERSION}/userTasks"
-USER_TASKS = lambda wait: with_wait(f"{USER_TASKS_MAIN}/", wait)
+USER_TASKS = lambda wait: with_wait(USER_TASKS_MAIN, wait)
 USER_TASKS_REAL_IDS = f"{USER_TASKS_MAIN}/realIds"
 USER_TASKS_MAP_IDS = f"{USER_TASKS_MAIN}/mapIds"
 USER_TASKS_MAP_ID = lambda id: f"{USER_TASKS_MAIN}/mapIds/{urllib.parse.quote(str(id), safe='')}"
@@ -133,7 +133,7 @@ USER_TASKS_REAL_ID = lambda id: f"{USER_TASKS_MAIN}/realIds/{urllib.parse.quote(
 
 ## UserPipelinesController
 USER_PIPELINES_MAIN = f"{API_VERSION}/userPipelines"
-USER_PIPELINES = lambda wait: with_wait(f"{USER_PIPELINES_MAIN}/", wait)
+USER_PIPELINES = lambda wait: with_wait(USER_PIPELINES_MAIN, wait)
 USER_PIPELINES_REAL_IDS = f"{USER_PIPELINES_MAIN}/realIds"
 USER_PIPELINES_MAP_IDS = f"{USER_PIPELINES_MAIN}/mapIds"
 USER_PIPELINES_MAP_ID = lambda id: f"{USER_PIPELINES_MAIN}/mapIds/{urllib.parse.quote(str(id), safe='')}"
@@ -144,7 +144,7 @@ USER_PIPELINES_TAG_REAL_IDS = lambda tag: f"{USER_PIPELINES_MAIN}/realIds/tagSea
 
 ## UserCfgsController
 USER_CFGS_MAIN = f"{API_VERSION}/userCfgs"
-USER_CFGS = lambda wait: with_wait(f"{USER_CFGS_MAIN}/", wait)
+USER_CFGS = lambda wait: with_wait(USER_CFGS_MAIN, wait)
 USER_CFGS_REAL_IDS = f"{USER_CFGS_MAIN}/realIds"
 USER_CFGS_MAP_IDS = f"{USER_CFGS_MAIN}/mapIds"
 USER_CFGS_MAP_ID = lambda id: f"{USER_CFGS_MAIN}/mapIds/{urllib.parse.quote(str(id), safe='')}"
@@ -153,7 +153,7 @@ USER_CFGS_REAL_ID = lambda id: f"{USER_CFGS_MAIN}/realIds/{urllib.parse.quote(st
 
 ## OperationResultsController
 OPERATION_RESULTS_MAIN = f"{API_VERSION}/operationResults"
-OPERATION_RESULTS = lambda wait: with_wait(f"{OPERATION_RESULTS_MAIN}/", wait)
+OPERATION_RESULTS = lambda wait: with_wait(OPERATION_RESULTS_MAIN, wait)
 OPERATION_RESULTS_ID = lambda id, wait: with_wait(f"{OPERATION_RESULTS_MAIN}/{urllib.parse.quote(str(id), safe='')}", wait)
 
 ## TempRunController
@@ -195,16 +195,16 @@ MANAGER_APP_PAUSE = lambda wait: with_wait(f"{MANAGER_MAIN}/app/pause", wait)
 
 ## LimitsController
 LIMITS_MAIN = f"{API_VERSION}/limits"
-LIMITS = lambda wait: with_wait(f"{LIMITS_MAIN}/", wait)
+LIMITS = lambda wait: with_wait(LIMITS_MAIN, wait)
 LIMITS_USER = lambda wait: with_wait(f"{LIMITS_MAIN}/user", wait)
 
 ## HandlerUrlController
 HANDLER_URL_MAIN = f"{API_VERSION}/handlerUrls"
-HANDLER_URL = lambda url, wait: with_key_values(f"{HANDLER_URL_MAIN}/", {"url": url, "wait": bool_to_str(wait)})
+HANDLER_URL = lambda url, wait: with_key_values(HANDLER_URL_MAIN, {"url": url, "wait": bool_to_str(wait)})
 
 ## AnalyticsController
 ANALYTICS_MAIN = f"{API_VERSION}/analytics"
-ANALYTICS = lambda wait: with_wait(f"{ANALYTICS_MAIN}/", wait)
+ANALYTICS = lambda wait: with_wait(ANALYTICS_MAIN, wait)
 ANALYTICS_MANY = lambda wait: with_wait(f"{ANALYTICS_MAIN}/many", wait)
 ANALYTICS_ID = lambda id, wait: with_wait(f"{ANALYTICS_MAIN}/{id}", wait)
 ANALYTICS_NAME = lambda name, wait: with_wait(f"{ANALYTICS_MAIN}/name/{name}", wait)
@@ -216,20 +216,20 @@ RUNS_INFO_LAST_FAILED = lambda count: with_key_values(f"{RUNS_INFO_MAIN}/lastFai
 
 ## WSAppsController
 WS_APPS_MAIN = f"{API_VERSION}/ws/apps"
-WS_APPS = lambda only_active, full: with_key_values(f"{WS_APPS_MAIN}/", {"onlyActive": only_active, "full": full})
-WS_APPS_ = lambda only_not_active, wait: with_key_values(f"{WS_APPS_MAIN}/", {"onlyNotActive": only_not_active, "wait": wait})
+WS_APPS = lambda only_active, full: with_key_values(WS_APPS_MAIN, {"onlyActive": only_active, "full": full})
+WS_APPS_ = lambda only_not_active, wait: with_key_values(WS_APPS_MAIN, {"onlyNotActive": only_not_active, "wait": wait})
 WS_APPS_ID = lambda id, wait: with_wait(f"{WS_APPS_MAIN}/{id}", wait)
 
 ## McpToolController
 MCP_TOOLS_MAIN = f"{API_VERSION}/tools"
-MCP_TOOLS = lambda id, name, wait: with_key_values(f"{MCP_TOOLS_MAIN}/", {"id": id, "name": name, "wait": wait})
+MCP_TOOLS = lambda id, name, wait: with_key_values(MCP_TOOLS_MAIN, {"id": id, "name": name, "wait": wait})
 MCP_TOOLS_ALL = lambda wait: with_wait(f"{MCP_TOOLS_MAIN}/all", wait)
 MCP_TOOLS_LIST = f"{MCP_TOOLS_MAIN}/list"
 MCP_TOOLS_CALL = f"{MCP_TOOLS_MAIN}/call"
 
 ## AppErrorInfoController
 APP_ERROR_INFO_MAIN = f"{API_VERSION}/errors"
-APP_ERROR_INFO = lambda wait: with_wait(f"{APP_ERROR_INFO_MAIN}/", wait)
+APP_ERROR_INFO = lambda wait: with_wait(APP_ERROR_INFO_MAIN, wait)
 APP_ERROR_INFO_ID = lambda operationId, wait: with_wait(f"{APP_ERROR_INFO_MAIN}/{operationId}", wait)
 
 ### Kafka
@@ -237,4 +237,4 @@ KAFKA_SEND = f"{MANAGER_MAIN}/kafkaMsg"
 
 ## BatchController
 BATCH_MAIN = f"{API_VERSION}/batch"
-BATCH = f"{BATCH_MAIN}/"
+BATCH = BATCH_MAIN

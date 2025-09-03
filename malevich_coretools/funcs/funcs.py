@@ -1222,14 +1222,22 @@ async def get_image_info_async(data: JsonImage, parse: bool, *args, **kwargs) ->
     return res
 
 
-def get_task_schedules(data: Operation, with_show: bool, *args, **kwargs) -> Schedules:
+def get_task_schedules(*args, **kwargs) -> ResultIds:
+    return model_from_json(send_to_core_get(MANAGER_TASK_SCHEDULES, *args, **kwargs), ResultIds)
+
+
+async def get_task_schedules_async(*args, **kwargs) -> ResultIds:
+    return model_from_json(await send_to_core_get_async(MANAGER_TASK_SCHEDULES, *args, **kwargs), ResultIds)
+
+
+def post_task_schedules(data: Operation, with_show: bool, *args, **kwargs) -> Schedules:
     res = model_from_json(send_to_core_modify(MANAGER_TASK_SCHEDULES, data, with_show=False, *args, **kwargs), Schedules)
     if with_show:
         Config.logger.info(res)
     return res
 
 
-async def get_task_schedules_async(data: Operation, with_show: bool, *args, **kwargs) -> Schedules:
+async def post_task_schedules_async(data: Operation, with_show: bool, *args, **kwargs) -> Schedules:
     res = model_from_json(await send_to_core_modify_async(MANAGER_TASK_SCHEDULES, data, with_show=False, *args, **kwargs), Schedules)
     if with_show:
         Config.logger.info(res)

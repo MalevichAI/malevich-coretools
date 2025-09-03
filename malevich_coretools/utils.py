@@ -6735,7 +6735,7 @@ def get_task_schedules(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: Literal[False] = False,
-) -> Schedules:
+) -> Union[Schedules, ResultIds]:
     pass
 
 
@@ -6748,32 +6748,39 @@ def get_task_schedules(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: Literal[True],
-) -> Coroutine[Any, Any, Schedules]:
+) -> Coroutine[Any, Any, Union[Schedules, ResultIds]]:
     pass
 
 
 def get_task_schedules(
-    operation_id: str,
+    operation_id: Optional[str] = None,
     with_show: bool = True,
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Union[Schedules, Coroutine[Any, Any, Schedules]]:
+) -> Union[ResultIds, Schedules, Coroutine[Any, Any, Schedules], Coroutine[Any, Any, ResultIds]]:
     """return schedule ids by `operation_id` """
     if batcher is None:
         batcher = Config.BATCHER
-    data = Operation(operationId=operation_id)
-    if batcher is not None:
-        return batcher.add("sendTaskSchedules", data=data, result_model=Schedules)
-    if is_async:
-        return f.get_task_schedules_async(
+    if operation_id is None:
+        if batcher is not None:
+            return batcher.add("getTaskSchedules", result_model=ResultIds)
+        if is_async:
+            return f.get_task_schedules_async(auth=auth, conn_url=conn_url)
+        return f.get_task_schedules(auth=auth, conn_url=conn_url)
+    else:
+        data = Operation(operationId=operation_id)
+        if batcher is not None:
+            return batcher.add("sendTaskSchedules", data=data, result_model=Schedules)
+        if is_async:
+            return f.post_task_schedules_async(
+                data, with_show=with_show, auth=auth, conn_url=conn_url
+            )
+        return f.post_task_schedules(
             data, with_show=with_show, auth=auth, conn_url=conn_url
         )
-    return f.get_task_schedules(
-        data, with_show=with_show, auth=auth, conn_url=conn_url
-    )
 
 
 @overload
@@ -6834,7 +6841,6 @@ def task_full(
     pass
 
 
-# FIXME check component
 def task_full(
     task_id: str,
     cfg_id: str,
