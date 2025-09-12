@@ -6728,7 +6728,7 @@ def get_image_info(
 
 @overload
 def get_task_schedules(
-    operation_id: str,
+    operation_id: Optional[str] = None,
     with_show: bool = True,
     *,
     auth: Optional[AUTH] = None,
@@ -6741,7 +6741,7 @@ def get_task_schedules(
 
 @overload
 def get_task_schedules(
-    operation_id: str,
+    operation_id: Optional[str] = None,
     with_show: bool = True,
     *,
     auth: Optional[AUTH] = None,
