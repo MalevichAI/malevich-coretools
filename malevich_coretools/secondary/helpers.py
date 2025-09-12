@@ -57,7 +57,7 @@ def bool_to_str(b: bool) -> str:
     return "true" if b else "false"
 
 
-def __show_logs_result(res: LogsResult, i: Optional[int]):  # noqa: ANN202
+def __show_logs_result(res: LogsResult, i: Optional[int] = None):  # noqa: ANN202
     if len(res.data) > 0:
         print(f"------- main ({i}):" if i is not None else "------- main:")
         print(res.data)

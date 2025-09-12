@@ -287,21 +287,13 @@ def create_user_config(
 
 
 def create_task_component(
-    app_control: Optional[str] = None,
-    control: Optional[str] = None,
-    extra: Optional[str] = None,
-    internal: Optional[str] = None,
+    main: Optional[str] = None,
     key_value: Optional[str] = None,
-    minimal: Optional[str] = None,
     object_storage: Optional[str] = None,
 ) -> TaskComponent:
     return TaskComponent(
-        appControl=app_control,
-        control=control,
-        extra=extra,
-        internal=internal,
+        main=main,
         keyValue=key_value,
-        minimal=minimal,
         objectStorage=object_storage
     )
 

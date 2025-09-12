@@ -168,6 +168,7 @@ TEMP_RUN_OPERATIONS_IDS = lambda taskId, cfgId: f"{TEMP_RUN_MAIN}/operationsIds/
 ADMIN_MAIN = f"{API_VERSION}/admin"
 ADMIN_RUNS = f"{ADMIN_MAIN}/runs"
 ADMIN_RUNS_INFO = f"{ADMIN_MAIN}/runs/info"
+ADMIN_DM_REGISTER = f"{ADMIN_MAIN}/dm/register"
 ADMIN_SUPERUSER = f"{ADMIN_MAIN}/superuser"
 
 ## ManagerController

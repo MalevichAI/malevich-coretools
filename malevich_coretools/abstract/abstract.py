@@ -139,12 +139,8 @@ class ScaleInfo(BaseModel):
 
 
 class TaskComponent(BaseModel):
-    appControl: Optional[str] = None
-    control: Optional[str] = None
-    extra: Optional[str] = None
-    internal: Optional[str] = None
+    main: Optional[str] = None
     keyValue: Optional[str] = None
-    minimal: Optional[str] = None
     objectStorage: Optional[str] = None
 
 
@@ -502,6 +498,24 @@ class AdminRunInfo(BaseModel):
 
 class OperationOrNone(BaseModel):
     operationId: Optional[Alias.Id] = None
+
+
+class AdminRunInfoReq(OperationOrNone):
+    dmId: Optional[str] = None
+
+
+class AdminDMRegister(BaseModel):
+    id: int
+    url: Optional[str]
+    secret: Optional[str]
+    appSecret: Optional[str]
+    login: Optional[str]
+    actuaryDMId: Optional[int]
+
+
+class AdminDMUnregister(BaseModel):
+    id: str
+    actuaryDMId: Optional[int]
 
 
 class AdminStopOperation(BaseModel):

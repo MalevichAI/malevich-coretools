@@ -1114,12 +1114,28 @@ async def get_admin_runs_async(*args, **kwargs) -> AdminRunsInfo:
     return model_from_json(await send_to_core_get_async(ADMIN_RUNS, *args, **kwargs), AdminRunsInfo)
 
 
-def get_admin_runs_info(data: OperationOrNone, *args, **kwargs) -> Alias.Json:
+def get_admin_runs_info(data: AdminRunInfoReq, *args, **kwargs) -> Alias.Json:
     return send_to_core_modify(ADMIN_RUNS_INFO, data, *args, **kwargs)
 
 
-async def get_admin_runs_info_async(data: OperationOrNone, *args, **kwargs) -> Alias.Json:
+async def get_admin_runs_info_async(data: AdminRunInfoReq, *args, **kwargs) -> Alias.Json:
     return await send_to_core_modify_async(ADMIN_RUNS_INFO, data, *args, **kwargs)
+
+
+def post_admin_dm_register(data: AdminDMRegister, *args, **kwargs) -> None:
+    return send_to_core_modify(ADMIN_DM_REGISTER, data, *args, **kwargs)
+
+
+async def post_admin_dm_register_async(data: AdminDMRegister, *args, **kwargs) -> None:
+    return await send_to_core_modify_async(ADMIN_DM_REGISTER, data, *args, **kwargs)
+
+
+def delete_admin_dm_register(data: AdminDMUnregister, *args, **kwargs) -> None:
+    return send_to_core_modify(ADMIN_DM_REGISTER, data, *args, **kwargs, is_post=False)
+
+
+async def delete_admin_dm_register_async(data: AdminDMUnregister, *args, **kwargs) -> None:
+    return await send_to_core_modify_async(ADMIN_DM_REGISTER, data, *args, **kwargs, is_post=False)
 
 
 def post_admin_update_superuser(data: Superuser, *args, **kwargs) -> Alias.Info:
