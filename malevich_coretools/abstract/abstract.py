@@ -101,6 +101,7 @@ class JsonImage(BaseModel):
     tag: str = ""
     user: Optional[str] = None
     token: Optional[str] = None
+    syncRef: bool = True
 
 
 class UserApp(BaseModel):

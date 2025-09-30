@@ -4104,6 +4104,7 @@ def create_app(
     image_ref: Optional[str] = None,
     image_auth: Optional[AUTH] = None,
     image_tag: Optional[str] = None,
+    image_sync: bool = True,
     platform: str = "base",
     platform_settings: Optional[str] = None,
     extra_collections_from: Optional[Dict[str, Union[List[str], str]]] = None,
@@ -4128,6 +4129,7 @@ def create_app(
     image_ref: Optional[str] = None,
     image_auth: Optional[AUTH] = None,
     image_tag: Optional[str] = None,
+    image_sync: bool = True,
     platform: str = "base",
     platform_settings: Optional[str] = None,
     extra_collections_from: Optional[Dict[str, Union[List[str], str]]] = None,
@@ -4151,6 +4153,7 @@ def create_app(
     image_ref: Optional[str] = None,
     image_auth: Optional[AUTH] = None,
     image_tag: Optional[str] = None,
+    image_sync: bool = True,
     platform: str = "base",
     platform_settings: Optional[str] = None,
     extra_collections_from: Optional[Dict[str, Union[List[str], str]]] = None,
@@ -4176,7 +4179,7 @@ def create_app(
     image_token = image_auth[1] if image_auth is not None else Config.TOKEN if use_system_auth else None
     if Config.WITH_WARNINGS and (image_user is None or image_token is None):
         Config.logger.warning("image_auth not set")
-    json_image = JsonImage(ref=image_ref, tag=image_tag or "", user=image_user, token=image_token)
+    json_image = JsonImage(ref=image_ref, tag=image_tag or "", user=image_user, token=image_token, syncRef=image_sync)
     if extra_collections_from is not None:
         for k, v in extra_collections_from.items():
             if isinstance(v, str):
@@ -4210,6 +4213,7 @@ def update_app(
     image_ref: Optional[str] = None,
     image_auth: Optional[AUTH] = None,
     image_tag: Optional[str] = None,
+    image_sync: bool = True,
     platform: str = "base",
     platform_settings: Optional[str] = None,
     extra_collections_from: Optional[Dict[str, Union[List[str], str]]] = None,
@@ -4235,6 +4239,7 @@ def update_app(
     image_ref: Optional[str] = None,
     image_auth: Optional[AUTH] = None,
     image_tag: Optional[str] = None,
+    image_sync: bool = True,
     platform: str = "base",
     platform_settings: Optional[str] = None,
     extra_collections_from: Optional[Dict[str, Union[List[str], str]]] = None,
@@ -4259,6 +4264,7 @@ def update_app(
     image_ref: Optional[str] = None,
     image_auth: Optional[AUTH] = None,
     image_tag: Optional[str] = None,
+    image_sync: bool = True,
     platform: str = "base",
     platform_settings: Optional[str] = None,
     extra_collections_from: Optional[Dict[str, Union[List[str], str]]] = None,
@@ -4283,7 +4289,7 @@ def update_app(
     image_token = image_auth[1] if image_auth is not None else Config.TOKEN if use_system_auth else None
     if Config.WITH_WARNINGS and (image_user is None or image_token is None):
         Config.logger.warning("image_auth not set")
-    json_image = JsonImage(ref=image_ref, tag=image_tag or "", user=image_user, token=image_token)
+    json_image = JsonImage(ref=image_ref, tag=image_tag or "", user=image_user, token=image_token, syncRef=image_sync)
     if extra_collections_from is not None:
         for k, v in extra_collections_from.items():
             if isinstance(v, str):
@@ -6672,6 +6678,7 @@ def get_image_info(
     image_ref: str,
     image_auth: Optional[AUTH] = None,
     image_tag: Optional[str] = None,
+    image_sync: bool = True,
     parse: bool = False,
     *,
     use_system_auth: bool = False,
@@ -6688,6 +6695,7 @@ def get_image_info(
     image_ref: str,
     image_auth: Optional[AUTH] = None,
     image_tag: Optional[str] = None,
+    image_sync: bool = True,
     parse: bool = False,
     *,
     use_system_auth: bool = False,
@@ -6703,6 +6711,7 @@ def get_image_info(
     image_ref: str,
     image_auth: Optional[AUTH] = None,
     image_tag: Optional[str] = None,
+    image_sync: bool = True,
     parse: bool = False,
     *,
     use_system_auth: bool = False,
@@ -6718,7 +6727,7 @@ def get_image_info(
     image_token = image_auth[1] if image_auth is not None else Config.TOKEN if use_system_auth else None
     if Config.WITH_WARNINGS and (image_user is None or image_token is None):
         Config.logger.warning("image_auth not set")
-    data = JsonImage(ref=image_ref, tag=image_tag or "", user=image_user, token=image_token)
+    data = JsonImage(ref=image_ref, tag=image_tag or "", user=image_user, token=image_token, syncRef=image_sync)
     if batcher is not None:
         return batcher.add("imageInfo", data=data, result_model=AppFunctionsInfo if parse else None)
     if is_async:
