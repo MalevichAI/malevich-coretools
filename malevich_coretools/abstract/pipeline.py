@@ -1,3 +1,4 @@
+import json
 from enum import IntEnum
 from typing import Dict, List, Optional, Union
 
@@ -80,7 +81,7 @@ class AlternativeArgument(BaseArgument):
 
 
 class AppEntity(BaseModel):
-    cfg: Optional[str] = None                           # local cfg for processor/condition
+    cfg: Optional[Union[Alias.Json, Dict]] = None       # local cfg for processor/condition
     arguments: Dict[str, AlternativeArgument] = {}      # TODO or List[Argument]?
     conditions: Optional[Union[Dict[str, bool], List[Dict[str, bool]]]] = None          # condition bindId to it result (list - any variant of them)
     conditionsStructure: Optional[Union[Not, And, Or, InternalNot, InternalAnd, InternalOr, Value]] = None  # set BoolOp, it transform to internal before send
@@ -105,6 +106,8 @@ class AppEntity(BaseModel):
             self.loopConditions = [self.loopConditions]
         if isinstance(self.loopConditionsStructure, BoolOp):
             self.loopConditionsStructure = self.loopConditionsStructure.internal()
+        if isinstance(self.cfg, Dict):
+            self.cfg = json.dumps(self.cfg)
 
     def simplify(self) -> None:
         if isinstance(self.conditionsStructure, InternalBoolOp):
@@ -156,7 +159,7 @@ class MainPipelineCfg(BaseModel):
     conditions: Dict[str, Condition]
     results: Dict[str, List[Result]]
     pullCollectionPolicy: PullCollectionPolicy
-    cfg: str
+    cfg: Alias.Json
     infoUrl: Optional[str] = None
     debugMode: bool
     coreManage: bool
