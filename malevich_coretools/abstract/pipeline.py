@@ -27,6 +27,14 @@ from malevich_coretools.abstract.operations import (
 )
 
 
+def _validation_common(arg: 'BaseArgument', other_k = 0) -> None:
+    k = (arg.id is not None) + (arg.collectionName is not None) + (arg.collectionId is not None) + other_k
+    if k == 0:
+        raise ValueError("argument construction requires exactly one parameter, got none")
+    if k > 1:
+        raise ValueError("argument construction requires exactly one parameter, multiple provided")
+
+
 class PullCollectionPolicy(IntEnum):
     INIT = 0
     IF_NOT_EXIST = 1
@@ -43,7 +51,7 @@ class BaseArgument(BaseModel):
     collectionId: Optional[str] = None                  # hardcode collection with id (or obj path)
 
     def validation(self) -> None:
-        assert (self.id is not None) + (self.collectionName is not None) + (self.collectionId is not None) == 1, "one way of constructing the argument must be chosen"
+        _validation_common(self)
 
 
 class Argument(BaseArgument):
@@ -52,11 +60,11 @@ class Argument(BaseArgument):
 
     def validation(self) -> None:
         if self.group is not None:
-            assert self.id is None and self.collectionName is None and self.collectionId is None, "one way of constructing the argument must be chosen"
+            _validation_common(self, 1)
             for subarg in self.group:
                 subarg.validation()
         else:
-            assert (self.id is not None) + (self.collectionName is not None) + (self.collectionId is not None) == 1, "one way of constructing the argument must be chosen"
+            _validation_common(self)
 
 
 class AlternativeArgument(BaseArgument):
@@ -65,19 +73,19 @@ class AlternativeArgument(BaseArgument):
 
     def validation(self) -> None:
         if self.group is not None:
-            assert self.id is None and self.collectionName is None and self.collectionId is None, "one way of constructing the argument must be chosen"
+            _validation_common(self, 1)
             for subarg in self.group:
                 subarg.validation()
         elif self.alternative is not None:
             for alt_arg in self.alternative:
                 if alt_arg.group is not None:
-                    assert alt_arg.id is None and alt_arg.collectionName is None and alt_arg.collectionId is None, "one way of constructing the argument must be chosen"
+                    _validation_common(self, 1)
                     for subarg in alt_arg.group:
                         subarg.validation()
                 else:
-                    assert (self.id is not None) + (self.collectionName is not None) + (self.collectionId is not None) == 1, "one way of constructing the argument must be chosen"
+                    _validation_common(self)
         else:
-            assert (self.id is not None) + (self.collectionName is not None) + (self.collectionId is not None) == 1, "one way of constructing the argument must be chosen"
+            _validation_common(self)
 
 
 class AppEntity(BaseModel):
