@@ -124,12 +124,18 @@ async def get_collections_groupName_async(name: str, operation_id: str, run_id: 
     return model_from_json(await send_to_core_get_async(COLLECTIONS_GROUP_NAME(name, operation_id, run_id), *args, **kwargs), ResultCollections)
 
 
-def get_collections_id(id: str, offset: int, limit: int, *args, **kwargs) -> ResultCollection:
-    return model_from_json(send_to_core_get(COLLECTIONS_ID(id, offset, limit), *args, **kwargs), ResultCollection)
+def get_collections_id(id: str, offset: int, limit: int, raw: bool, *args, **kwargs) -> Union[ResultCollection, Alias.Json]:
+    res = send_to_core_get(COLLECTIONS_ID(id, offset, limit, raw), *args, is_text=raw, **kwargs)
+    if not raw:
+        res = model_from_json(res, ResultCollection)
+    return res
 
 
-async def get_collections_id_async(id: str, offset: int, limit: int, *args, **kwargs) -> ResultCollection:
-    return model_from_json(await send_to_core_get_async(COLLECTIONS_ID(id, offset, limit), *args, **kwargs), ResultCollection)
+async def get_collections_id_async(id: str, offset: int, limit: int, raw: bool, *args, **kwargs) -> Union[ResultCollection, Alias.Json]:
+    res = await send_to_core_get_async(COLLECTIONS_ID(id, offset, limit, raw), *args, is_text=raw, **kwargs)
+    if not raw:
+        res = model_from_json(res, ResultCollection)
+    return res
 
 
 def post_collections(data: DocsCollection, wait: bool, *args, **kwargs) -> Alias.Id:
@@ -1280,26 +1286,24 @@ async def post_manager_task_async(data: MainTask, with_show: bool, long: bool, l
     return AppLogs.model_validate_json(res)
 
 
-def post_manager_task_run(data: RunTask, with_show: bool, long: bool, long_timeout: int, wait: bool, auth: Optional[AUTH], conn_url: Optional[str]=None, *args, **kwargs) -> Optional[Union[Alias.Id, AppLogs]]:
+def post_manager_task_run(data: RunTask, with_show: bool, long: bool, long_timeout: int, wait: bool, auth: Optional[AUTH], conn_url: Optional[str]=None, *args, **kwargs) -> Union[Alias.Id, AppLogs]:
     check_profile_mode(data.profileMode)
     res = send_to_core_modify(MANAGER_TASK_RUN(wait and not long), data, with_show=with_show, show_func=show_logs_func, auth=auth, conn_url=conn_url, *args, **kwargs)
     if wait and long:
         res = asyncio.run(__get_result(res, timeout=long_timeout, auth=auth))
-    if data.withLogs or data.schedule is not None:
-        if not wait:
-            return res
-        return AppLogs.model_validate_json(res)
+    if not wait:
+        return res
+    return AppLogs.model_validate_json(res)
 
 
-async def post_manager_task_run_async(data: RunTask, with_show: bool, long: bool, long_timeout: int, wait: bool, auth: Optional[AUTH], conn_url: Optional[str]=None, *args, **kwargs) -> Optional[Union[Alias.Id, AppLogs]]:
+async def post_manager_task_run_async(data: RunTask, with_show: bool, long: bool, long_timeout: int, wait: bool, auth: Optional[AUTH], conn_url: Optional[str]=None, *args, **kwargs) -> Union[Alias.Id, AppLogs]:
     check_profile_mode(data.profileMode)
     res = await send_to_core_modify_async(MANAGER_TASK_RUN(wait and not long), data, with_show=with_show, show_func=show_logs_func, auth=auth, conn_url=conn_url, *args, **kwargs)
     if wait and long:
         res = await __get_result(res, timeout=long_timeout, auth=auth)
-    if data.withLogs or data.schedule is not None:
-        if not wait:
-            return res
-        return AppLogs.model_validate_json(res)
+    if not wait:
+        return res
+    return AppLogs.model_validate_json(res)
 
 
 def post_manager_pipeline(data: MainPipeline, with_show: bool, long: bool, long_timeout: int, return_response: bool, wait: bool, auth: Optional[AUTH], conn_url: Optional[str]=None, *args, **kwargs) -> Union[Alias.Id, AppLogs]:

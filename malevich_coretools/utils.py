@@ -609,6 +609,7 @@ def get_collection(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
+    raw: Literal[False] = False,
     is_async: Literal[False] = False,
 ) -> ResultCollection:
     pass
@@ -623,8 +624,39 @@ def get_collection(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
+    raw: Literal[False] = False,
     is_async: Literal[True],
 ) -> Coroutine[Any, Any, ResultCollection]:
+    pass
+
+
+@overload
+def get_collection(
+    id: str,
+    offset: int = 0,
+    limit: int = -1,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    raw: Literal[True],
+    is_async: Literal[False] = False,
+) -> Alias.Json:
+    pass
+
+
+@overload
+def get_collection(
+    id: str,
+    offset: int = 0,
+    limit: int = -1,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    raw: Literal[True],
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Json]:
     pass
 
 
@@ -636,16 +668,18 @@ def get_collection(
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
+    raw: bool = False,
     is_async: bool = False,
-) -> Union[ResultCollection, Coroutine[Any, Any, ResultCollection]]:
+) -> Union[ResultCollection, Alias.Json, Coroutine[Any, Any, ResultCollection], Coroutine[Any, Any, Alias.Json]]:
     """return collection by `id`, pagination: unlimited - `limit` < 0"""
     if batcher is None:
         batcher = Config.BATCHER
     if batcher is not None:
-        return batcher.add("getCollectionById", vars={"id": id, "offset": offset, "limit": limit}, result_model=ResultCollection)
+        result_model = None if raw else ResultCollection
+        return batcher.add("getCollectionById", vars={"id": id, "offset": offset, "limit": limit, "raw": raw}, result_model=result_model)
     if is_async:
-        return f.get_collections_id_async(id, offset, limit, auth=auth, conn_url=conn_url)
-    return f.get_collections_id(id, offset, limit, auth=auth, conn_url=conn_url)
+        return f.get_collections_id_async(id, offset, limit, raw, auth=auth, conn_url=conn_url)
+    return f.get_collections_id(id, offset, limit, raw, auth=auth, conn_url=conn_url)
 
 
 @overload
@@ -7161,7 +7195,7 @@ def task_run(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: Literal[False] = False,
-) -> Optional[Union[Alias.Id, AppLogs]]:
+) -> Union[Alias.Id, AppLogs]:
     pass
 
 
@@ -7186,7 +7220,7 @@ def task_run(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: Literal[True],
-) -> Coroutine[Any, Any, Optional[Union[Alias.Id, AppLogs]]]:
+) -> Coroutine[Any, Any, Union[Alias.Id, AppLogs]]:
     pass
 
 
@@ -7210,7 +7244,7 @@ def task_run(
     conn_url: Optional[str] = None,
     batcher: Optional[Batcher] = None,
     is_async: bool = False,
-) -> Union[Optional[Union[Alias.Id, AppLogs]], Coroutine[Any, Any, Optional[Union[Alias.Id, AppLogs]]]]:
+) -> Union[Union[Alias.Id, AppLogs], Coroutine[Any, Any, Union[Alias.Id, AppLogs]]]:
     """run prepared task by `operation_id` with `cfg_id` and other overridden parameters
 
     Args:

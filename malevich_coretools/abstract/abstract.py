@@ -400,6 +400,7 @@ class PipelineRunInfo(BaseModel):
 
 class AppLogs(BaseModel):
     operationId: Alias.Id
+    runId: Optional[Alias.Id] = None
     dagLogs: str = ""
     data: Dict[str, AppLog] = {}
     error: Optional[str] = None

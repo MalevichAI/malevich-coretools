@@ -50,7 +50,7 @@ COLLECTIONS_IDS_NAME = lambda name, operation_id, run_id: with_key_values(f"{COL
 COLLECTIONS_NAME = lambda name, operation_id, run_id, offset, limit: with_key_values(f"{COLLECTIONS_MAIN}/name/{urllib.parse.quote(str(name), safe='')}", {"operationId": operation_id, "runId": run_id, "offset": offset, "limit": limit})
 COLLECTIONS_IDS_GROUP_NAME = lambda name, operation_id, run_id: with_key_values(f"{COLLECTIONS_MAIN}/ids/groupName/{urllib.parse.quote(str(name), safe='')}", {"operationId": operation_id, "runId": run_id})
 COLLECTIONS_GROUP_NAME = lambda name, operation_id, run_id: with_key_values(f"{COLLECTIONS_MAIN}/groupName/{urllib.parse.quote(str(name), safe='')}", {"operationId": operation_id, "runId": run_id})
-COLLECTIONS_ID = lambda id, offset, limit: with_key_values(f"{COLLECTIONS_MAIN}/{urllib.parse.quote(str(id), safe='')}", {"offset": offset, "limit": limit})
+COLLECTIONS_ID = lambda id, offset, limit, raw: with_key_values(f"{COLLECTIONS_MAIN}/{urllib.parse.quote(str(id), safe='')}", {"offset": offset, "limit": limit, "raw": raw})
 COLLECTIONS_ID_MODIFY = lambda id, wait: with_wait(f"{COLLECTIONS_MAIN}/{urllib.parse.quote(str(id), safe='')}", wait)
 COLLECTIONS_ID_S3 = lambda id, wait: with_wait(f"{COLLECTIONS_MAIN}/s3/{urllib.parse.quote(str(id), safe='')}", wait)
 COLLECTIONS_ID_ADD = lambda id, wait: with_wait(f"{COLLECTIONS_MAIN}/{urllib.parse.quote(str(id), safe='')}/add", wait)
