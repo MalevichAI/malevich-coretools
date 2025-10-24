@@ -47,15 +47,24 @@ def set_host_port(host_port: str) -> None:
     Config.HOST_PORT = host_port
 
 
+def set_dm_host_port(host_port: str) -> None:
+    """update host and port for malevich-dm, example: `http://localhost:8000/` """
+    assert len(host_port) > 0, "empty host port"
+    host_port = host_port if host_port[-1] == "/" else f"{host_port}/"
+    Config.DM_HOST_PORT = host_port
+
+
 def set_kafka_host_port(host_port: str) -> None:
     """update kafka host and port for malevich-kafka, example: `localhost:9092` """
     assert len(host_port) > 0, "empty host port"
     Config.KAFKA_HOST_PORT = host_port
 
 
-def set_conn_url(conn_url: str) -> None:
+def set_conn_url(conn_url: str, dm_url: Optional[str] = None) -> None:
     """analogue set_host_port; update `conn_url` for malevich-core, example: `http://localhost:8080/` """
     set_host_port(conn_url)
+    if dm_url is not None:
+        set_dm_host_port(dm_url)
 
 
 def set_verbose(verbose: bool) -> None:

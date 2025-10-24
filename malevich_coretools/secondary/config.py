@@ -8,6 +8,7 @@ class Config:
     TOKEN = os.environ.get("GITLAB_ACCESS_TOKEN")   # FIXME
 
     HOST_PORT = None
+    DM_HOST_PORT = None
     KAFKA_HOST_PORT = None
     CORE_USERNAME = None
     CORE_PASSWORD = None

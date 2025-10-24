@@ -239,3 +239,10 @@ KAFKA_SEND = f"{MANAGER_MAIN}/kafkaMsg"
 ## BatchController
 BATCH_MAIN = f"{API_VERSION}/batch"
 BATCH = BATCH_MAIN
+
+##### DM
+DM_STREAM = lambda operationId, runId, bindId : f"stream/{operationId}/{runId}/{bindId}"
+DM_CONTINUE = lambda operationId, runId, id: f"continue/{operationId}/{runId}/{id}"
+DM_STATE = lambda operationId, runId, bindId, key, index : with_key_values(f"state/{operationId}/{runId}/{bindId}", {"key": key, "index": index})
+DM_JOURNAL_LIST = lambda operationId, runId : f"journal/{operationId}/{runId}"
+DM_JOURNAL = lambda operationId, runId, key, stream : with_key_values(f"journal/{operationId}/{runId}/{key}", {"stream": stream})
