@@ -531,6 +531,39 @@ def get_ping(*args, **kwargs) -> Alias.Info:
 async def get_ping_async(*args, **kwargs) -> Alias.Info:
     return await send_to_core_get_async(PING, *args, **kwargs, is_text=True)
 
+
+def get_secret_keys(*args, **kwargs) -> ResultNames:
+    return model_from_json(send_to_core_get(SECRET_KEYS_MAIN, *args, **kwargs), ResultNames)
+
+
+async def get_secret_keys_async(*args, **kwargs) -> ResultNames:
+    return model_from_json(await send_to_core_get_async(SECRET_KEYS_MAIN, *args, **kwargs), ResultNames)
+
+
+def post_secret_keys_name(name: str, wait: bool, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify(SECRET_KEYS_NAME(name, wait), *args, **kwargs)
+
+
+async def post_secret_keys_name_async(name: str, wait: bool, *args, **kwargs) -> Alias.Info:
+    return await send_to_core_modify_async(SECRET_KEYS_NAME(name, wait), *args, **kwargs)
+
+
+def delete_secret_keys_name(name: str, wait: bool, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify(SECRET_KEYS_NAME(name, wait), *args, **kwargs, is_post=False)
+
+
+async def delete_secret_keys_name_async(name: str, wait: bool, *args, **kwargs) -> Alias.Info:
+    return await send_to_core_modify_async(SECRET_KEYS_NAME(name, wait), *args, **kwargs, is_post=False)
+
+
+def delete_secret_keys(wait: bool, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify(SECRET_KEYS_ALL(wait), *args, **kwargs, is_post=False)
+
+
+async def delete_secret_keys_async(wait: bool, *args, **kwargs) -> Alias.Info:
+    return await send_to_core_modify_async(SECRET_KEYS_ALL(wait), *args, **kwargs, is_post=False)
+
+
 # UserShareController
 
 
@@ -680,6 +713,47 @@ async def delete_register_login_async(login: str, wait: bool, *args, **kwargs) -
     if Config.VERBOSE:
         Config.logger.info(info)
     return info
+
+
+def get_register_keys(*args, **kwargs) -> Keys:
+    return model_from_json(send_to_core_get(REGISTER_KEYS(None), *args, **kwargs), Keys)
+
+
+async def get_register_keys_async(*args, **kwargs) -> Keys:
+    return model_from_json(await send_to_core_get_async(REGISTER_KEYS(None), *args, **kwargs), Keys)
+
+
+def get_register_keys_name(name: str, *args, **kwargs) -> str:
+    return send_to_core_get(REGISTER_KEYS_NAME(name, None), *args, **kwargs, is_text=True)
+
+
+async def get_register_keys_name_async(name: str, *args, **kwargs) -> str:
+    return await send_to_core_get_async(REGISTER_KEYS_NAME(name, None), *args, **kwargs, is_text=True)
+
+
+def post_register_keys(data: Keys, wait: bool, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify(REGISTER_KEYS(wait), data, *args, **kwargs)
+
+
+async def post_register_keys_async(data: Keys, wait: bool, *args, **kwargs) -> Alias.Info:
+    return await send_to_core_modify_async(REGISTER_KEYS(wait), data, *args, **kwargs)
+
+
+def delete_register_keys_name(name: str, wait: bool, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify(REGISTER_KEYS_NAME(name, wait), *args, **kwargs, is_post=False)
+
+
+async def delete_register_keys_name_async(name: str, wait: bool, *args, **kwargs) -> Alias.Info:
+    return await send_to_core_modify_async(REGISTER_KEYS_NAME(name, wait), *args, **kwargs, is_post=False)
+
+
+def delete_register_keys(wait: bool, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify(REGISTER_KEYS(wait), *args, **kwargs, is_post=False)
+
+
+async def delete_register_keys_async(wait: bool, *args, **kwargs) -> Alias.Info:
+    return await send_to_core_modify_async(REGISTER_KEYS(wait), *args, **kwargs, is_post=False)
+
 
 # UserAppsController
 

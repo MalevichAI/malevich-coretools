@@ -97,6 +97,9 @@ PING = "ping"
 # MAPPING = lambda wait: with_wait(f"{COMMON_MAIN}/mapping", wait)
 # MAPPING_ID = lambda id, wait: with_wait(f"{COMMON_MAIN}/mapping/{urllib.parse.quote(str(id), safe='')}", wait)
 # COMMON_ALL = lambda wait: with_wait(f"{COMMON_MAIN}/all", wait)
+SECRET_KEYS_MAIN = f"{API_VERSION}/secretKeys"
+SECRET_KEYS_NAME = lambda name, wait: with_wait(f"{SECRET_KEYS_MAIN}/name/{urllib.parse.quote(str(name), safe='')}", wait)
+SECRET_KEYS_ALL = lambda wait: with_wait(f"{SECRET_KEYS_MAIN}/all", wait)
 
 ## UserShareController
 SHARE_MAIN = f"{API_VERSION}/share"
@@ -112,6 +115,8 @@ REGISTER_MAIN = f"{API_VERSION}/register"
 REGISTER = REGISTER_MAIN
 REGISTER_LOGIN = lambda login, wait: with_wait(f"{REGISTER_MAIN}/login/{urllib.parse.quote(str(login), safe='')}", wait)
 REGISTER_ALL = f"{REGISTER_MAIN}/all"
+REGISTER_KEYS = lambda wait: with_wait(f"{REGISTER_MAIN}/keys", wait)
+REGISTER_KEYS_NAME = lambda name, wait: with_wait(f"{REGISTER_MAIN}/keys/{urllib.parse.quote(str(name), safe='')}", wait)
 
 ## UserAppsController
 USER_APPS_MAIN = f"{API_VERSION}/userApps"

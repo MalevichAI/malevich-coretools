@@ -133,6 +133,10 @@ class KeysValues(Operation):
     data: Dict[str, str]
 
 
+class Keys(BaseModel):
+    data: Dict[str, str]
+
+
 class ScaleInfo(BaseModel):
     taskId: Optional[Alias.Id] = None
     appId: Alias.Id
@@ -252,6 +256,10 @@ class AppManage(Operation):
 
 class ResultIds(BaseModel):
     ids: List[Alias.Id]
+
+
+class ResultNames(BaseModel):
+    names: List[str]
 
 
 class FilesDirs(BaseModel):

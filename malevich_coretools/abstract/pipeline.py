@@ -101,6 +101,8 @@ class AppEntity(BaseModel):
     image: JsonImage
     platform: str = "base"
     platformSettings: Optional[str] = None
+    requestedKeys: Optional[list[str]] = None   # user secret keys
+    optionalKeys: Optional[list[str]] = None    # user secret keys
 
     def internal(self) -> None:
         assert self.conditions is None or self.conditionsStructure is None, "should be set not more, than one of (conditions, conditionsStructure)"

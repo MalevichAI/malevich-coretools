@@ -3133,6 +3133,202 @@ def ping(
         return f.get_ping_async(with_auth=False, conn_url=conn_url)
     return f.get_ping(with_auth=False, conn_url=conn_url)
 
+
+@overload
+def get_secret_keys(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False] = False,
+) -> Coroutine[Any, Any, ResultNames]:
+    pass
+
+
+@overload
+def get_secret_keys(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False] = False,
+) -> ResultNames:
+    pass
+
+
+def get_secret_keys(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: bool = False,
+) -> Union[ResultNames, Coroutine[Any, Any, ResultNames]]:
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getSecretKeys", result_model=ResultNames)
+    if is_async:
+        return f.get_secret_keys_async(auth=auth, conn_url=conn_url)
+    return f.get_secret_keys(auth=auth, conn_url=conn_url)
+
+
+@overload
+def create_secret_key(
+    name: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False] = False,
+) -> Alias.Info:
+    pass
+
+
+@overload
+def create_secret_key(
+    name: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
+def create_secret_key(
+    name: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: bool = False,
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("postSecretKeysByName", vars={"name": name})
+    if is_async:
+        return f.post_secret_keys_name_async(
+            name,
+            wait=wait,
+            auth=auth,
+            conn_url=conn_url,
+        )
+    return f.post_secret_keys_name(
+        name,
+        wait=wait,
+        auth=auth,
+        conn_url=conn_url,
+    )
+
+
+@overload
+def delete_secret_key(
+    name: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False] = False,
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_secret_key(
+    name: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
+def delete_secret_key(
+    name: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: bool = False,
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteSecretKeysByName", vars={"name": name})
+    if is_async:
+        return f.delete_secret_keys_name_async(
+            name,
+            wait=wait,
+            auth=auth,
+            conn_url=conn_url,
+        )
+    return f.delete_secret_keys_name(
+        name,
+        wait=wait,
+        auth=auth,
+        conn_url=conn_url,
+    )
+
+
+@overload
+def delete_secret_keys(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False] = False,
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_secret_keys(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
+def delete_secret_keys(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: bool = False,
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteSecretKeys")
+    if is_async:
+        return f.delete_secret_keys_async(
+            wait=wait,
+            auth=auth,
+            conn_url=conn_url,
+        )
+    return f.delete_secret_keys(
+        wait=wait,
+        auth=auth,
+        conn_url=conn_url,
+    )
+
+
 # UserShare
 
 
@@ -3889,6 +4085,243 @@ def delete_user(
     if is_async:
         return f.delete_register_async(auth=auth, conn_url=conn_url)
     return f.delete_register(auth=auth, conn_url=conn_url)
+
+
+@overload
+def get_user_keys(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False] = False,
+) -> Keys:
+    pass
+
+
+@overload
+def get_user_keys(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Keys]:
+    pass
+
+
+def get_user_keys(
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: bool = False,
+) -> Union[Keys, Coroutine[Any, Any, Keys]]:
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getKeys", result_model=Keys)
+    if is_async:
+        return f.get_register_keys_async(auth=auth, conn_url=conn_url)
+    return f.get_register_keys(auth=auth, conn_url=conn_url)
+
+
+@overload
+def get_user_key(
+    name: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False] = False,
+) -> str:
+    pass
+
+
+@overload
+def get_user_key(
+    name: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, str]:
+    pass
+
+
+def get_user_key(
+    name: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: bool = False,
+) -> Union[str, Coroutine[Any, Any, str]]:
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getKeysByName", vars={"name": name})
+    if is_async:
+        return f.get_register_keys_name_async(name, auth=auth, conn_url=conn_url)
+    return f.get_register_keys_name(name, auth=auth, conn_url=conn_url)
+
+
+@overload
+def update_user_keys(
+    keys: Dict[str, str],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False] = False,
+) -> Alias.Info:
+    pass
+
+
+@overload
+def update_user_keys(
+    keys: Dict[str, str],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
+def update_user_keys(
+    keys: Dict[str, str],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: bool = False,
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = Keys(data=keys)
+    if batcher is not None:
+        return batcher.add("postKeys", data=data)
+    if is_async:
+        return f.post_register_keys_async(
+            data,
+            wait=wait,
+            auth=auth,
+            conn_url=conn_url,
+        )
+    return f.post_register_keys(
+        data,
+        wait=wait,
+        auth=auth,
+        conn_url=conn_url,
+    )
+
+
+@overload
+def delete_user_key(
+    name: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False] = False,
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_user_key(
+    name: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
+def delete_user_key(
+    name: str,
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: bool = False,
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteKeysByName", vars={"name": name})
+    if is_async:
+        return f.delete_register_keys_name_async(
+            name,
+            wait=wait,
+            auth=auth,
+            conn_url=conn_url,
+        )
+    return f.delete_register_keys_name(
+        name,
+        wait=wait,
+        auth=auth,
+        conn_url=conn_url,
+    )
+
+
+@overload
+def delete_user_keys(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False] = False,
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_user_keys(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
+def delete_user_keys(
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: bool = False,
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("deleteKeys")
+    if is_async:
+        return f.delete_register_keys_async(
+            wait=wait,
+            auth=auth,
+            conn_url=conn_url,
+        )
+    return f.delete_register_keys(
+        wait=wait,
+        auth=auth,
+        conn_url=conn_url,
+    )
 
 
 # UserApps
