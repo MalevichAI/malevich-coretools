@@ -137,6 +137,10 @@ class Keys(BaseModel):
     data: Dict[str, str]
 
 
+class Statuses(BaseModel):
+    data: Dict[str, str]    # key - runId, value - one of: IN_PROGRESS, SUCCESS, FAILED
+
+
 class ScaleInfo(BaseModel):
     taskId: Optional[Alias.Id] = None
     appId: Alias.Id

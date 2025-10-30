@@ -1144,20 +1144,20 @@ async def get_run_condition_async(id: str, *args, **kwargs) -> Condition:
     return model_from_json(await send_to_core_get_async(TEMP_RUN_CONDITION(id), *args, **kwargs), Condition)
 
 
-def get_run_activeRuns(*args, **kwargs) -> ResultIds:
-    return model_from_json(send_to_core_get(TEMP_RUN_ACTIVE_RUNS, *args, **kwargs), ResultIds)
+def get_run_activeRuns(id: Optional[str], *args, **kwargs) -> ResultIds:
+    return model_from_json(send_to_core_get(TEMP_RUN_ACTIVE_RUNS(id), *args, **kwargs), ResultIds)
 
 
-async def get_run_activeRuns_async(*args, **kwargs) -> ResultIds:
-    return model_from_json(await send_to_core_get_async(TEMP_RUN_ACTIVE_RUNS, *args, **kwargs), ResultIds)
+async def get_run_activeRuns_async(id: Optional[str], *args, **kwargs) -> ResultIds:
+    return model_from_json(await send_to_core_get_async(TEMP_RUN_ACTIVE_RUNS(id), *args, **kwargs), ResultIds)
 
 
 def post_run_activeRuns(data: RunsFilter, *args, **kwargs) -> Union[ResultIds, ResultTags]:
-    return model_from_json(send_to_core_modify(TEMP_RUN_ACTIVE_RUNS, data, *args, **kwargs), ResultTags if data.withTags else ResultIds)
+    return model_from_json(send_to_core_modify(TEMP_RUN_ACTIVE_RUNS(None), data, *args, **kwargs), ResultTags if data.withTags else ResultIds)
 
 
 async def post_run_activeRuns_async(data: RunsFilter, *args, **kwargs) -> Union[ResultIds, ResultTags]:
-    return model_from_json(await send_to_core_modify_async(TEMP_RUN_ACTIVE_RUNS, data, *args, **kwargs), ResultTags if data.withTags else ResultIds)
+    return model_from_json(await send_to_core_modify_async(TEMP_RUN_ACTIVE_RUNS(None), data, *args, **kwargs), ResultTags if data.withTags else ResultIds)
 
 
 def get_run_mainTaskCfg(id: str, *args, **kwargs) -> MainTaskCfg:
@@ -1182,6 +1182,23 @@ def get_run_operationsIds(task_id: str, cfg_id: Optional[str]=None, *args, **kwa
 
 async def get_run_operationsIds_async(task_id: str, cfg_id: Optional[str]=None, *args, **kwargs) -> ResultIds:
     return model_from_json(await send_to_core_get_async(TEMP_RUN_OPERATIONS_IDS(task_id, cfg_id), *args, **kwargs), ResultIds)
+
+
+def get_run_statuses(id: str, *args, **kwargs) -> Statuses:
+    return model_from_json(send_to_core_get(TEMP_RUN_STATUSES(id), *args, **kwargs), Statuses)
+
+
+async def get_run_statuses_async(id: str, *args, **kwargs) -> Statuses:
+    return model_from_json(await send_to_core_get_async(TEMP_RUN_STATUSES(id), *args, **kwargs), Statuses)
+
+
+def get_run_status(id: str, run_id: str, *args, **kwargs) -> str:
+    return send_to_core_get(TEMP_RUN_STATUS(id, run_id), *args, **kwargs, is_text=True)
+
+
+async def get_run_status_async(id: str, run_id: str, *args, **kwargs) -> str:
+    return await send_to_core_get_async(TEMP_RUN_STATUS(id, run_id), *args, **kwargs, is_text=True)
+
 
 # AdminController
 
