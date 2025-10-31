@@ -1,3 +1,4 @@
+import io
 import json
 import os
 import re
@@ -10372,6 +10373,88 @@ def get_collection_by_name_to_df(
     )
     records = list(map(lambda x: json.loads(x.data), collection.docs))
     return pd.DataFrame.from_records(records)
+
+
+@overload
+def update_collection_object_from_file(
+    path: str,
+    filename: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False] = False,
+) -> Alias.Info:
+    pass
+
+
+@overload
+def update_collection_object_from_file(
+    path: str,
+    filename: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
+def update_collection_object_from_file(
+    path: str,
+    filename: str,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: bool = False,
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
+    """update collection object: with `path` by data from filename"""
+    with open(filename, 'rb') as f:
+        data = f.read()
+    return update_collection_object(path, data, auth=auth, conn_url=conn_url, batcher=batcher, is_async=is_async)
+
+
+@overload
+def update_collection_object_from_df(
+    path: str,
+    data: pd.DataFrame,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False] = False,
+) -> Alias.Info:
+    pass
+
+
+@overload
+def update_collection_object_from_df(
+    path: str,
+    data: pd.DataFrame,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
+def update_collection_object_from_df(
+    path: str,
+    data: pd.DataFrame,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: bool = False,
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
+    """update collection object: with `path` by data from dataframe"""
+    buffer = io.StringIO()
+    data = data.to_csv(buffer, index=False)
+    return update_collection_object(path, buffer.getvalue().encode('utf-8'), auth=auth, conn_url=conn_url, batcher=batcher, is_async=is_async)
 
 
 @overload

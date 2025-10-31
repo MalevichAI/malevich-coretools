@@ -462,6 +462,7 @@ class InputFunctionInfo(FunctionInfo):
 
 class ProcessorFunctionInfo(FunctionInfo):
     isStream: bool
+    objectDfConvert: bool = False
     contextClass: Optional[Dict[str, Any]] = None   # model_json_schema
 
 
