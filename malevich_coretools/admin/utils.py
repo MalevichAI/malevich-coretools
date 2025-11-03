@@ -39,7 +39,7 @@ def admin_get_runs(
     if batcher is None:
         batcher = Config.BATCHER
     if batcher is not None:
-        return batcher.add("getAllRuns", result_model=AdminRunsInfo)
+        return batcher.add("getAllRunsAdmin", result_model=AdminRunsInfo)
     if is_async:
         return f.get_admin_runs_async(auth=auth, conn_url=conn_url)
     return f.get_admin_runs(auth=auth, conn_url=conn_url)

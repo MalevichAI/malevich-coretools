@@ -6636,6 +6636,59 @@ def get_run_active_runs(
 
 
 @overload
+def get_run_all_runs(
+    tags: Optional[Dict[str, str]] = None,
+    with_tags: bool = False,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False] = False,
+) -> Union[ResultIds, ResultTags]:
+    pass
+
+
+@overload
+def get_run_all_runs(
+    tags: Optional[Dict[str, str]] = None,
+    with_tags: bool = False,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Union[Coroutine[Any, Any, ResultIds], Coroutine[Any, Any, ResultTags]]:
+    pass
+
+
+def get_run_all_runs(
+    tags: Optional[Dict[str, str]] = None,
+    with_tags: bool = False,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: bool = False,
+) -> Union[ResultIds, ResultTags, Coroutine[Any, Any, ResultIds], Coroutine[Any, Any, ResultTags]]:
+    """return list all operationIds (running and not), filter by tags if set, return id -> tags if with_tags"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if tags is not None or with_tags:
+        data = RunsFilter(data=tags, withTags=with_tags)
+        if batcher is not None:
+            return batcher.add("postAllRuns", data=data, result_model=ResultTags if with_tags else ResultIds)
+        if is_async:
+            return f.post_run_allRuns_async(data, auth=auth, conn_url=conn_url)
+        return f.post_run_allRuns(data, auth=auth, conn_url=conn_url)
+    else:
+        if batcher is not None:
+            return batcher.add("getAllRuns", result_model=ResultIds)
+        if is_async:
+            return f.get_run_allRuns_async(auth=auth, conn_url=conn_url)
+        return f.get_run_allRuns(auth=auth, conn_url=conn_url)
+
+
+@overload
 def get_run_main_task_cfg(
     id: str,
     *,
@@ -6723,6 +6776,7 @@ def get_run_main_pipeline_cfg(
 def get_task_runs(
     task_id: str,
     cfg_id: Optional[str] = None,
+    all: bool = False,
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
@@ -6736,6 +6790,7 @@ def get_task_runs(
 def get_task_runs(
     task_id: str,
     cfg_id: Optional[str] = None,
+    all: bool = False,
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
@@ -6748,6 +6803,7 @@ def get_task_runs(
 def get_task_runs(
     task_id: str,
     cfg_id: Optional[str] = None,
+    all: bool = False,
     *,
     auth: Optional[AUTH] = None,
     conn_url: Optional[str] = None,
@@ -6758,13 +6814,13 @@ def get_task_runs(
     if batcher is None:
         batcher = Config.BATCHER
     if batcher is not None:
-        vars = {"taskId": task_id}
+        vars = {"taskId": task_id, "all": all}
         if cfg_id is not None:
             vars["cfgId"] = cfg_id
         return batcher.add("getOperationsIds", vars=vars, result_model=ResultIds)
     if is_async:
-        return f.get_run_operationsIds_async(task_id, cfg_id, auth=auth, conn_url=conn_url)
-    return f.get_run_operationsIds(task_id, cfg_id, auth=auth, conn_url=conn_url)
+        return f.get_run_operationsIds_async(task_id, cfg_id, all, auth=auth, conn_url=conn_url)
+    return f.get_run_operationsIds(task_id, cfg_id, all, auth=auth, conn_url=conn_url)
 
 
 @overload
@@ -6852,6 +6908,54 @@ def get_run_status(
     if is_async:
         return f.get_run_status_async(id, run_id, auth=auth, conn_url=conn_url)
     return f.get_run_status(id, run_id, auth=auth, conn_url=conn_url)
+
+
+@overload
+def get_run_info(
+    id: str,
+    run_id: Optional[str] = None,
+    logs: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False] = False,
+) -> RunInfo:
+    pass
+
+
+@overload
+def get_run_info(
+    id: str,
+    run_id: Optional[str] = None,
+    logs: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, RunInfo]:
+    pass
+
+
+def get_run_info(
+    id: str,
+    run_id: Optional[str] = None,
+    logs: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: bool = False,
+) -> Union[RunInfo, Coroutine[Any, Any, RunInfo]]:
+    """return run info by operation `id` and optional `run_id`"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    if batcher is not None:
+        return batcher.add("getOperationRunInfo" if run_id is None else "getOperationRunInfoOne", vars={"operationId": id, "runId": run_id, "logs": logs}, result_model=RunInfo)
+    if is_async:
+        return f.get_operation_run_info_async(id, run_id, logs, auth=auth, conn_url=conn_url)
+    return f.get_operation_run_info(id, run_id, logs, auth=auth, conn_url=conn_url)
 
 
 # Manager

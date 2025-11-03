@@ -165,11 +165,13 @@ OPERATION_RESULTS_ID = lambda id, wait: with_wait(f"{OPERATION_RESULTS_MAIN}/{ur
 TEMP_RUN_MAIN = f"{API_VERSION}/run"
 TEMP_RUN_CONDITION = lambda operationId: f"{TEMP_RUN_MAIN}/condition/{urllib.parse.quote(str(operationId), safe='')}"
 TEMP_RUN_ACTIVE_RUNS = lambda operationId: with_key_values(f"{TEMP_RUN_MAIN}/activeRuns", {"operationId": operationId})
+TEMP_RUN_ALL_RUNS = f"{TEMP_RUN_MAIN}/allRuns"
 TEMP_RUN_MAIN_TASK_CFG = lambda operationId: f"{TEMP_RUN_MAIN}/mainTaskCfg/{urllib.parse.quote(str(operationId), safe='')}"
 TEMP_RUN_MAIN_PIPELINE_CFG = lambda operationId: f"{TEMP_RUN_MAIN}/mainPipelineCfg/{urllib.parse.quote(str(operationId), safe='')}"
-TEMP_RUN_OPERATIONS_IDS = lambda taskId, cfgId: f"{TEMP_RUN_MAIN}/operationsIds/{urllib.parse.quote(str(taskId), safe='')}" if cfgId is None else f"{TEMP_RUN_MAIN}/operationsIds/{urllib.parse.quote(str(taskId), safe='')}/{urllib.parse.quote(str(cfgId), safe='')}"
+TEMP_RUN_OPERATIONS_IDS = lambda taskId, cfgId, all: with_key_values(f"{TEMP_RUN_MAIN}/operationsIds/{urllib.parse.quote(str(taskId), safe='')}" if cfgId is None else f"{TEMP_RUN_MAIN}/operationsIds/{urllib.parse.quote(str(taskId), safe='')}/{urllib.parse.quote(str(cfgId), safe='')}", {"all": all})
 TEMP_RUN_STATUSES = lambda operationId: f"{TEMP_RUN_MAIN}/statuses/{urllib.parse.quote(str(operationId), safe='')}"
 TEMP_RUN_STATUS = lambda operationId, runId: f"{TEMP_RUN_MAIN}/statuses/{urllib.parse.quote(str(operationId), safe='')}/{urllib.parse.quote(str(runId), safe='')}"
+TEMP_RUN_OPERATION_RUN_INFO = lambda operationId, runId, logs: with_key_values(f"{TEMP_RUN_MAIN}/operationRunInfo/{urllib.parse.quote(str(operationId), safe='')}" if runId is None else f"{TEMP_RUN_MAIN}/operationsIds/{urllib.parse.quote(str(operationId), safe='')}/{urllib.parse.quote(str(runId), safe='')}", {"logs": logs})
 
 ## AdminController
 ADMIN_MAIN = f"{API_VERSION}/admin"

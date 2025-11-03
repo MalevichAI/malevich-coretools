@@ -14,6 +14,7 @@ from malevich_coretools.abstract.pipeline import (
     AdminRunsInfo,
     MainPipelineCfg,
     Pipeline,
+    RunInfo,
 )
 from malevich_coretools.funcs.checks import check_profile_mode
 from malevich_coretools.secondary import Config, model_from_json, show_logs_func
@@ -1160,6 +1161,22 @@ async def post_run_activeRuns_async(data: RunsFilter, *args, **kwargs) -> Union[
     return model_from_json(await send_to_core_modify_async(TEMP_RUN_ACTIVE_RUNS(None), data, *args, **kwargs), ResultTags if data.withTags else ResultIds)
 
 
+def get_run_allRuns(*args, **kwargs) -> ResultIds:
+    return model_from_json(send_to_core_get(TEMP_RUN_ALL_RUNS, *args, **kwargs), ResultIds)
+
+
+async def get_run_allRuns_async(*args, **kwargs) -> ResultIds:
+    return model_from_json(await send_to_core_get_async(TEMP_RUN_ALL_RUNS, *args, **kwargs), ResultIds)
+
+
+def post_run_allRuns(data: RunsFilter, *args, **kwargs) -> Union[ResultIds, ResultTags]:
+    return model_from_json(send_to_core_modify(TEMP_RUN_ALL_RUNS, data, *args, **kwargs), ResultTags if data.withTags else ResultIds)
+
+
+async def post_run_allRuns_async(data: RunsFilter, *args, **kwargs) -> Union[ResultIds, ResultTags]:
+    return model_from_json(await send_to_core_modify_async(TEMP_RUN_ALL_RUNS, data, *args, **kwargs), ResultTags if data.withTags else ResultIds)
+
+
 def get_run_mainTaskCfg(id: str, *args, **kwargs) -> MainTaskCfg:
     return model_from_json(send_to_core_get(TEMP_RUN_MAIN_TASK_CFG(id), *args, **kwargs), MainTaskCfg)
 
@@ -1176,12 +1193,12 @@ async def get_run_mainPipelineCfg_async(id: str, *args, **kwargs) -> MainPipelin
     return model_from_json(await send_to_core_get_async(TEMP_RUN_MAIN_PIPELINE_CFG(id), *args, **kwargs), MainPipelineCfg)
 
 
-def get_run_operationsIds(task_id: str, cfg_id: Optional[str]=None, *args, **kwargs) -> ResultIds:
-    return model_from_json(send_to_core_get(TEMP_RUN_OPERATIONS_IDS(task_id, cfg_id), *args, **kwargs), ResultIds)
+def get_run_operationsIds(task_id: str, cfg_id: Optional[str]=None, all: bool = False, *args, **kwargs) -> ResultIds:
+    return model_from_json(send_to_core_get(TEMP_RUN_OPERATIONS_IDS(task_id, cfg_id, all), *args, **kwargs), ResultIds)
 
 
-async def get_run_operationsIds_async(task_id: str, cfg_id: Optional[str]=None, *args, **kwargs) -> ResultIds:
-    return model_from_json(await send_to_core_get_async(TEMP_RUN_OPERATIONS_IDS(task_id, cfg_id), *args, **kwargs), ResultIds)
+async def get_run_operationsIds_async(task_id: str, cfg_id: Optional[str]=None, all: bool = False, *args, **kwargs) -> ResultIds:
+    return model_from_json(await send_to_core_get_async(TEMP_RUN_OPERATIONS_IDS(task_id, cfg_id, all), *args, **kwargs), ResultIds)
 
 
 def get_run_statuses(id: str, *args, **kwargs) -> Statuses:
@@ -1198,6 +1215,14 @@ def get_run_status(id: str, run_id: str, *args, **kwargs) -> str:
 
 async def get_run_status_async(id: str, run_id: str, *args, **kwargs) -> str:
     return await send_to_core_get_async(TEMP_RUN_STATUS(id, run_id), *args, **kwargs, is_text=True)
+
+
+def get_operation_run_info(id: str, run_id: Optional[str], logs: bool, *args, **kwargs) -> RunInfo:
+    return model_from_json(send_to_core_get(TEMP_RUN_OPERATION_RUN_INFO(id, run_id, logs), *args, **kwargs), RunInfo)
+
+
+async def get_operation_run_info_async(id: str, run_id: Optional[str], logs: bool, *args, **kwargs) -> RunInfo:
+    return model_from_json(await send_to_core_get_async(TEMP_RUN_OPERATION_RUN_INFO(id, run_id, logs), *args, **kwargs), RunInfo)
 
 
 # AdminController

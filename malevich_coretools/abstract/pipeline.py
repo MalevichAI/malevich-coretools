@@ -8,6 +8,7 @@ from malevich_coretools.abstract.abstract import (  # noqa: F401
     AdminRunInfo,
     Alias,
     JsonImage,
+    MainTaskCfg,
     Restrictions,
     ScaleInfo,
     Schedule,
@@ -210,3 +211,18 @@ class AdminRunPipelineInfo(BaseModel):
 class AdminRunsInfo(BaseModel):
     tasks: List[AdminRunInfo]
     pipelines: List[AdminRunPipelineInfo]
+
+
+class TaskRunInfo(BaseModel):
+    logs: str
+    results: Dict[str, str]
+
+
+class RunInfo(BaseModel):
+    jsonMainTask: Optional[MainTaskCfg] = None
+    jsonMainPipeline: Optional[MainPipelineCfg] = None
+    tags: Optional[Dict[str, str]] = None
+    cfgId: str
+    runs: Dict[str, str] = {}
+    info: Dict[str, TaskRunInfo] = {}
+    stopped: bool
