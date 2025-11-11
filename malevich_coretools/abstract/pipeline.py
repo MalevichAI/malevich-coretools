@@ -1,6 +1,6 @@
 import json
 from enum import IntEnum
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from pydantic import BaseModel
 
@@ -215,7 +215,8 @@ class AdminRunsInfo(BaseModel):
 
 class TaskRunInfo(BaseModel):
     logs: str
-    results: Dict[str, str]
+    inputs: Dict[str, Union[str, Dict[str, Any]]]   # collections from cfg
+    results: Dict[str, List[str]]                   # name -> collections list (1 collection common)
 
 
 class RunInfo(BaseModel):
