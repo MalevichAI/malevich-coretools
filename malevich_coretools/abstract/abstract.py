@@ -28,6 +28,10 @@ class Operation(BaseModel):
     operationId: Alias.Id
 
 
+class Tags(BaseModel):
+    data: List[str]
+
+
 class StopOperation(Operation):
     withLogs: bool = False
     infoUrl: Optional[str] = None

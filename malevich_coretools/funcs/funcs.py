@@ -971,20 +971,36 @@ async def get_userPipelines_realId_async(id: str, *args, **kwargs) -> Pipeline:
     return model_from_json(await send_to_core_get_async(USER_PIPELINES_REAL_ID(id), *args, **kwargs), Pipeline).simplify()
 
 
-def get_userPipelines_tagSearch(tag: str, *args, **kwargs) -> ResultIds:
-    return model_from_json(send_to_core_get(USER_PIPELINES_TAG(tag), *args, **kwargs), ResultIds)
+def get_userPipelines_imageTag(tag: str, *args, **kwargs) -> ResultIds:
+    return model_from_json(send_to_core_get(USER_PIPELINES_IMAGE_TAG(tag), *args, **kwargs), ResultIds)
 
 
-async def get_userPipelines_tagSearch_async(tag: str, *args, **kwargs) -> ResultIds:
-    return model_from_json(await send_to_core_get_async(USER_PIPELINES_TAG(tag), *args, **kwargs), ResultIds)
+async def get_userPipelines_imageTag_async(tag: str, *args, **kwargs) -> ResultIds:
+    return model_from_json(await send_to_core_get_async(USER_PIPELINES_IMAGE_TAG(tag), *args, **kwargs), ResultIds)
 
 
-def get_userPipelines_realIds_tagSearch(tag: str, *args, **kwargs) -> ResultIds:
-    return model_from_json(send_to_core_get(USER_PIPELINES_TAG_REAL_IDS(tag), *args, **kwargs), ResultIds)
+def get_userPipelines_realIds_imageTag(tag: str, *args, **kwargs) -> ResultIds:
+    return model_from_json(send_to_core_get(USER_PIPELINES_IMAGE_TAG_REAL_IDS(tag), *args, **kwargs), ResultIds)
 
 
-async def get_userPipelines_realIds_tagSearch_async(tag: str, *args, **kwargs) -> ResultIds:
-    return model_from_json(await send_to_core_get_async(USER_PIPELINES_TAG_REAL_IDS(tag), *args, **kwargs), ResultIds)
+async def get_userPipelines_realIds_imageTag_async(tag: str, *args, **kwargs) -> ResultIds:
+    return model_from_json(await send_to_core_get_async(USER_PIPELINES_IMAGE_TAG_REAL_IDS(tag), *args, **kwargs), ResultIds)
+
+
+def post_userPipelines_tags(data: Tags, *args, **kwargs) -> ResultIds:
+    return model_from_json(send_to_core_modify(USER_PIPELINES_TAGS(None), data, *args, **kwargs), ResultIds)
+
+
+async def post_userPipelines_tags_async(data: Tags, *args, **kwargs) -> ResultIds:
+    return model_from_json(await send_to_core_modify_async(USER_PIPELINES_TAGS(None), data, *args, **kwargs), ResultIds)
+
+
+def post_userPipelines_realIds_tags(data: Tags, *args, **kwargs) -> ResultIds:
+    return model_from_json(send_to_core_modify(USER_PIPELINES_TAGS_REAL_IDS(None), data, *args, **kwargs), ResultIds)
+
+
+async def post_userPipelines_realIds_tags_async(data: Tags, *args, **kwargs) -> ResultIds:
+    return model_from_json(await send_to_core_modify_async(USER_PIPELINES_TAGS_REAL_IDS(None), data, *args, **kwargs), ResultIds)
 
 
 def post_userPipelines(data: UserTask, wait: bool, *args, **kwargs) -> Alias.Id:
@@ -1017,6 +1033,15 @@ def delete_userPipelines_id(id: str, wait: bool, *args, **kwargs) -> Alias.Info:
 
 async def delete_userPipelines_id_async(id: str, wait: bool, *args, **kwargs) -> Alias.Info:
     return await send_to_core_modify_async(USER_PIPELINES_ID(id, wait), *args, **kwargs, is_post=False)
+
+
+def delete_userPipelines_tags(data: Tags, wait: bool, *args, **kwargs) -> Alias.Info:
+    return send_to_core_modify(USER_PIPELINES_TAGS(wait), data, *args, **kwargs, is_post=False)
+
+
+async def delete_userPipelines_tags_async(data: Tags, wait: bool, *args, **kwargs) -> Alias.Info:
+    return await send_to_core_modify_async(USER_PIPELINES_TAGS(wait), data, *args, **kwargs, is_post=False)
+
 
 # UserCfgsController
 

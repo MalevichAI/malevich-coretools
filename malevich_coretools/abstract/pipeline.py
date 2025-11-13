@@ -147,6 +147,7 @@ class Pipeline(BaseModel):
     conditions: Dict[str, Condition] = {}               # bindConditionId to Condition
     results: Dict[str, List[Result]] = {}               # bindProcessorId to results
     pullCollectionPolicy: PullCollectionPolicy = PullCollectionPolicy.IF_NOT_EXIST
+    tags: List[str] = []
 
     def internal(self) -> 'Pipeline':
         for proc in self.processors.values():

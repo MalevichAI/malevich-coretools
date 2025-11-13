@@ -5630,10 +5630,10 @@ def search_pipeline_by_image_tag(
     if batcher is None:
         batcher = Config.BATCHER
     if batcher is not None:
-        return batcher.add("getPipelinesByTag", vars={"tag": tag}, result_model=ResultIds)
+        return batcher.add("getPipelinesByImageTag", vars={"tag": tag}, result_model=ResultIds)
     if is_async:
-        return f.get_userPipelines_tagSearch_async(tag, auth=auth, conn_url=conn_url)
-    return f.get_userPipelines_tagSearch(tag, auth=auth, conn_url=conn_url)
+        return f.get_userPipelines_imageTag_async(tag, auth=auth, conn_url=conn_url)
+    return f.get_userPipelines_imageTag(tag, auth=auth, conn_url=conn_url)
 
 
 @overload
@@ -5672,10 +5672,98 @@ def search_pipeline_by_image_tag_real(
     if batcher is None:
         batcher = Config.BATCHER
     if batcher is not None:
-        return batcher.add("getPipelinesByTagReal", vars={"tag": tag}, result_model=ResultIds)
+        return batcher.add("getPipelinesByImageTagReal", vars={"tag": tag}, result_model=ResultIds)
     if is_async:
-        return f.get_userPipelines_realIds_tagSearch_async(tag, auth=auth, conn_url=conn_url)
-    return f.get_userPipelines_realIds_tagSearch(tag, auth=auth, conn_url=conn_url)
+        return f.get_userPipelines_realIds_imageTag_async(tag, auth=auth, conn_url=conn_url)
+    return f.get_userPipelines_realIds_imageTag(tag, auth=auth, conn_url=conn_url)
+
+
+@overload
+def search_pipeline_by_tags(
+    tags: List[str],
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False] = False,
+) -> ResultIds:
+    pass
+
+
+@overload
+def search_pipeline_by_tags(
+    tags: List[str],
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultIds]:
+    pass
+
+
+def search_pipeline_by_tags(
+    tags: List[str],
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: bool = False,
+) -> Union[ResultIds, Coroutine[Any, Any, ResultIds]]:
+    """return pipelines ids by `tags`"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = Tags(data=tags)
+    if batcher is not None:
+        return batcher.add("getPipelinesByTags", data=data, result_model=ResultIds)
+    if is_async:
+        return f.post_userPipelines_tags_async(data, auth=auth, conn_url=conn_url)
+    return f.post_userPipelines_tags(data, auth=auth, conn_url=conn_url)
+
+
+@overload
+def search_pipeline_by_tags_real(
+    tags: List[str],
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False] = False,
+) -> ResultIds:
+    pass
+
+
+@overload
+def search_pipeline_by_tags_real(
+    tags: List[str],
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, ResultIds]:
+    pass
+
+
+def search_pipeline_by_tags_real(
+    tags: List[str],
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: bool = False,
+) -> Union[ResultIds, Coroutine[Any, Any, ResultIds]]:
+    """return real pipelines ids by `tags`"""
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = Tags(data=tags)
+    if batcher is not None:
+        return batcher.add("getPipelinesByTagsReal", data=data, result_model=ResultIds)
+    if is_async:
+        return f.post_userPipelines_realIds_tags_async(data, auth=auth, conn_url=conn_url)
+    return f.post_userPipelines_realIds_tags(data, auth=auth, conn_url=conn_url)
+
+#
 
 
 @overload
@@ -5685,6 +5773,7 @@ def create_pipeline(
     conditions: Dict[str, Condition] = None,
     results: Dict[str, List[Result]] = None,
     pull_collection_policy: PullCollectionPolicy = PullCollectionPolicy.IF_NOT_EXIST,
+    tags: List[str] = None,
     wait: bool = True,
     *,
     auth: Optional[AUTH] = None,
@@ -5702,6 +5791,7 @@ def create_pipeline(
     conditions: Dict[str, Condition] = None,
     results: Dict[str, List[Result]] = None,
     pull_collection_policy: PullCollectionPolicy = PullCollectionPolicy.IF_NOT_EXIST,
+    tags: List[str] = None,
     wait: bool = True,
     *,
     auth: Optional[AUTH] = None,
@@ -5718,6 +5808,7 @@ def create_pipeline(
     conditions: Dict[str, Condition] = None,
     results: Dict[str, List[Result]] = None,
     pull_collection_policy: PullCollectionPolicy = PullCollectionPolicy.IF_NOT_EXIST,
+    tags: List[str] = None,
     wait: bool = True,
     *,
     auth: Optional[AUTH] = None,
@@ -5734,12 +5825,15 @@ def create_pipeline(
         conditions = {}
     if results is None:
         results = {}
+    if tags is None:
+        tags = []
     data = Pipeline(
         pipelineId=pipeline_id,
         processors=processors,
         conditions=conditions,
         results=results,
         pullCollectionPolicy=pull_collection_policy,
+        tags=tags,
     ).internal()
     if batcher is not None:
         return batcher.add("postPipeline", data=data)
@@ -5756,6 +5850,7 @@ def update_pipeline(
     conditions: Dict[str, Condition] = None,
     results: Dict[str, List[Result]] = None,
     pull_collection_policy: PullCollectionPolicy = PullCollectionPolicy.IF_NOT_EXIST,
+    tags: List[str] = None,
     wait: bool = True,
     *,
     auth: Optional[AUTH] = None,
@@ -5774,6 +5869,7 @@ def update_pipeline(
     conditions: Dict[str, Condition] = None,
     results: Dict[str, List[Result]] = None,
     pull_collection_policy: PullCollectionPolicy = PullCollectionPolicy.IF_NOT_EXIST,
+    tags: List[str] = None,
     wait: bool = True,
     *,
     auth: Optional[AUTH] = None,
@@ -5791,6 +5887,7 @@ def update_pipeline(
     conditions: Dict[str, Condition] = None,
     results: Dict[str, List[Result]] = None,
     pull_collection_policy: PullCollectionPolicy = PullCollectionPolicy.IF_NOT_EXIST,
+    tags: List[str] = None,
     wait: bool = True,
     *,
     auth: Optional[AUTH] = None,
@@ -5807,12 +5904,15 @@ def update_pipeline(
         conditions = {}
     if results is None:
         results = {}
+    if tags is None:
+        tags = []
     data = Pipeline(
         pipelineId=pipeline_id,
         processors=processors,
         conditions=conditions,
         results=results,
         pullCollectionPolicy=pull_collection_policy,
+        tags=tags,
     ).internal()
     if batcher is not None:
         return batcher.add("postPipelineById", data=data, vars={"id": id})
@@ -5906,6 +6006,52 @@ def delete_pipeline(
     if is_async:
         return f.delete_userPipelines_id_async(id, wait=wait, auth=auth, conn_url=conn_url)
     return f.delete_userPipelines_id(id, wait=wait, auth=auth, conn_url=conn_url)
+
+
+@overload
+def delete_pipelines_tags(
+    tags: List[str],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[False] = False,
+) -> Alias.Info:
+    pass
+
+
+@overload
+def delete_pipelines_tags(
+    tags: List[str],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: Literal[True],
+) -> Coroutine[Any, Any, Alias.Info]:
+    pass
+
+
+def delete_pipelines_tags(
+    tags: List[str],
+    wait: bool = True,
+    *,
+    auth: Optional[AUTH] = None,
+    conn_url: Optional[str] = None,
+    batcher: Optional[Batcher] = None,
+    is_async: bool = False,
+) -> Union[Alias.Info, Coroutine[Any, Any, Alias.Info]]:
+    """delete user pipeline by `tags` """
+    if batcher is None:
+        batcher = Config.BATCHER
+    data = Tags(data=tags)
+    if batcher is not None:
+        return batcher.add("deletePipelineByTags", data=data)
+    if is_async:
+        return f.delete_userPipelines_tags_async(data, wait=wait, auth=auth, conn_url=conn_url)
+    return f.delete_userPipelines_tags(data, wait=wait, auth=auth, conn_url=conn_url)
 
 
 # UserCfgs
